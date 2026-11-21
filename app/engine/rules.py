@@ -122,6 +122,26 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
                               "Click each app you don't use > Delete all connections"],
                     "link": "https://myaccount.google.com/connections"})
 
+    last_loc = [r for r in records if r.meta.get("source") == "last_known_location"]
+    if last_loc:
+        precise = any(r.meta.get("precise") for r in last_loc)
+        add(layer=2, title=f"Instagram stores your {'precise ' if precise else ''}last known location",
+            detail="Your export contains latitude and longitude for where you last used Instagram"
+                   + (" - accurate enough to identify a building." if precise else "."),
+            priority="high", category="location", platforms=sorted({r.platform for r in last_loc}),
+            metric={"value": len(last_loc), "unit": "locations"}, evidence=[r.id for r in last_loc],
+            action={"steps": ["Phone Settings > Apps > Instagram > Permissions > Location > Don't allow (or 'While using' + turn off Precise)",
+                              "Instagram > Settings > Accounts Center > Your information and permissions > review location history"],
+                    "link": IG_CENTER})
+    loi = [r for r in records if r.meta.get("source") == "location_of_interest"]
+    if loi:
+        add(layer=2, title=f"Instagram inferred {len(loi)} locations you're interested in",
+            detail="Places: " + ", ".join(r.meta["place"] for r in loi[:6]) + ". Used to target ads and suggestions.",
+            priority="medium", category="location", platforms=["instagram"],
+            metric={"value": len(loi), "unit": "places"}, evidence=[r.id for r in loi],
+            action={"steps": ["Instagram > Settings > Accounts Center > Ad preferences > Ad topics: hide places you don't want used",
+                              "Turn off location access for Instagram in phone settings"], "link": IG_CENTER})
+
     g_ips = [r for r in records if r.platform == "google" and r.category == "location" and r.meta.get("ip")]
     if g_ips:
         places = {r.meta["place"] for r in g_ips if r.meta.get("place")}

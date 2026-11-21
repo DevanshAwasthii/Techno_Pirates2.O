@@ -107,5 +107,36 @@ class DownloadWatcher:
         return ready
 
 
+def file_key(p: Path) -> str:
+    """Identity of one downloaded export: same name re-downloaded with new content counts as new."""
+    st = p.stat()
+    return f"{p.name}|{st.st_size}|{int(st.st_mtime)}"
+
+
+def recent_exports(folder: Path, imported: set[str], days: int = 7, now: float | None = None) -> list[tuple[str, Path]]:
+    """Finished exports downloaded in the last `days` that were never imported. Duplicate copies (same size) once."""
+    now = time.time() if now is None else now
+    out, sizes = [], set()
+    try:
+        entries = sorted(Path(folder).iterdir(), key=lambda p: p.name)
+    except OSError:
+        return out
+    for p in entries:
+        platform = matches(p.name)
+        if not platform or not p.is_file():
+            continue
+        try:
+            st = p.stat()
+        except OSError:
+            continue
+        if st.st_size == 0 or now - st.st_mtime > days * 86400 or file_key(p) in imported:
+            continue
+        if (platform, st.st_size) in sizes:  # 'takeout-x.zip' and 'takeout-x (1).zip' downloaded twice
+            continue
+        sizes.add((platform, st.st_size))
+        out.append((platform, p))
+    return out
+
+
 def downloads_folder() -> Path:
     return Path.home() / "Downloads"

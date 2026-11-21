@@ -3,17 +3,29 @@ import pytest
 import app.ui.main as ui
 
 
-@pytest.fixture
-def app(tmp_path, monkeypatch):
-    monkeypatch.setattr(ui, "SETTINGS", tmp_path / "settings.json")
-    monkeypatch.setattr(ui.NexDataApp, "scan_laptop", lambda self: None)  # no real scan in tests
+@pytest.fixture(scope="module")
+def shared_app():
+    # One Tk root per module: creating/destroying many Tk roots in one process makes Tcl fail intermittently on Windows.
+    mp = pytest.MonkeyPatch()
+    mp.setattr(ui.NexDataApp, "scan_laptop", lambda self: None)  # no real scan in tests
     a = ui.NexDataApp()
     a.withdraw()
-    a.calls = []
-    a.resolve_browser_locks = lambda confirmed=False: a.calls.append(confirmed)
     yield a
     a.closing = True
     a.destroy()
+    mp.undo()
+
+
+@pytest.fixture
+def app(shared_app, tmp_path, monkeypatch):
+    monkeypatch.setattr(ui, "SETTINGS", tmp_path / "settings.json")
+    a = shared_app
+    a.calls = []
+    a.auto_close_tried = False
+    a.loading = False
+    a.resolve_browser_locks = lambda confirmed=False: a.calls.append(confirmed)
+    monkeypatch.setattr(a, "ask_auto_close", lambda: False, raising=False)
+    return a
 
 
 def test_settings_roundtrip_and_corrupt_file(tmp_path, monkeypatch):

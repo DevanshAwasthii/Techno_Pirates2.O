@@ -18,7 +18,7 @@ from fpdf import FPDF
 
 import webbrowser
 
-from app.connect import PLATFORMS, DownloadWatcher, downloads_folder
+from app.connect import PLATFORMS, DownloadWatcher, downloads_folder, file_key, recent_exports
 from app.engine.coverage import STATUS_LABELS, coverage_rows, audit_is_partial, tracker_display, storage_display, chat_display
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -238,7 +238,9 @@ class NexDataApp(ctk.CTk):
         self.after(150, self.scan_laptop)
         self.watcher = DownloadWatcher(downloads_folder())
         self.auto_queue = []
+        self.recent_offered = False
         self.after(5000, self.poll_downloads)
+        self.after(4000, self.offer_recent_exports)
 
     def poll_downloads(self):
         """Import finished exports that land in Downloads while the app is open."""
@@ -248,10 +250,41 @@ class NexDataApp(ctk.CTk):
             self.auto_queue.append(path)
             self.status_label.configure(text=f"New {platform} export found in Downloads: {path.name}. Importing...")
         if self.auto_queue and not self.loading:
-            merged = list(dict.fromkeys([*map(str, self.loaded_paths), *map(str, self.auto_queue)]))
+            self.import_exports(self.auto_queue)
             self.auto_queue = []
-            self.load_paths(merged)
         self.after(5000, self.poll_downloads)
+
+    def import_exports(self, paths):
+        """Add exports to what is loaded, remember them so the startup offer never repeats them."""
+        settings = load_settings()
+        done = set(settings.get("imported", []))
+        for p in paths:
+            try:
+                done.add(file_key(Path(p)))
+            except OSError:
+                pass
+        save_settings({**settings, "imported": sorted(done)[-500:]})
+        self.load_paths(list(dict.fromkeys([*map(str, self.loaded_paths), *map(str, paths)])))
+
+    def offer_recent_exports(self):
+        """Once per launch: exports downloaded while NexData was closed are offered, never imported silently."""
+        if self.recent_offered or self.closing:
+            return
+        if self.loading:
+            self.after(1500, self.offer_recent_exports)
+            return
+        self.recent_offered = True
+        found = recent_exports(downloads_folder(), set(load_settings().get("imported", [])))
+        if not found:
+            return
+        listing = "\n".join(f"- {platform}: {p.name}" for platform, p in found)
+        if messagebox.askyesno("Exports found in Downloads",
+                               f"NexData found {len(found)} data export(s) downloaded in the last 7 days:\n\n{listing}\n\nImport them now?",
+                               parent=self):
+            self.import_exports([p for _, p in found])
+        else:  # don't ask again for these files
+            settings = load_settings()
+            save_settings({**settings, "imported": sorted(set(settings.get("imported", [])) | {file_key(p) for _, p in found})[-500:]})
 
     def open_connect(self):
         win = ctk.CTkToplevel(self)

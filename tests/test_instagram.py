@@ -72,7 +72,8 @@ def test_html_export_rejected(tmp_path):
     p = tmp_path / "ig.zip"
     p.write_bytes(_zip({"your_instagram_activity/likes/liked_posts.html": "<html></html>"}))
     r = pipeline.run([p])
-    assert r["errors"][0]["code"] == "html_export"
+    # HTML exports are now parsed (instagram_html); an HTML export with no readable data is reported, not crashed.
+    assert r["errors"][0]["code"] == "wrong_format"
 
 
 def test_corrupt_and_unknown_files_do_not_crash(tmp_path):

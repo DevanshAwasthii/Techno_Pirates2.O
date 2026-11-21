@@ -17,7 +17,7 @@ from app.engine.rules import build_findings, build_graph
 import shutil
 import tempfile
 
-from app.parsers import instagram, spotify, whatsapp, mbox, chrome, ocr, google_access, deviceScan, iosPrivacy
+from app.parsers import instagram, instagram_html, spotify, whatsapp, mbox, chrome, ocr, google_access, deviceScan, iosPrivacy
 
 TMP = Path(__file__).resolve().parents[1] / ".cache" / "tmp"  # stays on the project drive
 
@@ -64,7 +64,8 @@ def _detect_and_parse(path: Path, wa_offset: int = 0, warnings=None, source_cove
             raise ParseError("corrupt_zip", "This zip is damaged. Download it again.", path.name)
         with zf:
             if instagram.is_instagram_zip(zf):
-                recs, cov, _ = instagram.parse(zf, path.name)
+                parser = instagram_html if instagram_html.is_html_export(zf) else instagram
+                recs, cov, _ = parser.parse(zf, path.name)
                 return "instagram", recs, cov
             if spotify.is_spotify_zip(zf):
                 recs, cov = spotify.parse(zf, path.name)

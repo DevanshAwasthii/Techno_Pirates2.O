@@ -20,6 +20,8 @@ def scan_text(text: str) -> list[str]:
     """Return labels of sensitive data found in text. Each span counts once (longest pattern first)."""
     if not text:
         return []
+    # links carry long digit ids (reels, posts, tracking) that look like phone/card numbers; never scan inside them
+    text = re.sub(r"(?:https?://|www\.)\S+", " ", text)
     hits, taken = [], []
     for label, rx in PATTERNS.items():
         for m in rx.finditer(text):
