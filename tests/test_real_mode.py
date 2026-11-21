@@ -176,3 +176,17 @@ def test_first_party_browser_relationship_stays_with_its_profile(tmp_path):
     assert both["summary"]["trackersFound"] == 1
     # Both cookie records remain available as evidence.
     assert len([r for r in both["records"] if r["meta"].get("source") == "tracker"]) == 2
+
+
+def test_ui_root_follows_package_location():
+    import app.ui.main as ui
+    assert ui.ROOT == Path(ui.__file__).resolve().parents[2]
+
+
+def test_pdf_default_prefers_documents_and_falls_back_to_repo(tmp_path, monkeypatch):
+    from app.ui.main import default_report_path
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+    assert default_report_path() == ROOT / "NexData_report.pdf"
+    documents = tmp_path / "Documents"
+    documents.mkdir()
+    assert default_report_path() == documents / "NexData_report.pdf"

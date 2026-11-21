@@ -12,7 +12,8 @@
    "recordRef": "urls host=youtube.com",
    "meta": {
     "domain": "youtube.com",
-    "visits": 403
+    "visits": 403,
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -27,7 +28,8 @@
    "recordRef": "urls host=instagram.com",
    "meta": {
     "domain": "instagram.com",
-    "visits": 203
+    "visits": 203,
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -42,7 +44,8 @@
    "recordRef": "urls host=web.whatsapp.com",
    "meta": {
     "domain": "web.whatsapp.com",
-    "visits": 136
+    "visits": 136,
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -57,7 +60,8 @@
    "recordRef": "urls host=amazon.in",
    "meta": {
     "domain": "amazon.in",
-    "visits": 103
+    "visits": 103,
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -72,7 +76,8 @@
    "recordRef": "urls host=flipkart.com",
    "meta": {
     "domain": "flipkart.com",
-    "visits": 83
+    "visits": 83,
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -87,7 +92,8 @@
    "recordRef": "urls host=zomato.com",
    "meta": {
     "domain": "zomato.com",
-    "visits": 69
+    "visits": 69,
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -102,7 +108,8 @@
    "recordRef": "urls host=chatgpt.com",
    "meta": {
     "domain": "chatgpt.com",
-    "visits": 60
+    "visits": 60,
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -117,7 +124,8 @@
    "recordRef": "urls host=geeksforgeeks.org",
    "meta": {
     "domain": "geeksforgeeks.org",
-    "visits": 53
+    "visits": 53,
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -132,7 +140,8 @@
    "recordRef": "urls host=github.com",
    "meta": {
     "domain": "github.com",
-    "visits": 47
+    "visits": 47,
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -147,7 +156,8 @@
    "recordRef": "urls host=cricbuzz.com",
    "meta": {
     "domain": "cricbuzz.com",
-    "visits": 43
+    "visits": 43,
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -162,7 +172,8 @@
    "recordRef": "urls host=myntra.com",
    "meta": {
     "domain": "myntra.com",
-    "visits": 39
+    "visits": 39,
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -177,7 +188,8 @@
    "recordRef": "urls host=practo.com",
    "meta": {
     "domain": "practo.com",
-    "visits": 36
+    "visits": 36,
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -192,7 +204,8 @@
    "recordRef": "urls host=irctc.co.in",
    "meta": {
     "domain": "irctc.co.in",
-    "visits": 33
+    "visits": 33,
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -207,7 +220,8 @@
    "recordRef": "urls host=naukri.com",
    "meta": {
     "domain": "naukri.com",
-    "visits": 31
+    "visits": 31,
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -222,7 +236,8 @@
    "recordRef": "downloads",
    "meta": {
     "domain": "uidai.gov.in",
-    "action": "download"
+    "action": "download",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -237,7 +252,8 @@
    "recordRef": "downloads",
    "meta": {
     "domain": "docs.google.com",
-    "action": "download"
+    "action": "download",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -252,7 +268,8 @@
    "recordRef": "cookies host_key in ['.adnxs.com']",
    "meta": {
     "domain": "adnxs.com",
-    "source": "tracker"
+    "source": "tracker",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -267,7 +284,8 @@
    "recordRef": "cookies host_key in ['.amazon-adsystem.com']",
    "meta": {
     "domain": "amazon-adsystem.com",
-    "source": "tracker"
+    "source": "tracker",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -282,7 +300,8 @@
    "recordRef": "cookies host_key in ['.clarity.ms']",
    "meta": {
     "domain": "clarity.ms",
-    "source": "tracker"
+    "source": "tracker",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -297,7 +316,8 @@
    "recordRef": "cookies host_key in ['.criteo.com']",
    "meta": {
     "domain": "criteo.com",
-    "source": "tracker"
+    "source": "tracker",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -312,7 +332,8 @@
    "recordRef": "cookies host_key in ['.doubleclick.net']",
    "meta": {
     "domain": "doubleclick.net",
-    "source": "tracker"
+    "source": "tracker",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -327,7 +348,8 @@
    "recordRef": "cookies host_key in ['.facebook.com']",
    "meta": {
     "domain": "facebook.com",
-    "source": "tracker"
+    "source": "tracker",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -342,7 +364,8 @@
    "recordRef": "cookies host_key in ['.google-analytics.com']",
    "meta": {
     "domain": "google-analytics.com",
-    "source": "tracker"
+    "source": "tracker",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -357,7 +380,8 @@
    "recordRef": "cookies host_key in ['.linkedin.com']",
    "meta": {
     "domain": "linkedin.com",
-    "source": "tracker"
+    "source": "tracker",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -372,7 +396,8 @@
    "recordRef": "cookies host_key in ['.pubmatic.com']",
    "meta": {
     "domain": "pubmatic.com",
-    "source": "tracker"
+    "source": "tracker",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -387,7 +412,8 @@
    "recordRef": "cookies host_key in ['.scorecardresearch.com']",
    "meta": {
     "domain": "scorecardresearch.com",
-    "source": "tracker"
+    "source": "tracker",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -402,7 +428,8 @@
    "recordRef": "cookies host_key in ['.taboola.com']",
    "meta": {
     "domain": "taboola.com",
-    "source": "tracker"
+    "source": "tracker",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -417,7 +444,8 @@
    "recordRef": "cookies host_key in ['.tiktok.com']",
    "meta": {
     "domain": "tiktok.com",
-    "source": "tracker"
+    "source": "tracker",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -433,7 +461,8 @@
    "meta": {
     "domain": "flipkart.com",
     "source": "session_replay",
-    "vendor": "LogRocket"
+    "vendor": "LogRocket",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -449,7 +478,8 @@
    "meta": {
     "domain": "myntra.com",
     "source": "session_replay",
-    "vendor": "Hotjar"
+    "vendor": "Hotjar",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -465,7 +495,8 @@
    "meta": {
     "domain": "naukri.com",
     "source": "session_replay",
-    "vendor": "Microsoft Clarity"
+    "vendor": "Microsoft Clarity",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -481,7 +512,8 @@
    "meta": {
     "domain": "practo.com",
     "source": "session_replay",
-    "vendor": "Hotjar"
+    "vendor": "Hotjar",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -497,7 +529,8 @@
    "meta": {
     "domain": "shop.lenskart.com",
     "source": "session_replay",
-    "vendor": "FullStory"
+    "vendor": "FullStory",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -513,7 +546,8 @@
    "meta": {
     "domain": "zomato.com",
     "source": "session_replay",
-    "vendor": "Microsoft Clarity"
+    "vendor": "Microsoft Clarity",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -528,7 +562,8 @@
    "recordRef": "logins origin_url",
    "meta": {
     "domain": "zomato.com",
-    "source": "saved_login"
+    "source": "saved_login",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -543,7 +578,8 @@
    "recordRef": "logins origin_url",
    "meta": {
     "domain": "irctc.co.in",
-    "source": "saved_login"
+    "source": "saved_login",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -558,7 +594,8 @@
    "recordRef": "logins origin_url",
    "meta": {
     "domain": "instagram.com",
-    "source": "saved_login"
+    "source": "saved_login",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -573,7 +610,8 @@
    "recordRef": "logins origin_url",
    "meta": {
     "domain": "naukri.com",
-    "source": "saved_login"
+    "source": "saved_login",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -588,7 +626,8 @@
    "recordRef": "logins origin_url",
    "meta": {
     "domain": "oldgamesite.net",
-    "source": "saved_login"
+    "source": "saved_login",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -603,7 +642,8 @@
    "recordRef": "logins origin_url",
    "meta": {
     "domain": "coursera.org",
-    "source": "saved_login"
+    "source": "saved_login",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -618,7 +658,8 @@
    "recordRef": "content_settings.geolocation",
    "meta": {
     "domain": "zomato.com",
-    "permission": "location"
+    "permission": "location",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -633,7 +674,8 @@
    "recordRef": "content_settings.geolocation",
    "meta": {
     "domain": "swiggy.com",
-    "permission": "location"
+    "permission": "location",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -648,7 +690,8 @@
    "recordRef": "content_settings.geolocation",
    "meta": {
     "domain": "maps.google.com",
-    "permission": "location"
+    "permission": "location",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -663,7 +706,8 @@
    "recordRef": "content_settings.geolocation",
    "meta": {
     "domain": "randomquiz.io",
-    "permission": "location"
+    "permission": "location",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -678,7 +722,8 @@
    "recordRef": "content_settings.media_stream_camera",
    "meta": {
     "domain": "meet.google.com",
-    "permission": "camera"
+    "permission": "camera",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -693,7 +738,8 @@
    "recordRef": "content_settings.media_stream_camera",
    "meta": {
     "domain": "omegle-clone.xyz",
-    "permission": "camera"
+    "permission": "camera",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -708,7 +754,8 @@
    "recordRef": "content_settings.media_stream_mic",
    "meta": {
     "domain": "meet.google.com",
-    "permission": "microphone"
+    "permission": "microphone",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -723,7 +770,8 @@
    "recordRef": "content_settings.notifications",
    "meta": {
     "domain": "cricbuzz.com",
-    "permission": "notifications"
+    "permission": "notifications",
+    "profile_id": "persona_chrome.zip/Default"
    }
   },
   {
@@ -12841,7 +12889,7 @@
    }
   },
   {
-   "id": "oc-in-00001",
+   "id": "oc-in-b0588b-00001",
    "platform": "instagram",
    "category": "activity",
    "item": "Feed showed: liked by arjun.das and 214 others",
@@ -12858,7 +12906,7 @@
    }
   },
   {
-   "id": "oc-in-00002",
+   "id": "oc-in-b0588b-00002",
    "platform": "instagram",
    "category": "activity",
    "item": "Feed showed: meera_k liked a post",
@@ -12874,7 +12922,7 @@
    }
   },
   {
-   "id": "oc-in-00003",
+   "id": "oc-in-b0588b-00003",
    "platform": "instagram",
    "category": "activity",
    "item": "Feed showed: rahul.k reacted to a post",
@@ -12890,7 +12938,7 @@
    }
   },
   {
-   "id": "oc-in-00004",
+   "id": "oc-in-b0588b-00004",
    "platform": "instagram",
    "category": "activity",
    "item": "Feed showed: liked by arjun.das and 87 others",
@@ -12907,7 +12955,7 @@
    }
   },
   {
-   "id": "oc-wh-00001",
+   "id": "oc-wh-9698b2-00001",
    "platform": "whatsapp",
    "category": "activity",
    "item": "Arjun Das posted a status (Today. 9:12 pm)",
@@ -12923,7 +12971,7 @@
    }
   },
   {
-   "id": "oc-wh-00002",
+   "id": "oc-wh-9698b2-00002",
    "platform": "whatsapp",
    "category": "activity",
    "item": "Meera K posted a status (Today. 9:13 pm)",
@@ -12939,7 +12987,7 @@
    }
   },
   {
-   "id": "oc-wh-00003",
+   "id": "oc-wh-9698b2-00003",
    "platform": "whatsapp",
    "category": "activity",
    "item": "Kabir Roy posted a status (Today. 9:14 pm)",
@@ -12955,7 +13003,7 @@
    }
   },
   {
-   "id": "oc-wh-00004",
+   "id": "oc-wh-9698b2-00004",
    "platform": "whatsapp",
    "category": "activity",
    "item": "Tanvi M posted a status (Today, 9:15 pm)",
@@ -12971,7 +13019,7 @@
    }
   },
   {
-   "id": "oc-wh-00005",
+   "id": "oc-wh-9698b2-00005",
    "platform": "whatsapp",
    "category": "activity",
    "item": "Ishaan G posted a status (Today, 9:16 pm)",
@@ -12987,7 +13035,7 @@
    }
   },
   {
-   "id": "oc-wh-00006",
+   "id": "oc-wh-9698b2-00006",
    "platform": "whatsapp",
    "category": "activity",
    "item": "Pooja S posted a status (Today, 9:17 pm)",
@@ -13003,7 +13051,7 @@
    }
   },
   {
-   "id": "oc-wh-00007",
+   "id": "oc-wh-9698b2-00007",
    "platform": "whatsapp",
    "category": "activity",
    "item": "Arjun Das viewed your status (Today. 9:12 pm)",
@@ -13019,7 +13067,7 @@
    }
   },
   {
-   "id": "oc-wh-00008",
+   "id": "oc-wh-9698b2-00008",
    "platform": "whatsapp",
    "category": "activity",
    "item": "Meera K viewed your status (Today. 9:13 pm)",
@@ -13035,7 +13083,7 @@
    }
   },
   {
-   "id": "oc-wh-00009",
+   "id": "oc-wh-9698b2-00009",
    "platform": "whatsapp",
    "category": "activity",
    "item": "Kabir Roy viewed your status (Today, 9:14 pm)",
@@ -13051,7 +13099,7 @@
    }
   },
   {
-   "id": "oc-wh-00010",
+   "id": "oc-wh-9698b2-00010",
    "platform": "whatsapp",
    "category": "activity",
    "item": "Tanvi M viewed your status (Today. 9:15 pm)",
@@ -13067,7 +13115,7 @@
    }
   },
   {
-   "id": "oc-wh-00011",
+   "id": "oc-wh-9698b2-00011",
    "platform": "whatsapp",
    "category": "activity",
    "item": "Ishaan G viewed your status (Today, 9:16 pm)",
@@ -13083,7 +13131,7 @@
    }
   },
   {
-   "id": "oc-wh-00012",
+   "id": "oc-wh-9698b2-00012",
    "platform": "whatsapp",
    "category": "activity",
    "item": "Pooja S viewed your status (Today, 9:17 pm)",
@@ -13099,7 +13147,7 @@
    }
   },
   {
-   "id": "oc-wh-00013",
+   "id": "oc-wh-9698b2-00013",
    "platform": "whatsapp",
    "category": "activity",
    "item": "Your status was viewed by 6 people",
@@ -13689,7 +13737,7 @@
   {
    "id": "F-019",
    "layer": 1,
-   "title": "12 ad and analytics companies track you across sites",
+   "title": "11 ad and analytics companies track you across sites",
    "detail": "Their cookies let them follow you from site to site and build an advertising profile.",
    "priority": "medium",
    "category": "activity",
@@ -13697,7 +13745,7 @@
     "chrome"
    ],
    "metric": {
-    "value": 12,
+    "value": 11,
     "unit": "trackers"
    },
    "evidence": [
@@ -13708,7 +13756,6 @@
     "ch-acco-00021",
     "ch-acco-00022",
     "ch-acco-00023",
-    "ch-acco-00024",
     "ch-acco-00025",
     "ch-acco-00026",
     "ch-acco-00027",
@@ -13857,12 +13904,12 @@
     "unit": "people"
    },
    "evidence": [
-    "oc-wh-00007",
-    "oc-wh-00008",
-    "oc-wh-00009",
-    "oc-wh-00010",
-    "oc-wh-00011",
-    "oc-wh-00012"
+    "oc-wh-9698b2-00007",
+    "oc-wh-9698b2-00008",
+    "oc-wh-9698b2-00009",
+    "oc-wh-9698b2-00010",
+    "oc-wh-9698b2-00011",
+    "oc-wh-9698b2-00012"
    ],
    "action": {
     "steps": [
@@ -14061,10 +14108,10 @@
     "unit": "friends"
    },
    "evidence": [
-    "oc-in-00001",
-    "oc-in-00002",
-    "oc-in-00003",
-    "oc-in-00004"
+    "oc-in-b0588b-00001",
+    "oc-in-b0588b-00002",
+    "oc-in-b0588b-00003",
+    "oc-in-b0588b-00004"
    ],
    "action": {
     "steps": [
@@ -14184,8 +14231,8 @@
   }
  },
  "summary": {
-  "servicesFound": 68,
-  "trackersFound": 12,
+  "servicesFound": 53,
+  "trackersFound": 11,
   "sessionRecorders": 6,
   "topPeople": [
    {
@@ -14295,1620 +14342,938 @@
     "id": "user",
     "label": "You",
     "type": "user",
-    "size": 40
-   },
-   {
-    "id": "svc:adnxs.com",
-    "label": "adnxs.com",
-    "type": "tracker",
-    "size": 10
-   },
-   {
-    "id": "svc:amazon-adsystem.com",
-    "label": "amazon-adsystem.com",
-    "type": "tracker",
-    "size": 10
-   },
-   {
-    "id": "svc:clarity.ms",
-    "label": "clarity.ms",
-    "type": "tracker",
-    "size": 10
-   },
-   {
-    "id": "svc:criteo.com",
-    "label": "criteo.com",
-    "type": "tracker",
-    "size": 10
-   },
-   {
-    "id": "svc:doubleclick.net",
-    "label": "doubleclick.net",
-    "type": "tracker",
-    "size": 10
-   },
-   {
-    "id": "svc:facebook.com",
-    "label": "facebook.com",
-    "type": "tracker",
-    "size": 10
-   },
-   {
-    "id": "svc:google-analytics.com",
-    "label": "google-analytics.com",
-    "type": "tracker",
-    "size": 10
-   },
-   {
-    "id": "svc:linkedin.com",
-    "label": "linkedin.com",
-    "type": "tracker",
-    "size": 10
-   },
-   {
-    "id": "svc:pubmatic.com",
-    "label": "pubmatic.com",
-    "type": "tracker",
-    "size": 10
-   },
-   {
-    "id": "svc:scorecardresearch.com",
-    "label": "scorecardresearch.com",
-    "type": "tracker",
-    "size": 10
-   },
-   {
-    "id": "svc:taboola.com",
-    "label": "taboola.com",
-    "type": "tracker",
-    "size": 10
-   },
-   {
-    "id": "svc:tiktok.com",
-    "label": "tiktok.com",
-    "type": "tracker",
-    "size": 10
-   },
-   {
-    "id": "svc:flipkart.com",
-    "label": "flipkart.com",
-    "type": "tracker",
-    "size": 10
-   },
-   {
-    "id": "svc:myntra.com",
-    "label": "myntra.com",
-    "type": "tracker",
-    "size": 10
-   },
-   {
-    "id": "svc:naukri.com",
-    "label": "naukri.com",
-    "type": "tracker",
-    "size": 10
-   },
-   {
-    "id": "svc:practo.com",
-    "label": "practo.com",
-    "type": "tracker",
-    "size": 10
-   },
-   {
-    "id": "svc:shop.lenskart.com",
-    "label": "shop.lenskart.com",
-    "type": "tracker",
-    "size": 10
-   },
-   {
-    "id": "svc:zomato.com",
-    "label": "zomato.com",
-    "type": "tracker",
-    "size": 10
-   },
-   {
-    "id": "svc:irctc.co.in",
-    "label": "irctc.co.in",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:instagram.com",
-    "label": "instagram.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:oldgamesite.net",
-    "label": "oldgamesite.net",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:coursera.org",
-    "label": "coursera.org",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:swiggy.in",
-    "label": "swiggy.in",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:paytm.com",
-    "label": "paytm.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:olx.in",
-    "label": "olx.in",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:dream11.com",
-    "label": "dream11.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:canva.com",
-    "label": "canva.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:duolingo.com",
-    "label": "duolingo.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:unacademy.com",
-    "label": "unacademy.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:lenskart.com",
-    "label": "lenskart.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:bookmyshow.com",
-    "label": "bookmyshow.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:uber.com",
-    "label": "uber.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:rapido.bike",
-    "label": "rapido.bike",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:cred.club",
-    "label": "cred.club",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:spotify.com",
-    "label": "spotify.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:discord.com",
-    "label": "discord.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:pinterest.com",
-    "label": "pinterest.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:shein.com",
-    "label": "shein.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:truecaller.com",
-    "label": "truecaller.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:byjus.com",
-    "label": "byjus.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:meesho.com",
-    "label": "meesho.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:hdfcbank.net",
-    "label": "hdfcbank.net",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:amazon.in",
-    "label": "amazon.in",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:makemytrip.com",
-    "label": "makemytrip.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:netflix.com",
-    "label": "netflix.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:reddit.com",
-    "label": "reddit.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:quora.com",
-    "label": "quora.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:zeptonow.com",
-    "label": "zeptonow.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:olacabs.com",
-    "label": "olacabs.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:hotstar.com",
-    "label": "hotstar.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:udemy.com",
-    "label": "udemy.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:grammarly.com",
-    "label": "grammarly.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:phonepe.com",
-    "label": "phonepe.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:desiforum.co.in",
-    "label": "desiforum.co.in",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:medium.com",
-    "label": "medium.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:zeptocafe.in",
-    "label": "zeptocafe.in",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:Truecaller",
-    "label": "Truecaller",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:Canva",
-    "label": "Canva",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:QuizMaster Pro",
-    "label": "QuizMaster Pro",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:thehindu.co.in",
-    "label": "thehindu.co.in",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:producthunt.com",
-    "label": "producthunt.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:Myntra",
-    "label": "Myntra",
-    "type": "advertiser",
-    "size": 10
-   },
-   {
-    "id": "svc:Swiggy",
-    "label": "Swiggy",
-    "type": "advertiser",
-    "size": 10
-   },
-   {
-    "id": "svc:Nykaa",
-    "label": "Nykaa",
-    "type": "advertiser",
-    "size": 10
-   },
-   {
-    "id": "svc:Byju's",
-    "label": "Byju's",
-    "type": "advertiser",
-    "size": 10
-   },
-   {
-    "id": "svc:MakeMyTrip",
-    "label": "MakeMyTrip",
-    "type": "advertiser",
-    "size": 10
-   },
-   {
-    "id": "svc:Meesho",
-    "label": "Meesho",
-    "type": "advertiser",
-    "size": 10
-   },
-   {
-    "id": "svc:Unacademy",
-    "label": "Unacademy",
-    "type": "advertiser",
-    "size": 10
-   },
-   {
-    "id": "svc:Ajio",
-    "label": "Ajio",
-    "type": "advertiser",
-    "size": 10
-   },
-   {
-    "id": "svc:Zomato",
-    "label": "Zomato",
-    "type": "advertiser",
-    "size": 10
-   },
-   {
-    "id": "svc:Flipkart",
-    "label": "Flipkart",
-    "type": "advertiser",
-    "size": 10
-   },
-   {
-    "id": "svc:Tata CLiQ",
-    "label": "Tata CLiQ",
-    "type": "advertiser",
-    "size": 10
-   },
-   {
-    "id": "svc:Lenskart",
-    "label": "Lenskart",
-    "type": "advertiser",
-    "size": 10
-   },
-   {
-    "id": "svc:boAt",
-    "label": "boAt",
-    "type": "advertiser",
-    "size": 10
-   },
-   {
-    "id": "svc:Mamaearth",
-    "label": "Mamaearth",
-    "type": "advertiser",
-    "size": 10
-   },
-   {
-    "id": "svc:PhysicsWallah",
-    "label": "PhysicsWallah",
-    "type": "advertiser",
-    "size": 10
-   },
-   {
-    "id": "svc:swiggy.com",
-    "label": "swiggy.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:nykaa.com",
-    "label": "nykaa.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:hdfcbank.com",
-    "label": "hdfcbank.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:ajio.com",
-    "label": "ajio.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "person:meera_k",
-    "label": "meera_k",
-    "type": "person",
-    "size": 40
-   },
-   {
-    "id": "person:arjun.das",
-    "label": "arjun.das",
-    "type": "person",
-    "size": 40
-   },
-   {
-    "id": "person:rahul.k",
-    "label": "rahul.k",
-    "type": "person",
-    "size": 40
-   },
-   {
-    "id": "person:tanvi.m",
-    "label": "tanvi.m",
-    "type": "person",
-    "size": 40
-   },
-   {
-    "id": "person:ishaan_g",
-    "label": "ishaan_g",
-    "type": "person",
-    "size": 40
-   },
-   {
-    "id": "person:kabir.roy",
-    "label": "kabir.roy",
-    "type": "person",
-    "size": 40
-   },
-   {
-    "id": "person:pooja.s",
-    "label": "pooja.s",
-    "type": "person",
-    "size": 40
-   },
-   {
-    "id": "person:sneha.b",
-    "label": "sneha.b",
-    "type": "person",
-    "size": 38
-   },
-   {
-    "id": "person:kolkata.foodies",
-    "label": "kolkata.foodies",
-    "type": "person",
-    "size": 32
-   },
-   {
-    "id": "person:zomato",
-    "label": "zomato",
-    "type": "person",
-    "size": 26
+    "size": 1
+   },
+   {
+    "id": "cluster:Trackers & ads",
+    "label": "Trackers & ads",
+    "type": "cluster",
+    "size": 15,
+    "services": [
+     {
+      "id": "svc:adnxs",
+      "label": "adnxs",
+      "type": "tracker",
+      "evidence": [
+       "ch-acco-00017"
+      ]
+     },
+     {
+      "id": "svc:amazonadsystem",
+      "label": "amazonadsystem",
+      "type": "tracker",
+      "evidence": [
+       "ch-acco-00018"
+      ]
+     },
+     {
+      "id": "svc:boat",
+      "label": "boat",
+      "type": "advertiser",
+      "evidence": [
+       "ig-acco-00311"
+      ]
+     },
+     {
+      "id": "svc:clarity",
+      "label": "clarity",
+      "type": "tracker",
+      "evidence": [
+       "ch-acco-00019"
+      ]
+     },
+     {
+      "id": "svc:criteo",
+      "label": "criteo",
+      "type": "tracker",
+      "evidence": [
+       "ch-acco-00020"
+      ]
+     },
+     {
+      "id": "svc:doubleclick",
+      "label": "doubleclick",
+      "type": "tracker",
+      "evidence": [
+       "ch-acco-00021"
+      ]
+     },
+     {
+      "id": "svc:facebook",
+      "label": "facebook",
+      "type": "tracker",
+      "evidence": [
+       "ch-acco-00022"
+      ]
+     },
+     {
+      "id": "svc:googleanalytics",
+      "label": "googleanalytics",
+      "type": "tracker",
+      "evidence": [
+       "ch-acco-00023"
+      ]
+     },
+     {
+      "id": "svc:mamaearth",
+      "label": "mamaearth",
+      "type": "advertiser",
+      "evidence": [
+       "ig-acco-00312"
+      ]
+     },
+     {
+      "id": "svc:physicswallah",
+      "label": "physicswallah",
+      "type": "advertiser",
+      "evidence": [
+       "ig-acco-00313"
+      ]
+     },
+     {
+      "id": "svc:pubmatic",
+      "label": "pubmatic",
+      "type": "tracker",
+      "evidence": [
+       "ch-acco-00025"
+      ]
+     },
+     {
+      "id": "svc:scorecardresearch",
+      "label": "scorecardresearch",
+      "type": "tracker",
+      "evidence": [
+       "ch-acco-00026"
+      ]
+     },
+     {
+      "id": "svc:taboola",
+      "label": "taboola",
+      "type": "tracker",
+      "evidence": [
+       "ch-acco-00027"
+      ]
+     },
+     {
+      "id": "svc:tatacliq",
+      "label": "tatacliq",
+      "type": "advertiser",
+      "evidence": [
+       "ig-acco-00309"
+      ]
+     },
+     {
+      "id": "svc:tiktok",
+      "label": "tiktok",
+      "type": "tracker",
+      "evidence": [
+       "ch-acco-00028"
+      ]
+     }
+    ]
+   },
+   {
+    "id": "cluster:Shopping",
+    "label": "Shopping",
+    "type": "cluster",
+    "size": 6,
+    "services": [
+     {
+      "id": "svc:ajio",
+      "label": "ajio",
+      "type": "service",
+      "evidence": [
+       "ig-acco-00306",
+       "ig-acco-00329"
+      ]
+     },
+     {
+      "id": "svc:amazon",
+      "label": "amazon",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00028",
+       "ig-acco-00314"
+      ]
+     },
+     {
+      "id": "svc:flipkart",
+      "label": "flipkart",
+      "type": "service",
+      "evidence": [
+       "ch-acco-00029",
+       "gm-acco-00029",
+       "ig-acco-00308",
+       "ig-acco-00315"
+      ]
+     },
+     {
+      "id": "svc:meesho",
+      "label": "meesho",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00026",
+       "ig-acco-00304",
+       "ig-acco-00330"
+      ]
+     },
+     {
+      "id": "svc:myntra",
+      "label": "myntra",
+      "type": "service",
+      "evidence": [
+       "ch-acco-00030",
+       "gm-acco-00003",
+       "ig-acco-00299",
+       "ig-acco-00318"
+      ]
+     },
+     {
+      "id": "svc:nykaa",
+      "label": "nykaa",
+      "type": "service",
+      "evidence": [
+       "ig-acco-00301",
+       "ig-acco-00321"
+      ]
+     }
+    ]
+   },
+   {
+    "id": "cluster:Other",
+    "label": "Other",
+    "type": "cluster",
+    "size": 17,
+    "services": [
+     {
+      "id": "svc:bookmyshow",
+      "label": "bookmyshow",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00015",
+       "ig-acco-00320"
+      ]
+     },
+     {
+      "id": "svc:canva",
+      "label": "canva",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00010",
+       "gm-acco-00046"
+      ]
+     },
+     {
+      "id": "svc:desiforum",
+      "label": "desiforum",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00041"
+      ]
+     },
+     {
+      "id": "svc:dream11",
+      "label": "dream11",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00009",
+       "ig-acco-00333"
+      ]
+     },
+     {
+      "id": "svc:grammarly",
+      "label": "grammarly",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00039"
+      ]
+     },
+     {
+      "id": "svc:hotstar",
+      "label": "hotstar",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00037"
+      ]
+     },
+     {
+      "id": "svc:lenskart",
+      "label": "lenskart",
+      "type": "service",
+      "evidence": [
+       "ch-acco-00033",
+       "gm-acco-00014",
+       "ig-acco-00310",
+       "ig-acco-00328"
+      ]
+     },
+     {
+      "id": "svc:medium",
+      "label": "medium",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00042"
+      ]
+     },
+     {
+      "id": "svc:netflix",
+      "label": "netflix",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00031"
+      ]
+     },
+     {
+      "id": "svc:oldgamesite",
+      "label": "oldgamesite",
+      "type": "service",
+      "evidence": [
+       "ch-acco-00039"
+      ]
+     },
+     {
+      "id": "svc:olx",
+      "label": "olx",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00008",
+       "ig-acco-00323"
+      ]
+     },
+     {
+      "id": "svc:practo",
+      "label": "practo",
+      "type": "service",
+      "evidence": [
+       "ch-acco-00032",
+       "gm-acco-00007",
+       "ig-acco-00322"
+      ]
+     },
+     {
+      "id": "svc:producthunt",
+      "label": "producthunt",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00049"
+      ]
+     },
+     {
+      "id": "svc:quora",
+      "label": "quora",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00034"
+      ]
+     },
+     {
+      "id": "svc:shein",
+      "label": "shein",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00023"
+      ]
+     },
+     {
+      "id": "svc:spotify",
+      "label": "spotify",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00020",
+       "ig-acco-00336"
+      ]
+     },
+     {
+      "id": "svc:thehindu",
+      "label": "thehindu",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00048"
+      ]
+     }
+    ]
+   },
+   {
+    "id": "cluster:Education & jobs",
+    "label": "Education & jobs",
+    "type": "cluster",
+    "size": 7,
+    "services": [
+     {
+      "id": "svc:byjus",
+      "label": "byjus",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00025",
+       "ig-acco-00302"
+      ]
+     },
+     {
+      "id": "svc:coursera",
+      "label": "coursera",
+      "type": "service",
+      "evidence": [
+       "ch-acco-00040",
+       "gm-acco-00012"
+      ]
+     },
+     {
+      "id": "svc:duolingo",
+      "label": "duolingo",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00011"
+      ]
+     },
+     {
+      "id": "svc:naukri",
+      "label": "naukri",
+      "type": "service",
+      "evidence": [
+       "ch-acco-00031",
+       "ch-acco-00038",
+       "gm-acco-00006",
+       "ig-acco-00324"
+      ]
+     },
+     {
+      "id": "svc:quizmasterpro",
+      "label": "quizmasterpro",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00047"
+      ]
+     },
+     {
+      "id": "svc:udemy",
+      "label": "udemy",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00038"
+      ]
+     },
+     {
+      "id": "svc:unacademy",
+      "label": "unacademy",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00013",
+       "ig-acco-00305",
+       "ig-acco-00331"
+      ]
+     }
+    ]
+   },
+   {
+    "id": "cluster:Finance & payments",
+    "label": "Finance & payments",
+    "type": "cluster",
+    "size": 4,
+    "services": [
+     {
+      "id": "svc:cred",
+      "label": "cred",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00018",
+       "ig-acco-00332"
+      ]
+     },
+     {
+      "id": "svc:hdfcbank",
+      "label": "hdfcbank",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00027",
+       "ig-acco-00326"
+      ]
+     },
+     {
+      "id": "svc:paytm",
+      "label": "paytm",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00005",
+       "ig-acco-00325"
+      ]
+     },
+     {
+      "id": "svc:phonepe",
+      "label": "phonepe",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00040"
+      ]
+     }
+    ]
+   },
+   {
+    "id": "cluster:Social & messaging",
+    "label": "Social & messaging",
+    "type": "cluster",
+    "size": 6,
+    "services": [
+     {
+      "id": "svc:discord",
+      "label": "discord",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00021"
+      ]
+     },
+     {
+      "id": "svc:instagram",
+      "label": "instagram",
+      "type": "service",
+      "evidence": [
+       "ch-acco-00037",
+       "gm-acco-00019"
+      ]
+     },
+     {
+      "id": "svc:linkedin",
+      "label": "linkedin",
+      "type": "service",
+      "evidence": [
+       "ch-acco-00024",
+       "gm-acco-00032"
+      ]
+     },
+     {
+      "id": "svc:pinterest",
+      "label": "pinterest",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00022"
+      ]
+     },
+     {
+      "id": "svc:reddit",
+      "label": "reddit",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00033"
+      ]
+     },
+     {
+      "id": "svc:truecaller",
+      "label": "truecaller",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00024",
+       "gm-acco-00045"
+      ]
+     }
+    ]
+   },
+   {
+    "id": "cluster:Travel",
+    "label": "Travel",
+    "type": "cluster",
+    "size": 5,
+    "services": [
+     {
+      "id": "svc:irctc",
+      "label": "irctc",
+      "type": "service",
+      "evidence": [
+       "ch-acco-00036",
+       "gm-acco-00004",
+       "ig-acco-00327"
+      ]
+     },
+     {
+      "id": "svc:makemytrip",
+      "label": "makemytrip",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00030",
+       "ig-acco-00303",
+       "ig-acco-00319"
+      ]
+     },
+     {
+      "id": "svc:olacabs",
+      "label": "olacabs",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00036"
+      ]
+     },
+     {
+      "id": "svc:rapido",
+      "label": "rapido",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00017",
+       "ig-acco-00334"
+      ]
+     },
+     {
+      "id": "svc:uber",
+      "label": "uber",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00016",
+       "ig-acco-00335"
+      ]
+     }
+    ]
+   },
+   {
+    "id": "cluster:Food & delivery",
+    "label": "Food & delivery",
+    "type": "cluster",
+    "size": 4,
+    "services": [
+     {
+      "id": "svc:swiggy",
+      "label": "swiggy",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00001",
+       "gm-acco-00043",
+       "ig-acco-00300",
+       "ig-acco-00317"
+      ]
+     },
+     {
+      "id": "svc:zeptocafe",
+      "label": "zeptocafe",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00044"
+      ]
+     },
+     {
+      "id": "svc:zeptonow",
+      "label": "zeptonow",
+      "type": "service",
+      "evidence": [
+       "gm-acco-00035"
+      ]
+     },
+     {
+      "id": "svc:zomato",
+      "label": "zomato",
+      "type": "service",
+      "evidence": [
+       "ch-acco-00034",
+       "ch-acco-00035",
+       "gm-acco-00002",
+       "ig-acco-00307",
+       "ig-acco-00316"
+      ]
+     }
+    ]
    }
   ],
   "edges": [
    {
     "source": "user",
-    "target": "svc:adnxs.com",
-    "weight": 1,
-    "label": "tracker",
+    "target": "cluster:Trackers & ads",
+    "weight": 15,
+    "label": "Trackers & ads",
     "evidence": [
-     "ch-acco-00017"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:amazon-adsystem.com",
-    "weight": 1,
-    "label": "tracker",
-    "evidence": [
-     "ch-acco-00018"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:clarity.ms",
-    "weight": 1,
-    "label": "tracker",
-    "evidence": [
-     "ch-acco-00019"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:criteo.com",
-    "weight": 1,
-    "label": "tracker",
-    "evidence": [
-     "ch-acco-00020"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:doubleclick.net",
-    "weight": 1,
-    "label": "tracker",
-    "evidence": [
-     "ch-acco-00021"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:facebook.com",
-    "weight": 1,
-    "label": "tracker",
-    "evidence": [
-     "ch-acco-00022"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:google-analytics.com",
-    "weight": 1,
-    "label": "tracker",
-    "evidence": [
-     "ch-acco-00023"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:linkedin.com",
-    "weight": 1,
-    "label": "tracker",
-    "evidence": [
-     "ch-acco-00024"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:pubmatic.com",
-    "weight": 1,
-    "label": "tracker",
-    "evidence": [
-     "ch-acco-00025"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:scorecardresearch.com",
-    "weight": 1,
-    "label": "tracker",
-    "evidence": [
-     "ch-acco-00026"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:taboola.com",
-    "weight": 1,
-    "label": "tracker",
-    "evidence": [
-     "ch-acco-00027"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:tiktok.com",
-    "weight": 1,
-    "label": "tracker",
-    "evidence": [
+     "ch-acco-00017",
+     "ch-acco-00018",
+     "ig-acco-00311",
+     "ch-acco-00019",
+     "ch-acco-00020",
+     "ch-acco-00021",
+     "ch-acco-00022",
+     "ch-acco-00023",
+     "ig-acco-00312",
+     "ig-acco-00313",
+     "ch-acco-00025",
+     "ch-acco-00026",
+     "ch-acco-00027",
+     "ig-acco-00309",
      "ch-acco-00028"
     ]
    },
    {
     "source": "user",
-    "target": "svc:flipkart.com",
-    "weight": 1,
-    "label": "session_replay",
-    "evidence": [
-     "ch-acco-00029"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:myntra.com",
-    "weight": 1,
-    "label": "session_replay",
-    "evidence": [
-     "ch-acco-00030"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:naukri.com",
-    "weight": 1,
-    "label": "session_replay",
-    "evidence": [
-     "ch-acco-00031"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:practo.com",
-    "weight": 1,
-    "label": "session_replay",
-    "evidence": [
-     "ch-acco-00032"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:shop.lenskart.com",
-    "weight": 1,
-    "label": "session_replay",
-    "evidence": [
-     "ch-acco-00033"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:zomato.com",
-    "weight": 1,
-    "label": "session_replay",
-    "evidence": [
-     "ch-acco-00034"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:zomato.com",
-    "weight": 1,
-    "label": "saved_login",
-    "evidence": [
-     "ch-acco-00035"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:irctc.co.in",
-    "weight": 1,
-    "label": "saved_login",
-    "evidence": [
-     "ch-acco-00036"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:instagram.com",
-    "weight": 1,
-    "label": "saved_login",
-    "evidence": [
-     "ch-acco-00037"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:naukri.com",
-    "weight": 1,
-    "label": "saved_login",
-    "evidence": [
-     "ch-acco-00038"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:oldgamesite.net",
-    "weight": 1,
-    "label": "saved_login",
-    "evidence": [
-     "ch-acco-00039"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:coursera.org",
-    "weight": 1,
-    "label": "saved_login",
-    "evidence": [
-     "ch-acco-00040"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:swiggy.in",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00001"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:zomato.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00002"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:myntra.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00003"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:irctc.co.in",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00004"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:paytm.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00005"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:naukri.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00006"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:practo.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00007"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:olx.in",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00008"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:dream11.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00009"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:canva.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00010"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:duolingo.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00011"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:coursera.org",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00012"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:unacademy.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00013"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:lenskart.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00014"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:bookmyshow.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00015"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:uber.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00016"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:rapido.bike",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00017"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:cred.club",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00018"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:instagram.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00019"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:spotify.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00020"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:discord.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00021"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:pinterest.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00022"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:shein.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00023"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:truecaller.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00024"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:byjus.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00025"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:meesho.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00026"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:hdfcbank.net",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00027"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:amazon.in",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00028"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:flipkart.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00029"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:makemytrip.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00030"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:netflix.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00031"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:linkedin.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00032"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:reddit.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00033"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:quora.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00034"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:zeptonow.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00035"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:olacabs.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00036"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:hotstar.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00037"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:udemy.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00038"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:grammarly.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00039"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:phonepe.com",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00040"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:desiforum.co.in",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00041"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:medium.com",
-    "weight": 1,
-    "label": "newsletter",
-    "evidence": [
-     "gm-acco-00042"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:swiggy.in",
-    "weight": 1,
-    "label": "newsletter",
-    "evidence": [
-     "gm-acco-00043"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:zeptocafe.in",
-    "weight": 1,
-    "label": "email",
-    "evidence": [
-     "gm-acco-00044"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:Truecaller",
-    "weight": 1,
-    "label": "google_signin",
-    "evidence": [
-     "gm-acco-00045"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:Canva",
-    "weight": 1,
-    "label": "google_signin",
-    "evidence": [
-     "gm-acco-00046"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:QuizMaster Pro",
-    "weight": 1,
-    "label": "google_signin",
-    "evidence": [
-     "gm-acco-00047"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:thehindu.co.in",
-    "weight": 1,
-    "label": "newsletter",
-    "evidence": [
-     "gm-acco-00048"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:producthunt.com",
-    "weight": 1,
-    "label": "newsletter",
-    "evidence": [
-     "gm-acco-00049"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:Myntra",
-    "weight": 1,
-    "label": "advertiser",
-    "evidence": [
-     "ig-acco-00299"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:Swiggy",
-    "weight": 1,
-    "label": "advertiser",
-    "evidence": [
-     "ig-acco-00300"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:Nykaa",
-    "weight": 1,
-    "label": "advertiser",
-    "evidence": [
-     "ig-acco-00301"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:Byju's",
-    "weight": 1,
-    "label": "advertiser",
-    "evidence": [
-     "ig-acco-00302"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:MakeMyTrip",
-    "weight": 1,
-    "label": "advertiser",
-    "evidence": [
-     "ig-acco-00303"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:Meesho",
-    "weight": 1,
-    "label": "advertiser",
-    "evidence": [
-     "ig-acco-00304"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:Unacademy",
-    "weight": 1,
-    "label": "advertiser",
-    "evidence": [
-     "ig-acco-00305"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:Ajio",
-    "weight": 1,
-    "label": "advertiser",
-    "evidence": [
-     "ig-acco-00306"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:Zomato",
-    "weight": 1,
-    "label": "advertiser",
-    "evidence": [
-     "ig-acco-00307"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:Flipkart",
-    "weight": 1,
-    "label": "advertiser",
-    "evidence": [
-     "ig-acco-00308"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:Tata CLiQ",
-    "weight": 1,
-    "label": "advertiser",
-    "evidence": [
-     "ig-acco-00309"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:Lenskart",
-    "weight": 1,
-    "label": "advertiser",
-    "evidence": [
-     "ig-acco-00310"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:boAt",
-    "weight": 1,
-    "label": "advertiser",
-    "evidence": [
-     "ig-acco-00311"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:Mamaearth",
-    "weight": 1,
-    "label": "advertiser",
-    "evidence": [
-     "ig-acco-00312"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:PhysicsWallah",
-    "weight": 1,
-    "label": "advertiser",
-    "evidence": [
-     "ig-acco-00313"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:amazon.in",
-    "weight": 1,
-    "label": "off_meta",
-    "evidence": [
-     "ig-acco-00314"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:flipkart.com",
-    "weight": 1,
-    "label": "off_meta",
-    "evidence": [
-     "ig-acco-00315"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:zomato.com",
-    "weight": 1,
-    "label": "off_meta",
-    "evidence": [
-     "ig-acco-00316"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:swiggy.com",
-    "weight": 1,
-    "label": "off_meta",
-    "evidence": [
-     "ig-acco-00317"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:myntra.com",
-    "weight": 1,
-    "label": "off_meta",
-    "evidence": [
-     "ig-acco-00318"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:makemytrip.com",
-    "weight": 1,
-    "label": "off_meta",
-    "evidence": [
-     "ig-acco-00319"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:bookmyshow.com",
-    "weight": 1,
-    "label": "off_meta",
-    "evidence": [
-     "ig-acco-00320"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:nykaa.com",
-    "weight": 1,
-    "label": "off_meta",
-    "evidence": [
+    "target": "cluster:Shopping",
+    "weight": 6,
+    "label": "Shopping",
+    "evidence": [
+     "ig-acco-00306",
+     "ig-acco-00329",
+     "gm-acco-00028",
+     "ig-acco-00314",
+     "ch-acco-00029",
+     "gm-acco-00029",
+     "ig-acco-00308",
+     "ig-acco-00315",
+     "gm-acco-00026",
+     "ig-acco-00304",
+     "ig-acco-00330",
+     "ch-acco-00030",
+     "gm-acco-00003",
+     "ig-acco-00299",
+     "ig-acco-00318",
+     "ig-acco-00301",
      "ig-acco-00321"
     ]
    },
    {
     "source": "user",
-    "target": "svc:practo.com",
-    "weight": 1,
-    "label": "off_meta",
+    "target": "cluster:Other",
+    "weight": 17,
+    "label": "Other",
     "evidence": [
-     "ig-acco-00322"
+     "gm-acco-00015",
+     "ig-acco-00320",
+     "gm-acco-00010",
+     "gm-acco-00046",
+     "gm-acco-00041",
+     "gm-acco-00009",
+     "ig-acco-00333",
+     "gm-acco-00039",
+     "gm-acco-00037",
+     "ch-acco-00033",
+     "gm-acco-00014",
+     "ig-acco-00310",
+     "ig-acco-00328",
+     "gm-acco-00042",
+     "gm-acco-00031",
+     "ch-acco-00039",
+     "gm-acco-00008",
+     "ig-acco-00323",
+     "ch-acco-00032",
+     "gm-acco-00007",
+     "ig-acco-00322",
+     "gm-acco-00049",
+     "gm-acco-00034",
+     "gm-acco-00023",
+     "gm-acco-00020",
+     "ig-acco-00336",
+     "gm-acco-00048"
     ]
    },
    {
     "source": "user",
-    "target": "svc:olx.in",
-    "weight": 1,
-    "label": "off_meta",
+    "target": "cluster:Education & jobs",
+    "weight": 7,
+    "label": "Education & jobs",
     "evidence": [
-     "ig-acco-00323"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:naukri.com",
-    "weight": 1,
-    "label": "off_meta",
-    "evidence": [
-     "ig-acco-00324"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:paytm.com",
-    "weight": 1,
-    "label": "off_meta",
-    "evidence": [
-     "ig-acco-00325"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:hdfcbank.com",
-    "weight": 1,
-    "label": "off_meta",
-    "evidence": [
-     "ig-acco-00326"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:irctc.co.in",
-    "weight": 1,
-    "label": "off_meta",
-    "evidence": [
-     "ig-acco-00327"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:lenskart.com",
-    "weight": 1,
-    "label": "off_meta",
-    "evidence": [
-     "ig-acco-00328"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:ajio.com",
-    "weight": 1,
-    "label": "off_meta",
-    "evidence": [
-     "ig-acco-00329"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:meesho.com",
-    "weight": 1,
-    "label": "off_meta",
-    "evidence": [
-     "ig-acco-00330"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:unacademy.com",
-    "weight": 1,
-    "label": "off_meta",
-    "evidence": [
+     "gm-acco-00025",
+     "ig-acco-00302",
+     "ch-acco-00040",
+     "gm-acco-00012",
+     "gm-acco-00011",
+     "ch-acco-00031",
+     "ch-acco-00038",
+     "gm-acco-00006",
+     "ig-acco-00324",
+     "gm-acco-00047",
+     "gm-acco-00038",
+     "gm-acco-00013",
+     "ig-acco-00305",
      "ig-acco-00331"
     ]
    },
    {
     "source": "user",
-    "target": "svc:cred.club",
-    "weight": 1,
-    "label": "off_meta",
+    "target": "cluster:Finance & payments",
+    "weight": 4,
+    "label": "Finance & payments",
     "evidence": [
-     "ig-acco-00332"
+     "gm-acco-00018",
+     "ig-acco-00332",
+     "gm-acco-00027",
+     "ig-acco-00326",
+     "gm-acco-00005",
+     "ig-acco-00325",
+     "gm-acco-00040"
     ]
    },
    {
     "source": "user",
-    "target": "svc:dream11.com",
-    "weight": 1,
-    "label": "off_meta",
+    "target": "cluster:Social & messaging",
+    "weight": 6,
+    "label": "Social & messaging",
     "evidence": [
-     "ig-acco-00333"
+     "gm-acco-00021",
+     "ch-acco-00037",
+     "gm-acco-00019",
+     "ch-acco-00024",
+     "gm-acco-00032",
+     "gm-acco-00022",
+     "gm-acco-00033",
+     "gm-acco-00024",
+     "gm-acco-00045"
     ]
    },
    {
     "source": "user",
-    "target": "svc:rapido.bike",
-    "weight": 1,
-    "label": "off_meta",
+    "target": "cluster:Travel",
+    "weight": 5,
+    "label": "Travel",
     "evidence": [
-     "ig-acco-00334"
-    ]
-   },
-   {
-    "source": "user",
-    "target": "svc:uber.com",
-    "weight": 1,
-    "label": "off_meta",
-    "evidence": [
+     "ch-acco-00036",
+     "gm-acco-00004",
+     "ig-acco-00327",
+     "gm-acco-00030",
+     "ig-acco-00303",
+     "ig-acco-00319",
+     "gm-acco-00036",
+     "gm-acco-00017",
+     "ig-acco-00334",
+     "gm-acco-00016",
      "ig-acco-00335"
     ]
    },
    {
     "source": "user",
-    "target": "svc:spotify.com",
-    "weight": 1,
-    "label": "off_meta",
+    "target": "cluster:Food & delivery",
+    "weight": 4,
+    "label": "Food & delivery",
     "evidence": [
-     "ig-acco-00336"
+     "gm-acco-00001",
+     "gm-acco-00043",
+     "ig-acco-00300",
+     "ig-acco-00317",
+     "gm-acco-00044",
+     "gm-acco-00035",
+     "ch-acco-00034",
+     "ch-acco-00035",
+     "gm-acco-00002",
+     "ig-acco-00307",
+     "ig-acco-00316"
     ]
-   },
-   {
-    "source": "user",
-    "target": "person:meera_k",
-    "weight": 122,
-    "label": "closeness",
-    "evidence": []
-   },
-   {
-    "source": "user",
-    "target": "person:arjun.das",
-    "weight": 118,
-    "label": "closeness",
-    "evidence": []
-   },
-   {
-    "source": "user",
-    "target": "person:rahul.k",
-    "weight": 74,
-    "label": "closeness",
-    "evidence": []
-   },
-   {
-    "source": "user",
-    "target": "person:tanvi.m",
-    "weight": 53,
-    "label": "closeness",
-    "evidence": []
-   },
-   {
-    "source": "user",
-    "target": "person:ishaan_g",
-    "weight": 46,
-    "label": "closeness",
-    "evidence": []
-   },
-   {
-    "source": "user",
-    "target": "person:kabir.roy",
-    "weight": 45,
-    "label": "closeness",
-    "evidence": []
-   },
-   {
-    "source": "user",
-    "target": "person:pooja.s",
-    "weight": 32,
-    "label": "closeness",
-    "evidence": []
-   },
-   {
-    "source": "user",
-    "target": "person:sneha.b",
-    "weight": 28,
-    "label": "closeness",
-    "evidence": []
-   },
-   {
-    "source": "user",
-    "target": "person:kolkata.foodies",
-    "weight": 22,
-    "label": "closeness",
-    "evidence": []
-   },
-   {
-    "source": "user",
-    "target": "person:zomato",
-    "weight": 16,
-    "label": "closeness",
-    "evidence": []
    }
   ]
  },
- "errors": []
+ "errors": [],
+ "sourceCoverage": [
+  {
+   "name": "persona_chrome.zip",
+   "source": "samples\\persona_chrome.zip",
+   "platform": "chrome",
+   "kind": "import",
+   "status": "scanned",
+   "records": 48,
+   "detail": "48 records extracted by the supported parser; other contents were not assessed."
+  },
+  {
+   "name": "Laptop app-folder storage",
+   "source": "samples\\persona_device_scan.json",
+   "platform": "device",
+   "kind": "device_storage",
+   "status": "scanned",
+   "records": 3,
+   "detail": "3 app folders reported. Original collection limits were not included in this report."
+  },
+  {
+   "name": "Laptop log pattern checks",
+   "source": "samples\\persona_device_scan.json",
+   "platform": "device",
+   "kind": "device_logs",
+   "status": "scanned",
+   "records": 3,
+   "detail": "3 log files checked for pattern counts; no matched values retained. Original log-selection limits were not included in this report."
+  },
+  {
+   "name": "Recent-file shortcut count",
+   "source": "samples\\persona_device_scan.json",
+   "platform": "device",
+   "kind": "recent_files",
+   "status": "not_assessed",
+   "records": 27,
+   "detail": "The Recent folder was absent or a complete count was not recorded."
+  },
+  {
+   "name": "Android permission/access report",
+   "source": "samples\\persona_device_scan.json",
+   "platform": "android",
+   "kind": "phone",
+   "status": "scanned",
+   "records": 3,
+   "detail": "Metadata for 3 apps imported. Null access times mean unknown; permission grants alone do not prove use."
+  },
+  {
+   "name": "persona_gmail.mbox",
+   "source": "persona_gmail.mbox",
+   "platform": "gmail",
+   "kind": "gmail_mail",
+   "status": "scanned",
+   "records": 49,
+   "skipped_spam_trash": 0,
+   "detail": "49 account/newsletter records extracted; 0 spam/trash emails ignored. Other mail was not assessed."
+  },
+  {
+   "name": "persona_instagram.zip",
+   "source": "samples\\persona_instagram.zip",
+   "platform": "instagram",
+   "kind": "import",
+   "status": "scanned",
+   "records": 374,
+   "detail": "374 records extracted by the supported parser; other contents were not assessed."
+  },
+  {
+   "name": "persona_ios_privacy.ndjson",
+   "source": "samples\\persona_ios_privacy.ndjson",
+   "platform": "ios",
+   "kind": "ios_report",
+   "status": "scanned",
+   "records": 12,
+   "detail": "12 events read; 0 bad lines skipped; 6 end events or unsupported rows excluded."
+  },
+  {
+   "name": "persona_spotify.zip",
+   "source": "samples\\persona_spotify.zip",
+   "platform": "spotify",
+   "kind": "import",
+   "status": "scanned",
+   "records": 241,
+   "detail": "241 records extracted by the supported parser; other contents were not assessed."
+  },
+  {
+   "name": "persona_whatsapp_Arjun.txt",
+   "source": "samples\\persona_whatsapp_Arjun.txt",
+   "platform": "whatsapp",
+   "kind": "import",
+   "status": "scanned",
+   "records": 9,
+   "detail": "9 records extracted by the supported parser; other contents were not assessed."
+  },
+  {
+   "name": "persona_whatsapp_College Gang.txt",
+   "source": "samples\\persona_whatsapp_College Gang.txt",
+   "platform": "whatsapp",
+   "kind": "import",
+   "status": "scanned",
+   "records": 30,
+   "detail": "30 records extracted by the supported parser; other contents were not assessed."
+  },
+  {
+   "name": "persona_whatsapp_Meera.txt",
+   "source": "samples\\persona_whatsapp_Meera.txt",
+   "platform": "whatsapp",
+   "kind": "import",
+   "status": "scanned",
+   "records": 7,
+   "detail": "7 records extracted by the supported parser; other contents were not assessed."
+  },
+  {
+   "name": "persona_instagram_feed.mp4",
+   "source": "samples\\persona_instagram_feed.mp4",
+   "platform": "instagram",
+   "kind": "import",
+   "status": "scanned",
+   "records": 4,
+   "detail": "4 records extracted by the supported parser; other contents were not assessed."
+  },
+  {
+   "name": "persona_whatsapp_status.mp4",
+   "source": "samples\\persona_whatsapp_status.mp4",
+   "platform": "whatsapp",
+   "kind": "import",
+   "status": "scanned",
+   "records": 13,
+   "detail": "13 records extracted by the supported parser; other contents were not assessed."
+  }
+ ]
 }

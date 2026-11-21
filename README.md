@@ -6,16 +6,15 @@ A local Windows desktop application that inspects supported data sources and exp
 
 ## Setup and run
 
-The current desktop build targets Windows and Python 3.12. Its GUI expects the project at `D:\NEXDATA`.
+The current desktop build targets Windows and Python 3.12. The checkout can live in any folder; application paths follow the package location. Run commands below from your checkout root. PDF reports default to your Documents folder (or the checkout root if Documents is absent), and the GUI shows the saved path.
 
 ```powershell
-cd D:\NEXDATA
 py -3.12 -m venv .venv
-& D:\NEXDATA\.venv\Scripts\python.exe -m pip install -r D:\NEXDATA\requirements.txt
-& D:\NEXDATA\.venv\Scripts\python.exe -m app.ui.main
+& .\.venv\Scripts\python.exe -m pip install -r .\requirements.txt
+& .\.venv\Scripts\python.exe -m app.ui.main
 ```
 
-After the first setup, run only the last command from `D:\NEXDATA`.
+After the first setup, run only the last command from your checkout root.
 
 ## What the current version scans
 
@@ -26,13 +25,13 @@ After the first setup, run only the last command from `D:\NEXDATA`.
 - User-selected recordings/screenshots for supported friend-activity and status-viewer OCR patterns.
 - Imported Android device scans and iPhone App Privacy Report NDJSON.
 
-The GUI includes Footprint, Scan coverage, What they know, Inner circle, Findings, Fix first, evidence windows and local PDF export.
+The GUI includes Footprint, Scan coverage, What they know, Inner circle, Findings, Fix first, evidence windows and local PDF export. The footprint map groups canonical services into up to eight categories; click a group for its services, findings and source records. Company names and common domain variants count once. Gmail Spam/Trash messages are ignored with a count in Scan coverage. Browser cookies for a service with account evidence are excluded from tracker totals; saved logins establish this relationship only within their browser profile.
 
 ## Browser locks
 
 Closing a browser window may leave background processes holding its databases. NexData identifies verified Chrome/Edge file owners and offers **Close browsers and rescan**. This requires confirmation. It tries normal shutdown first; with explicit consent, it can stop verified background processes if normal shutdown fails. Visible browser windows must be closed first. This can interrupt browser background apps or downloads.
 
-The scanner does not bypass database locks or copy secret-bearing browser databases.
+The scanner does not bypass database locks. It briefly copies each browser database and any matching SQLite WAL, shared-memory or rollback-journal files into the ignored local cache, queries supported metadata read-only, then removes the copies on success or failure. Cookie values, usernames and passwords are never selected into scan records.
 
 ## Coverage and interpretation
 
@@ -50,9 +49,8 @@ Choose **Quick (20s)** or **Extended (120s)** before scanning. Extended mode giv
 ## Standalone device scanner
 
 ```powershell
-cd D:\NEXDATA
-New-Item -ItemType Directory -Force D:\NEXDATA\.cache | Out-Null
-& D:\NEXDATA\.venv\Scripts\python.exe -m scanner.scan --output D:\NEXDATA\.cache\device_scan.json
+New-Item -ItemType Directory -Force .\.cache | Out-Null
+& .\.venv\Scripts\python.exe -m scanner.scan --output .\.cache\device_scan.json
 ```
 
 Add `--seconds 120` for an extended laptop scan. Add `--android` for a connected, authorised ADB device. Install Android platform-tools, enable USB debugging and approve the device prompt first.
@@ -60,8 +58,7 @@ Add `--seconds 120` for an extended laptop scan. Add `--android` for a connected
 ## Tests and synthetic fixtures
 
 ```powershell
-cd D:\NEXDATA
-& D:\NEXDATA\.venv\Scripts\python.exe -m pytest -q tests
+& .\.venv\Scripts\python.exe -m pytest -q tests
 ```
 
 Latest verified suite: **107 tests passed in 32.82 seconds**. Tests include real OCR on synthetic recordings, parser/rule checks, scanner limits, read-only browser queries and browser-lock shutdown safeguards. Real PC verification also confirmed that the previously blocked Chrome databases became readable after approved background-process shutdown.
@@ -69,9 +66,9 @@ Latest verified suite: **107 tests passed in 32.82 seconds**. Tests include real
 Fixture generators:
 
 ```powershell
-& D:\NEXDATA\.venv\Scripts\python.exe -m samples.make_persona
-& D:\NEXDATA\.venv\Scripts\python.exe -m samples.make_recordings
-& D:\NEXDATA\.venv\Scripts\python.exe -m samples.make_device
+& .\.venv\Scripts\python.exe -m samples.make_persona
+& .\.venv\Scripts\python.exe -m samples.make_recordings
+& .\.venv\Scripts\python.exe -m samples.make_device
 ```
 
 Real Android hardware and an actual iPhone privacy export have not been verified in this workspace.

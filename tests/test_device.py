@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
 import subprocess
+import sys
 from types import SimpleNamespace
 
 import pytest
@@ -245,7 +246,7 @@ def test_laptop_zero_time_budget_returns_partial(appdata):
 
 
 def test_scanner_is_importable_without_site_packages():
-    completed = subprocess.run([str(ROOT / ".venv" / "Scripts" / "python.exe"), "-S", "-c", "import scanner.scan"], cwd=ROOT, capture_output=True, timeout=10)
+    completed = subprocess.run([sys.executable, "-S", "-c", "import scanner.scan"], cwd=ROOT, capture_output=True, timeout=10)
     assert completed.returncode == 0, completed.stderr.decode()
 
 

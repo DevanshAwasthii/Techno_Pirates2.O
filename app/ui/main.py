@@ -1,4 +1,4 @@
-"""Run with: D:\\NEXDATA\\.venv\\Scripts\\python.exe -m app.ui.main"""
+"""Run from the project root with: python -m app.ui.main"""
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -18,8 +18,15 @@ from fpdf import FPDF
 
 from app.engine.coverage import STATUS_LABELS, coverage_rows, audit_is_partial, tracker_display, storage_display, chat_display
 
-ROOT = Path(r"D:\NEXDATA")
-REPORT_PATH = ROOT / "NexData_report.pdf"
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def default_report_path():
+    documents = Path.home() / "Documents"
+    return (documents if documents.is_dir() else ROOT) / "NexData_report.pdf"
+
+
+REPORT_PATH = default_report_path()
 BG = "#10151f"
 PANEL = "#1b2432"
 TEXT = "#ecf2fa"
@@ -29,7 +36,6 @@ PRIORITIES = {"high": "#c84959", "medium": "#a97522", "low": "#536174"}
 CLUSTER_COLORS = {"Shopping": "#ffa75c", "Food & delivery": "#8edc99", "Finance & payments": "#f3ce69",
                   "Travel": "#78bfff", "Social & messaging": "#56d9ed", "Education & jobs": "#f29dc6",
                   "Trackers & ads": "#cba6f7", "Other": "#a4b2c5"}
-NODE_COLORS = {"user": "#ffffff", "advertiser": "#f26873", "service": "#ffa75c", "person": CYAN, "tracker": "#cba6f7"}
 TAB_NAMES = ("Footprint", "Scan coverage", "What they know", "Inner circle", "Findings", "Fix first")
 SCAN_MODES = {"Quick (20s)": 20, "Extended (120s)": 120}
 
