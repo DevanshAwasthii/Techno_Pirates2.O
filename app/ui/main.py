@@ -56,6 +56,40 @@ def error_text(errors):
     )
 
 
+def prepare_distribution(records):
+    """Summarize measured app storage, or imported records when storage is unavailable."""
+    app_rows = []
+    for record in records:
+        meta = record.get("meta") or {}
+        if meta.get("source") != "laptop_store" or not meta.get("app"):
+            continue
+        try:
+            size = max(0, int(meta.get("bytes") or 0))
+            files = max(0, int(meta.get("files") or 0))
+        except (TypeError, ValueError, OverflowError):
+            continue
+        app_rows.append({"app": str(meta["app"]), "bytes": size, "files": files})
+    if app_rows:
+        app_rows.sort(key=lambda row: (-row["bytes"], row["app"].casefold()))
+        return {
+            "kind": "apps",
+            "apps": app_rows[:12],
+            "totals": {
+                "bytes": sum(row["bytes"] for row in app_rows),
+                "files": sum(row["files"] for row in app_rows),
+            },
+        }
+
+    platforms = sorted({str(record.get("platform") or "unknown") for record in records})
+    categories = sorted({str(record.get("category") or "unknown") for record in records})
+    counts = {platform: {category: 0 for category in categories} for platform in platforms}
+    for record in records:
+        platform = str(record.get("platform") or "unknown")
+        category = str(record.get("category") or "unknown")
+        counts[platform][category] += 1
+    return {"kind": "records", "platforms": platforms, "categories": categories, "counts": counts}
+
+
 def prepare_charts(result):
     """Compute expensive layout without touching Tk widgets."""
     graph = nx.Graph()
@@ -65,9 +99,10 @@ def prepare_charts(result):
     for edge in (result.get("graph") or {}).get("edges", []):
         if edge.get("source") in graph and edge.get("target") in graph:
             graph.add_edge(edge["source"], edge["target"], weight=max(0.01, float(edge.get("weight") or 1)))
-    positions = nx.spring_layout(graph, seed=1) if graph else {}
+    positions = nx.spring_layout(graph, seed=1, dim=3) if graph else {}
     heat = [[0 for _ in range(24)] for _ in range(7)]
-    for record in result.get("records") or []:
+    records = result.get("records") or []
+    for record in records:
         stamp = record.get("timestamp")
         if not stamp:
             continue
@@ -76,7 +111,7 @@ def prepare_charts(result):
         except (ValueError, TypeError, OverflowError):
             continue
         heat[date.weekday()][date.hour] += 1
-    return graph, positions, heat
+    return graph, positions, heat, prepare_distribution(records)
 
 
 def report_bytes(result):
@@ -380,10 +415,10 @@ class NexDataApp(ctk.CTk):
         frame.pack(fill="x", padx=8, pady=8)
         return frame
 
-    def new_figure(self, height):
+    def new_figure(self, height, projection=None):
         fig = Figure(figsize=(10.5, height), dpi=100, facecolor=PANEL)
         self.figures.append(fig)
-        ax = fig.add_subplot(111)
+        ax = fig.add_subplot(111, projection=projection)
         ax.set_facecolor(PANEL)
         ax.tick_params(colors=MUTED, labelsize=9)
         for spine in ax.spines.values():
@@ -397,11 +432,9 @@ class NexDataApp(ctk.CTk):
         self.canvases.append(canvas)
 
     def render_footprint(self, charts):
-        page = self.tabs.tab("Footprint")
-        page.grid_rowconfigure(0, weight=0)
-        page.grid_rowconfigure(1, weight=1)
+        page = self.scroll_page("Footprint")
         stats = ctk.CTkFrame(page, fg_color="transparent")
-        stats.grid(row=0, column=0, sticky="ew", pady=8)
+        stats.pack(fill="x", pady=8)
         summary = self.result.get("summary") or {}
         if self.source_mode == "pc":
             values = [("App folders reported", summary.get("laptopDataApps", 0)),
@@ -418,38 +451,58 @@ class NexDataApp(ctk.CTk):
             card.grid(row=0, column=col, sticky="ew", padx=6)
             self.label(card, value, bold=True, color=CYAN, size=28)
             self.label(card, title, color=MUTED, size=13)
+
+        distribution_panel = ctk.CTkFrame(page, fg_color=PANEL)
+        distribution_panel.pack(fill="x", expand=True, pady=(0, 10))
+        distribution = charts[3]
+        title = "App-folder storage and file distribution" if distribution["kind"] == "apps" else "Record distribution by platform and category"
+        self.label(distribution_panel, title, bold=True, size=17)
+        if distribution["kind"] == "apps":
+            self.label(distribution_panel, "Top 12 app folders; bar height shows each folder's share of total storage or files. Drag to rotate.", color=MUTED, size=12)
+        else:
+            self.label(distribution_panel, "Bar height shows the number of records in each platform/category group. Drag to rotate.", color=MUTED, size=12)
+        fig, ax = self.new_figure(3.8, projection="3d")
+        if distribution["kind"] == "apps":
+            self.draw_app_distribution(ax, distribution["apps"], distribution["totals"])
+        else:
+            self.draw_record_distribution(ax, distribution)
+        fig.tight_layout(pad=1.2)
+        self.mount_chart(distribution_panel, fig)
+
         plot = ctk.CTkFrame(page, fg_color=PANEL)
         plot.grid(row=1, column=0, sticky="nsew")
-        self.label(plot, "Connections in stored browser metadata", bold=True, size=17)
-        self.label(plot, "White: you     Red: advertiser     Orange: service     Cyan: person     Purple: tracker indicator. Not live network traffic.", color=MUTED, size=12)
+        self.label(plot, "Your data connections", bold=True, size=17)
+        self.label(plot, "White: you     Red: advertiser     Orange: service     Cyan: person", color=MUTED, size=12)
         graph, positions, _ = charts
         fig, ax = self.new_figure(4.0)
         if graph:
-            nx.draw_networkx_edges(graph, positions, ax=ax, edge_color="#6b7a91", alpha=0.38, width=0.9)
-            nx.draw_networkx_nodes(graph, positions, ax=ax, node_color=[NODE_COLORS.get(graph.nodes[n].get("type"), "#9aa7ba") for n in graph], node_size=[max(90, min(1800, float(graph.nodes[n].get("size") or 10) * 14)) for n in graph], linewidths=1, edgecolors=PANEL)
-            nx.draw_networkx_labels(graph, positions, ax=ax, labels={n: graph.nodes[n].get("label", str(n)) for n in graph}, font_color=TEXT, font_size=8)
-            ax.margins(0.16)
+            for source, target in graph.edges:
+                start, end = positions[source], positions[target]
+                ax.plot((start[0], end[0]), (start[1], end[1]), (start[2], end[2]),
+                        color="#6b7a91", alpha=0.5, linewidth=0.9)
+            nodes = list(graph.nodes)
+            ax.scatter(
+                [positions[node][0] for node in nodes],
+                [positions[node][1] for node in nodes],
+                [positions[node][2] for node in nodes],
+                c=[NODE_COLORS.get(graph.nodes[node].get("type"), "#9aa7ba") for node in nodes],
+                s=[max(90, min(1800, float(graph.nodes[node].get("size") or 10) * 14)) for node in nodes],
+                edgecolors=PANEL,
+                linewidths=1,
+                depthshade=True,
+            )
+            for node in nodes:
+                x, y, z = positions[node]
+                ax.text(x, y, z, str(graph.nodes[node].get("label", node)),
+                        color=TEXT, fontsize=8, ha="center", va="bottom")
         else:
-            ax.text(0.5, 0.5, "No connections found in these files", ha="center", color=MUTED)
+            ax.text2D(0.5, 0.5, "No connections found in these files",
+                      transform=ax.transAxes, ha="center", color=MUTED)
         ax.set_axis_off()
+        ax.view_init(elev=24, azim=35)
+        ax.set_box_aspect((1, 1, 0.8))
         fig.tight_layout(pad=0.5)
         self.mount_chart(plot, fig)
-
-    def render_coverage(self):
-        page = self.scroll_page("Scan coverage")
-        self.label(page, "What was checked, and what is missing", bold=True, size=20)
-        self.label(page, "A finished scan covers supported checks only. Folder/log limits, unreadable files and missing imports remain explicit below.", color=MUTED, size=13)
-        palette = {"scanned": "#206348", "partial": "#986c28", "unavailable": "#a94450",
-                   "not_provided": "#536174", "not_assessed": "#536174"}
-        for row in coverage_rows(self.result):
-            card = self.card(page)
-            status = row.get("status", "not_assessed")
-            ctk.CTkLabel(card, text=STATUS_LABELS.get(status, status), fg_color=palette.get(status, "#536174"),
-                         corner_radius=7, width=110, height=24, font=("Segoe UI", 11, "bold")).pack(anchor="w", padx=16, pady=(10, 3))
-            self.label(card, row["name"], bold=True, size=16)
-            self.label(card, row["detail"], color=MUTED, size=13)
-            if row.get("source"):
-                self.label(card, row["source"], color=MUTED, size=11)
 
     def render_knowledge(self):
         page = self.scroll_page("What they know")
