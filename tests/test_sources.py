@@ -94,3 +94,23 @@ def test_not_whatsapp_rejected(tmp_path):
 def test_mbox_base_domain():
     assert mbox.base_domain("a@mail.instagram.com") == "instagram.com"
     assert mbox.base_domain("x@ticketadmin.irctc.co.in") == "irctc.co.in"
+
+
+def test_mbox_ignores_spam_trash_and_reports_coverage(tmp_path):
+    p = tmp_path / "mail.mbox"
+    entries = []
+    for domain, labels in (("myntra.com", "Inbox"), ("spamshop.com", "Inbox,Spam"),
+                           ("trashshop.com", "Trash"), ("keep.com", "Spam research, Trash receipts")):
+        entries.append(f"From a@{domain} Mon Jan 01 00:00:00 2024\nFrom: a@{domain}\nSubject: Verify your email\nX-Gmail-Labels: {labels}\n\nBody\n\n")
+    p.write_text("".join(entries))
+    result = pipeline.run([p])
+    assert result["errors"] == []
+    assert {r["meta"]["domain"] for r in result["records"]} == {"myntra.com", "keep.com"}
+    row = next(r for r in result["sourceCoverage"] if r["kind"] == "gmail_mail")
+    assert row["skipped_spam_trash"] == 2
+    assert "2 spam/trash emails ignored" in row["detail"]
+    p.write_text("".join(entries[1:3]))
+    result = pipeline.run([p])
+    assert result["errors"] == []
+    assert result["records"] == []
+    assert result["sourceCoverage"][0]["skipped_spam_trash"] == 2

@@ -87,7 +87,7 @@ def _detect_and_parse(path: Path, wa_offset: int = 0, warnings=None, source_cove
                 with tempfile.NamedTemporaryFile(dir=TMP, suffix=".mbox", delete=False) as out:
                     shutil.copyfileobj(zf.open(boxes[0]), out)
                 try:
-                    recs, cov = mbox.parse(out.name, boxes[0])
+                    recs, cov = mbox.parse(out.name, boxes[0], source_coverage=source_coverage)
                 finally:
                     Path(out.name).unlink(missing_ok=True)
                 return "gmail", recs, cov
@@ -95,7 +95,7 @@ def _detect_and_parse(path: Path, wa_offset: int = 0, warnings=None, source_cove
         recs, _ = whatsapp.parse_text(_wa_text(path.read_bytes()), path.name, wa_offset)
         return "whatsapp", recs, _wa_cov()
     elif suffix == ".mbox":
-        recs, cov = mbox.parse(str(path), path.name)
+        recs, cov = mbox.parse(str(path), path.name, source_coverage=source_coverage)
         return "gmail", recs, cov
     raise ParseError("wrong_format", "We don't recognise this file.", path.name)
 

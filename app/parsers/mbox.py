@@ -5,6 +5,7 @@ signup, verification, password reset, receipts, security alerts. Streams message
 """
 from __future__ import annotations
 
+import csv
 import mailbox
 import re
 from email.header import decode_header, make_header
@@ -64,13 +65,18 @@ def classify(subject: str) -> str | None:
     return None
 
 
-def parse(path: str, src: str = "mail.mbox"):
+def parse(path: str, src: str = "mail.mbox", source_coverage=None):
     try:
         box = mailbox.mbox(path, create=False)
     except Exception as e:
         raise ParseError("wrong_format", f"Cannot open mailbox: {e}", src)
-    recs, n = [], 0
+    recs, n, skipped = [], 0, 0
     for i, msg in enumerate(box):
+        labels = {label.strip().casefold() for header in msg.get_all("X-Gmail-Labels", [])
+                  for row in csv.reader([_h(header)]) for label in row}
+        if labels & {"spam", "trash"}:
+            skipped += 1
+            continue
         subject = _h(msg.get("Subject"))
         name, addr = parseaddr(_h(msg.get("From")))
         if "@" not in addr:
@@ -100,7 +106,11 @@ def parse(path: str, src: str = "mail.mbox"):
                            sourceFile=src, recordRef=f"message {i + 1}",
                            meta={"domain": dom_out, "source": source, "email_kind": kind, "sender": name or addr}))
     box.close()
-    if not recs:
+    if source_coverage is not None:
+        source_coverage.append({"name": src, "source": src, "platform": "gmail", "kind": "gmail_mail",
+                                "status": "scanned", "records": len(recs), "skipped_spam_trash": skipped,
+                                "detail": f"{len(recs)} account/newsletter records extracted; {skipped} spam/trash emails ignored. Other mail was not assessed."})
+    if not recs and not skipped:
         raise ParseError("wrong_format", "No account emails found in this mailbox", src)
     cov = {"location": "not_assessed", "interest": "not_assessed", "contact": "not_assessed", "activity": "found"}
     return recs, cov
