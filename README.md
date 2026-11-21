@@ -26,7 +26,7 @@ After the first setup, run only the last command from `D:\NEXDATA`.
 - User-selected recordings/screenshots for supported friend-activity and status-viewer OCR patterns.
 - Imported Android device scans and iPhone App Privacy Report NDJSON.
 
-The GUI includes Footprint, What they know, Inner circle, Findings, Fix first, evidence windows and local PDF export.
+The GUI includes Footprint, Scan coverage, What they know, Inner circle, Findings, Fix first, evidence windows and local PDF export.
 
 ## Browser locks
 
@@ -36,7 +36,11 @@ The scanner does not bypass database locks or copy secret-bearing browser databa
 
 ## Coverage and interpretation
 
-- The laptop scan has a roughly 20-second budget and reports up to 30 app folders; incomplete sizes are lower bounds.
+Open **Scan coverage** to see each supported browser database, storage/log check and imported report labelled Scanned, Partial, Unavailable, Not provided or Not assessed. A finished run is not a claim that the entire device was audited. Partial status remains visible even when there are no read errors.
+
+Choose **Quick (20s)** or **Extended (120s)** before scanning. Extended mode gives folder measurement more time; it keeps the same folder-selection and log limits. A `+` after a storage or tracker figure identifies an incomplete subtotal/lower bound. Missing chat imports are shown as **Not provided**, not as zero sensitive data. PDFs include the same coverage information.
+
+- The laptop scan uses the selected 20- or 120-second budget and reports up to 30 app folders. Folder, log, access-error and size-limit counters explain what was excluded; incomplete sizes are lower bounds.
 - Log checks are capped at 300 files and 2 MB per file.
 - Unavailable sources remain explicit errors; they are not replaced with invented records.
 - Cookie indicators do not prove that recording or cross-site tracking actually occurred.
@@ -51,7 +55,7 @@ New-Item -ItemType Directory -Force D:\NEXDATA\.cache | Out-Null
 & D:\NEXDATA\.venv\Scripts\python.exe -m scanner.scan --output D:\NEXDATA\.cache\device_scan.json
 ```
 
-Add `--android` for a connected, authorised ADB device. Install Android platform-tools, enable USB debugging and approve the device prompt first.
+Add `--seconds 120` for an extended laptop scan. Add `--android` for a connected, authorised ADB device. Install Android platform-tools, enable USB debugging and approve the device prompt first.
 
 ## Tests and synthetic fixtures
 
@@ -60,7 +64,7 @@ cd D:\NEXDATA
 & D:\NEXDATA\.venv\Scripts\python.exe -m pytest -q tests
 ```
 
-Latest verified suite: **88 tests passed**. Tests include real OCR on synthetic recordings, parser/rule checks, scanner limits, read-only browser queries and browser-lock shutdown safeguards. Real PC verification also confirmed that the previously blocked Chrome databases became readable after approved background-process shutdown.
+Latest verified suite: **107 tests passed in 32.82 seconds**. Tests include real OCR on synthetic recordings, parser/rule checks, scanner limits, read-only browser queries and browser-lock shutdown safeguards. Real PC verification also confirmed that the previously blocked Chrome databases became readable after approved background-process shutdown.
 
 Fixture generators:
 

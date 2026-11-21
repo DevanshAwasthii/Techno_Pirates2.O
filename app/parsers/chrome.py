@@ -86,13 +86,15 @@ def _query(db: Path, sql: str):
         con.close()
 
 
-def parse(profile: Path, src: str | None = None, warnings=None):
+def parse(profile: Path, src: str | None = None, warnings=None, source_coverage=None):
     profile = Path(profile)
     live = src is None
     namespace = "ch-" + hashlib.sha256(str(profile.resolve()).encode()).hexdigest()[:12] if live else "ch"
     src = src or profile.name
     recs, n = [], 0
     failed_sources = set()
+    states = {}
+    browser = "Edge" if "Edge" in profile.parts else "Chrome"
     cov = {"location": "not_assessed", "interest": "not_assessed", "contact": "not_assessed", "activity": "not_assessed"}
 
     def add(category, item, ts, file, ref, **meta):
@@ -103,15 +105,34 @@ def parse(profile: Path, src: str | None = None, warnings=None):
             meta["live_profile"] = True
         recs.append(Record(f"{namespace}-{category[:4]}-{n:05d}", PLATFORM, category, item, ts, "recorded", None, source, ref, meta))
 
+    def source_row(db, kind):
+        key = str(db)
+        if key not in states:
+            states[key] = {"name": f"{browser} {profile.name} - {db.name}", "source": key,
+                           "platform": "chrome", "kind": kind, "status": "not_provided",
+                           "records": 0, "metadata_rows": 0, "detail": "Source file was not found."}
+        return states[key]
+
     def query(db, sql):
+        kind = {"History": "browser_history", "Cookies": "browser_cookies", "Login Data": "browser_logins"}.get(db.name, "browser_metadata")
+        row = source_row(db, kind)
         try:
-            return _query(db, sql)
+            rows = _query(db, sql)
+            row["status"] = "partial" if str(db) in failed_sources else "scanned"
+            row["metadata_rows"] += len(rows)
+            if str(db) not in failed_sources:
+                row["detail"] = f"{row['metadata_rows']} metadata rows read. " + ("Visit history is summarised to the top 50 domains; downloads are included." if db.name == "History" else "Only supported metadata fields were selected.")
+            return rows
         except (OSError, sqlite3.Error) as exc:
+            previously_read = row["status"] in {"scanned", "partial"}
             failed_sources.add(str(db))
+            row["status"] = "partial" if previously_read else "unavailable"
+            row["detail"] = str(exc)
             if warnings is None:
                 raise ParseError("unknown", f"Cannot read browser metadata: {exc}", str(db)) from None
             from scanner.browser_access import describe_failure
             warning = {"code": "unknown", "file": str(db), **describe_failure(db, exc)}
+            row["detail"] = warning["message"]
             if warning not in warnings:
                 warnings.append(warning)
             return []
@@ -146,7 +167,8 @@ def parse(profile: Path, src: str | None = None, warnings=None):
             add("account", f"Tracker cookie from {base}", None, str(cookies.relative_to(profile)) if live else cookies.name, f"cookies host_key in {sorted(hosts)[:3]}",
                 domain=base, source="tracker")
         for site, vendor in sorted(replay.items()):
-            add("account", f"{site} records your session with {vendor}", None, str(cookies.relative_to(profile)) if live else cookies.name, f"cookies host_key={site}",
+            item = f"{site} has a cookie associated with {vendor}" if live else f"{site} records your session with {vendor}"
+            add("account", item, None, str(cookies.relative_to(profile)) if live else cookies.name, f"cookies host_key={site}",
                 domain=site, source="session_replay", vendor=vendor)
 
     logins = profile / "Login Data"
@@ -159,15 +181,45 @@ def parse(profile: Path, src: str | None = None, warnings=None):
 
     prefs = profile / "Preferences"
     if prefs.exists():
-        exc = json.loads(prefs.read_text(encoding="utf-8")).get("profile", {}).get("content_settings", {}).get("exceptions", {})
-        for key, label in PERMS.items():
-            for pattern, v in exc.get(key, {}).items():
-                if v.get("setting") == 1:  # 1 = allow
-                    site = _host(pattern.split(",")[0].replace("[*.]", ""))
-                    add("device", f"{site} can use your {label}", None, "Preferences", f"content_settings.{key}",
-                        domain=site, permission=label)
-        if any(r.meta.get("permission") == "location" for r in recs):
-            cov["location"] = "found"
+        row = source_row(prefs, "browser_permissions")
+        try:
+            data = json.loads(prefs.read_text(encoding="utf-8"))
+            exc = data.get("profile", {}).get("content_settings", {}).get("exceptions", {})
+            if not isinstance(exc, dict):
+                raise ValueError("Browser permission exceptions are not an object")
+            skipped = 0
+            for key, label in PERMS.items():
+                values = exc.get(key, {})
+                if not isinstance(values, dict):
+                    skipped += 1
+                    continue
+                for pattern, value in values.items():
+                    if not isinstance(pattern, str) or not isinstance(value, dict):
+                        skipped += 1
+                        continue
+                    if value.get("setting") == 1:
+                        site = _host(pattern.split(",")[0].replace("[*.]", ""))
+                        add("device", f"{site} can use your {label}", None, "Preferences", f"content_settings.{key}",
+                            domain=site, permission=label)
+            row["status"] = "partial" if skipped else "scanned"
+            row["detail"] = "Checked location, camera, microphone and notification permissions. Other preferences were not assessed."
+            if skipped:
+                row["detail"] += f" {skipped} malformed entries skipped."
+            if any(r.meta.get("permission") == "location" for r in recs):
+                cov["location"] = "found"
+        except (OSError, ValueError, AttributeError) as exc:
+            row["status"], row["detail"] = "unavailable", f"Browser permissions unavailable: {exc}"
+            if warnings is None:
+                raise ParseError("unknown", row["detail"], str(prefs)) from None
+            warnings.append({"code": "unknown", "file": str(prefs), "message": row["detail"]})
+    source_row(hist, "browser_history")
+    source_row(cookies or profile / "Network" / "Cookies", "browser_cookies")
+    source_row(logins, "browser_logins")
+    source_row(prefs, "browser_permissions")
+    if source_coverage is not None:
+        for row in states.values():
+            row["records"] = sum(r.sourceFile == row["source"] if live else Path(r.sourceFile).name == Path(row["source"]).name for r in recs)
+            source_coverage.append(row)
 
     if not recs and warnings is None:
         raise ParseError("wrong_format", "No browser data found in this folder", src)

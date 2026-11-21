@@ -47,7 +47,7 @@ def parse(path, data=None):
             add("device", "device", f"{app['name']} holds {size / 1_000_000_000:.2f} GB of app data", f"laptop.apps[{i}] path={app.get('path', '')}",
                 timestamp=app.get("last_modified") if isinstance(app.get("last_modified"), str) else scanned,
                 source="laptop_store", app=app["name"], path=str(app.get("path") or ""), bytes=size,
-                files=count(app.get("files")), partial=bool(laptop.get("partial")))
+                files=count(app.get("files")), partial=bool(app.get("partial", laptop.get("storage_partial", laptop.get("partial")))))
         logs = laptop.get("logs") if isinstance(laptop.get("logs"), list) else []
         for i, log in enumerate(logs):
             if not isinstance(log, dict):

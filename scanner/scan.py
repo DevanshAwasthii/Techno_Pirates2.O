@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 from datetime import datetime, timedelta, timezone
 import json
+from math import isfinite
 import os
 from pathlib import Path
 import re
@@ -20,7 +21,7 @@ MAX_LOG_FILES = 300
 MAX_APPS = 30
 WALK_SECONDS = 20
 ADB_TIMEOUT = 8
-EMAIL = re.compile(rb"(?i)(?<![\w.+-])[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}(?![\w.-])")
+EMAIL = re.compile(rb"(?i)(?<![\w.+-])[a-z0-9._%+-]{1,64}@[a-z0-9.-]{1,253}\.[a-z]{2,63}(?![\w.-])")
 OCTET = rb"(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)"
 IPV4 = re.compile(rb"(?<![\d.])" + OCTET + rb"(?:\." + OCTET + rb"){3}(?![\d.])")
 PHONE = re.compile(rb"(?<![\w+])(?:\+91[ -]?)?[6-9]\d{4}[ -]?\d{5}(?!\w)")
@@ -38,11 +39,20 @@ def scan_laptop(max_seconds=WALK_SECONDS):
     A deadline and inaccessible entries can make sizes lower bounds. The partial
     flag records that limitation instead of claiming a complete inventory.
     """
+    if not isfinite(max_seconds):
+        raise ValueError("Scan time budget must be finite")
     start = time.monotonic()
     deadline = start + max(0, max_seconds)
     walk_deadline = start + max(0, max_seconds) * 0.75
     apps, candidates, roots, folders = [], {}, set(), []
-    partial, recent = False, 0
+    scope = {"budget_seconds": max(0, max_seconds), "folder_limit": MAX_APPS,
+             "log_limit": MAX_LOG_FILES, "log_max_bytes": MAX_LOG_BYTES,
+             "folders_discovered": 0, "folders_measured": 0, "folders_complete": 0,
+             "folders_reported": 0, "storage_errors": 0, "storage_time_limited": max_seconds <= 0,
+             "logs_candidates": 0, "logs_checked": 0, "logs_skipped_large": 0,
+             "logs_skipped_limit": 0, "logs_errors": 0, "logs_time_limited": False,
+             "recent_checked": False, "recent_errors": 0, "links_skipped": 0}
+    recent = 0
     for variable in ("APPDATA", "LOCALAPPDATA"):
         raw = os.environ.get(variable)
         if not raw:
@@ -56,39 +66,46 @@ def scan_laptop(max_seconds=WALK_SECONDS):
             with os.scandir(root) as entries:
                 for entry in entries:
                     if time.monotonic() >= walk_deadline:
-                        partial = True
+                        scope["storage_time_limited"] = True
                         break
                     try:
-                        if entry.is_dir(follow_symlinks=False) and not os.path.isjunction(entry.path):
+                        if entry.is_symlink() or os.path.isjunction(entry.path):
+                            scope["links_skipped"] += 1
+                        elif entry.is_dir(follow_symlinks=False):
                             folders.append(Path(entry.path))
                     except OSError:
-                        partial = True
+                        scope["storage_errors"] += 1
         except OSError:
-            partial = True
+            scope["storage_errors"] += 1
+    scope["roots_provided"] = len(roots)
+    scope["folders_discovered"] = len(folders)
     raw = os.environ.get("APPDATA")
     if raw:
         try:
             with os.scandir(Path(raw) / "Microsoft" / "Windows" / "Recent") as entries:
+                scope["recent_checked"] = True
                 for entry in entries:
                     if time.monotonic() >= walk_deadline:
-                        partial = True
+                        scope["recent_checked"] = False
                         break
                     try:
                         if entry.name.lower().endswith(".lnk") and entry.is_file(follow_symlinks=False):
                             recent += 1
                     except OSError:
-                        partial = True
-        except OSError:
+                        scope["recent_errors"] += 1
+        except FileNotFoundError:
             pass
-    folders.sort(key=lambda p: str(p).lower())
+        except OSError:
+            scope["recent_errors"] += 1
+    folders.sort(key=lambda path: str(path).lower())
     for index, folder in enumerate(folders):
         now = time.monotonic()
         if now >= walk_deadline:
-            partial = True
+            scope["storage_time_limited"] = True
             break
-        # Share the budget across folders and reserve time for bounded log counts.
         folder_deadline = now + (walk_deadline - now) / (len(folders) - index)
-        total, count, modified = 0, 0, 0
+        total, count, modified, eligible, large = 0, 0, 0, 0, 0
+        folder_partial = False
         logs, stack = [], [folder]
         while stack and time.monotonic() < folder_deadline:
             directory = stack.pop()
@@ -96,10 +113,11 @@ def scan_laptop(max_seconds=WALK_SECONDS):
                 with os.scandir(directory) as entries:
                     for entry in entries:
                         if time.monotonic() >= folder_deadline:
-                            partial = True
+                            folder_partial = scope["storage_time_limited"] = True
                             break
                         try:
                             if entry.is_symlink() or os.path.isjunction(entry.path):
+                                scope["links_skipped"] += 1
                                 continue
                             if entry.is_dir(follow_symlinks=False):
                                 stack.append(Path(entry.path))
@@ -108,43 +126,66 @@ def scan_laptop(max_seconds=WALK_SECONDS):
                                 total += stat.st_size
                                 count += 1
                                 modified = max(modified, stat.st_mtime)
-                                if Path(entry.name).suffix.lower() in {".log", ".txt"} and stat.st_size <= MAX_LOG_BYTES:
-                                    if len(logs) < MAX_LOG_FILES:
-                                        logs.append(Path(entry.path))
+                                if Path(entry.name).suffix.lower() in {".log", ".txt"}:
+                                    if stat.st_size > MAX_LOG_BYTES:
+                                        large += 1
                                     else:
-                                        partial = True
+                                        eligible += 1
+                                        if len(logs) < MAX_LOG_FILES:
+                                            logs.append(Path(entry.path))
                         except OSError:
-                            partial = True
+                            folder_partial = True
+                            scope["storage_errors"] += 1
             except OSError:
-                partial = True
+                folder_partial = True
+                scope["storage_errors"] += 1
         if stack or time.monotonic() >= folder_deadline:
-            partial = True
+            folder_partial = scope["storage_time_limited"] = True
+        scope["folders_measured"] += 1
+        if not folder_partial:
+            scope["folders_complete"] += 1
         apps.append({"name": folder.name, "path": str(folder), "bytes": total,
-                     "files": count, "last_modified": _iso(modified) if modified else None})
-        candidates[str(folder)] = logs
+                     "files": count, "last_modified": _iso(modified) if modified else None,
+                     "partial": folder_partial})
+        candidates[str(folder)] = (logs, eligible, large)
     apps.sort(key=lambda app: (-app["bytes"], app["path"].lower()))
     apps = apps[:MAX_APPS]
-    logs = []
+    scope["folders_reported"] = len(apps)
+    scope["logs_candidates"] = sum(candidates[a["path"]][1] for a in apps)
+    scope["logs_skipped_large"] = sum(candidates[a["path"]][2] for a in apps)
+    scope["logs_skipped_limit"] = max(0, scope["logs_candidates"] - MAX_LOG_FILES)
+    logs, attempted = [], 0
     for app in apps:
-        for path in candidates[app["path"]]:
-            if len(logs) >= MAX_LOG_FILES or time.monotonic() >= deadline:
-                partial = True
+        for path in candidates[app["path"]][0]:
+            if attempted >= MAX_LOG_FILES:
                 break
+            if time.monotonic() >= deadline:
+                scope["logs_time_limited"] = True
+                break
+            attempted += 1
             try:
                 if path.is_symlink() or path.stat().st_size > MAX_LOG_BYTES:
+                    scope["logs_skipped_large"] += 1
                     continue
                 with path.open("rb") as stream:
                     raw = stream.read(MAX_LOG_BYTES + 1)
                 if len(raw) > MAX_LOG_BYTES:
+                    scope["logs_skipped_large"] += 1
                     continue
-                counts = {"emails": sum(1 for _ in EMAIL.finditer(raw)),
+                counts = {"emails": sum(1 for _ in EMAIL.finditer(raw)) if b"@" in raw else 0,
                           "ips": sum(1 for _ in IPV4.finditer(raw)),
                           "phones": sum(1 for _ in PHONE.finditer(raw))}
                 logs.append({"app": app["name"], "path": str(path), **counts})
                 del raw
             except OSError:
-                partial = True
-    return {"apps": apps, "logs": logs, "recent_files": recent, "partial": partial or time.monotonic() >= deadline,
+                scope["logs_errors"] += 1
+    scope["logs_checked"] = len(logs)
+    storage_partial = bool(scope["storage_errors"] or scope["storage_time_limited"] or not roots)
+    logs_partial = bool(storage_partial or scope["logs_skipped_large"] or scope["logs_skipped_limit"] or
+                        scope["logs_errors"] or scope["logs_time_limited"])
+    return {"apps": apps, "logs": logs, "recent_files": recent,
+            "partial": storage_partial or logs_partial or bool(scope["recent_errors"]),
+            "storage_partial": storage_partial, "logs_partial": logs_partial, "scope": scope,
             "scan_seconds": round(time.monotonic() - start, 3)}
 
 
@@ -218,7 +259,7 @@ def scan_android():
         device = sorted(devices)[0]
         packages = sorted({line.split(":", 1)[1].strip() for line in _adb("-s", device, "shell", "pm", "list", "packages", "-3").splitlines()
                            if re.fullmatch(r"package:[A-Za-z0-9_.]+", line.strip())})
-        apps = []
+        apps, errors = [], []
         for package in packages:
             try:
                 dump = _adb("-s", device, "shell", "dumpsys", "package", package)
@@ -235,8 +276,10 @@ def scan_android():
                 access = parse_appops(_adb("-s", device, "shell", "cmd", "appops", "get", package))
                 apps.append({"package": package, "granted": sorted(granted), "last_access": access})
             except RuntimeError as exc:
+                errors.append({"package": package, "message": str(exc)})
                 print(f"Android package {package}: {exc}", file=sys.stderr)
-        return {"device": device, "apps": apps}
+        return {"device": device, "apps": apps, "partial": bool(errors),
+                "packages_total": len(packages), "packages_scanned": len(apps), "errors": errors}
     except RuntimeError as exc:
         print(f"Android scan: {exc}", file=sys.stderr)
         return None
@@ -246,8 +289,11 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--android", action="store_true", help="Also scan an authorised adb device")
     parser.add_argument("--output", type=Path, default=Path("device_scan.json"))
+    parser.add_argument("--seconds", type=float, default=WALK_SECONDS, help="Laptop scan time budget (default: 20 seconds)")
     args = parser.parse_args(argv)
-    result = {"scanned_at": datetime.now(timezone.utc).isoformat(), "laptop": scan_laptop(),
+    if not isfinite(args.seconds) or args.seconds <= 0:
+        parser.error("--seconds must be positive and finite")
+    result = {"scanned_at": datetime.now(timezone.utc).isoformat(), "laptop": scan_laptop(max_seconds=args.seconds),
               "android": scan_android() if args.android else None}
     args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print(f"Saved: {args.output.resolve()}")

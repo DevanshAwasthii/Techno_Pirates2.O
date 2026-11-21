@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 
 from app.engine.records import ParseError, to_dict
+from app.engine.coverage import laptop_sources, coverage_rows
 from app.engine.rules import build_findings, build_graph
 import shutil
 import tempfile
@@ -29,14 +30,18 @@ def _wa_text(raw: bytes) -> str:
     return raw.decode("utf-8-sig", errors="replace")
 
 
-def _detect_and_parse(path: Path, wa_offset: int = 0, warnings=None):
+def _detect_and_parse(path: Path, wa_offset: int = 0, warnings=None, source_coverage=None):
     """Pick a parser by content, not filename. Returns (platform, records, coverage)."""
     suffix = path.suffix.lower()
     if chrome.is_profile(path):
-        recs, cov = chrome.parse(path, warnings=warnings)
+        recs, cov = chrome.parse(path, warnings=warnings, source_coverage=source_coverage)
         return "chrome", recs, cov
     if suffix == ".ndjson":
-        recs, cov, _ = iosPrivacy.parse(path)
+        recs, cov, stats = iosPrivacy.parse(path)
+        if source_coverage is not None:
+            source_coverage.append({"name": path.name, "source": str(path), "platform": "ios", "kind": "ios_report",
+                                    "status": "partial" if stats["bad_lines"] else "scanned", "records": len(recs),
+                                    "detail": f"{len(recs)} events read; {stats['bad_lines']} bad lines skipped; {stats['ignored_lines']} end events or unsupported rows excluded."})
         return "ios", recs, cov
     if suffix not in {".zip", ".mbox"}:
         with path.open("rb") as stream:
@@ -48,6 +53,8 @@ def _detect_and_parse(path: Path, wa_offset: int = 0, warnings=None):
                 raise ParseError("wrong_format", "Invalid JSON scan file", path.name) from None
             if isinstance(data, dict) and ("laptop" in data or "android" in data):
                 recs, cov = deviceScan.parse(path, data)
+                if source_coverage is not None:
+                    source_coverage.extend(laptop_sources(path, data))
                 return None, recs, cov  # One scan can cover both laptop and Android.
             raise ParseError("wrong_format", "JSON is not a device scan", path.name)
     if suffix == ".zip":
@@ -99,6 +106,7 @@ def _wa_cov():
 
 def run(paths, progress=lambda *a: None, cancel=None) -> dict:
     records, coverage, errors = [], {}, []
+    source_coverage = []
     media = ocr.VIDEO | ocr.IMAGE
     # recordings last: OCR snaps names to people already found in the exports
     paths = sorted((Path(p) for p in paths), key=lambda p: p.suffix.lower() in media)
@@ -106,6 +114,7 @@ def run(paths, progress=lambda *a: None, cancel=None) -> dict:
         if cancel is not None and cancel.is_set():
             raise Cancelled()
         progress("parse", p.name, int(80 * i / max(len(paths), 1)))
+        records_before, errors_before, coverage_before = len(records), len(errors), len(source_coverage)
         try:
             if p.suffix.lower() in media:
                 known = sorted({n for r in records for n in [r.meta.get("person")] if n})
@@ -115,7 +124,7 @@ def run(paths, progress=lambda *a: None, cancel=None) -> dict:
                 prev = coverage.get(platform, {})
                 coverage[platform] = {k: ("found" if "found" in (v, prev.get(k)) else prev.get(k, v)) for k, v in cov.items()}
                 continue
-            platform, recs, cov = _detect_and_parse(p, sum(r.platform == "whatsapp" for r in records), warnings=errors)
+            platform, recs, cov = _detect_and_parse(p, sum(r.platform == "whatsapp" for r in records), warnings=errors, source_coverage=source_coverage)
             records += recs
             sections = cov if platform is None else {platform: cov}
             for name, values in sections.items():
@@ -125,17 +134,29 @@ def run(paths, progress=lambda *a: None, cancel=None) -> dict:
             errors.append(e.to_dict())
         except Exception as e:  # never crash the whole run on one file
             errors.append({"code": "unknown", "message": str(e), "file": p.name})
+        finally:
+            if len(source_coverage) == coverage_before:
+                added = records[records_before:]
+                issues = errors[errors_before:]
+                platforms = sorted({r.platform for r in added})
+                source_coverage.append({"name": p.name, "source": str(p), "platform": ", ".join(platforms), "kind": "import",
+                                        "status": "partial" if issues and added else "unavailable" if issues else "scanned",
+                                        "records": len(added), "detail": "; ".join(str(error.get("message", "Unavailable")) for error in issues)
+                                        if issues else f"{len(added)} records extracted by the supported parser; other contents were not assessed."})
     # only chat-export messages carry chat/senders; OCR status records do not
     whatsapp.assign_owner([r for r in records if r.platform == "whatsapp" and "chat" in r.meta])
     progress("rules", "", 90)
     findings, summary = build_findings(records)
     graph = build_graph(records, summary)
     progress("done", "", 100)
-    return {
+    result = {
         "records": [to_dict(r) for r in records],
         "findings": [to_dict(f) for f in findings],
         "coverage": coverage,
         "summary": summary,
         "graph": graph,
         "errors": errors,
+        "sourceCoverage": source_coverage,
     }
+    result["sourceCoverage"] = coverage_rows(result)
+    return result

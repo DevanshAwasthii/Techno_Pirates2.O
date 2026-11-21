@@ -15,6 +15,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib import pyplot as plt
 from fpdf import FPDF
 
+from app.engine.coverage import STATUS_LABELS, coverage_rows, audit_is_partial, tracker_display, storage_display, chat_display
+
 ROOT = Path(r"D:\NEXDATA")
 REPORT_PATH = ROOT / "NexData_report.pdf"
 BG = "#10151f"
@@ -23,8 +25,9 @@ TEXT = "#ecf2fa"
 MUTED = "#a4b2c5"
 CYAN = "#56d9ed"
 PRIORITIES = {"high": "#c84959", "medium": "#a97522", "low": "#536174"}
-NODE_COLORS = {"user": "#ffffff", "advertiser": "#f26873", "service": "#ffa75c", "person": CYAN}
-TAB_NAMES = ("Footprint", "What they know", "Inner circle", "Findings", "Fix first")
+NODE_COLORS = {"user": "#ffffff", "advertiser": "#f26873", "service": "#ffa75c", "person": CYAN, "tracker": "#cba6f7"}
+TAB_NAMES = ("Footprint", "Scan coverage", "What they know", "Inner circle", "Findings", "Fix first")
+SCAN_MODES = {"Quick (20s)": 20, "Extended (120s)": 120}
 
 
 def is_demo_path(path):
@@ -94,8 +97,18 @@ def report_bytes(result):
     line(datetime.now().strftime("Generated %Y-%m-%d %H:%M"))
     summary = result.get("summary") or {}
     line(f"Services holding your data: {summary.get('servicesFound', 0)}")
-    line(f"Sensitive items in chats: {summary.get('sensitiveHits', 0)}")
-    line(f"People ranked: {len(summary.get('topPeople') or [])}")
+    line(f"Sensitive items in chats: {chat_display(result)}")
+    line(f"People ranked: {len(summary['topPeople']) if summary.get('topPeople') else 'Not provided'}")
+    if result.get("sourceMode") == "pc":
+        line(f"Selected app-folder data (GB): {storage_display(result)}")
+        line(f"Browser tracker indicators: {tracker_display(result)}")
+    line("Coverage: partial" if audit_is_partial(result) else "Supported checks finished; unprovided sources remain unassessed")
+    line("Scan coverage", 14, True)
+    for row in coverage_rows(result):
+        line(f"{row['name']} [{STATUS_LABELS.get(row['status'], row['status'])}]", 11, True)
+        line(row["detail"])
+        if row.get("source"):
+            line(row["source"], 9)
     line(f"Records reviewed: {len(result.get('records') or [])}")
     pdf.ln(3)
     line("Platform coverage", 14, True)
@@ -148,9 +161,12 @@ class NexDataApp(ctk.CTk):
         ctk.CTkLabel(top, text="NexData", font=("Segoe UI", 27, "bold"), text_color=TEXT).grid(row=0, column=0, padx=(22, 18), pady=18)
         ctk.CTkLabel(top, text="Offline - nothing leaves this device", fg_color="#173e32", text_color="#87e3b1", corner_radius=8, padx=12).grid(row=0, column=1)
         self.open_button = ctk.CTkButton(top, text="Open my exports...", command=self.open_files, width=150)
-        self.open_button.grid(row=0, column=3, padx=(10, 10))
+        self.scan_mode = ctk.CTkOptionMenu(top, values=list(SCAN_MODES), width=145)
+        self.scan_mode.set("Quick (20s)")
+        self.scan_mode.grid(row=0, column=3, padx=8)
+        self.open_button.grid(row=0, column=4, padx=(4, 10))
         self.scan_button = ctk.CTkButton(top, text="Scan this PC", command=self.scan_laptop, width=145, fg_color="#217989")
-        self.scan_button.grid(row=0, column=4, padx=(0, 22))
+        self.scan_button.grid(row=0, column=5, padx=(0, 22))
 
         status = ctk.CTkFrame(self, fg_color="transparent")
         status.grid(row=1, column=0, sticky="ew", padx=22, pady=(10, 0))
@@ -192,11 +208,13 @@ class NexDataApp(ctk.CTk):
         if self.loading or self.closing:
             return
         self.loading = True
+        budget = SCAN_MODES[self.scan_mode.get()]
+        self.scan_mode.configure(state="disabled")
         self.resolve_button.configure(state="disabled")
         for button in (self.open_button, self.scan_button):
             button.configure(state="disabled")
         self.show_errors("")
-        self.status_label.configure(text="Scanning this PC: app folders, log pattern counts and browser metadata...")
+        self.status_label.configure(text=f"Scanning this PC with a {budget}s budget; fixed folder/log limits still apply...")
         self.progress.grid()
         self.progress.start()
 
@@ -205,7 +223,7 @@ class NexDataApp(ctk.CTk):
                 from scanner.scan import scan_laptop
                 from app.parsers.chrome import default_profiles
                 profiles = default_profiles()
-                scan = {"scanned_at": datetime.now(timezone.utc).isoformat(), "laptop": scan_laptop(), "android": None}
+                scan = {"scanned_at": datetime.now(timezone.utc).isoformat(), "laptop": scan_laptop(max_seconds=budget), "android": None}
                 path = ROOT / ".cache" / "device_scan.json"
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_text(json.dumps(scan, indent=2) + "\n", encoding="utf-8")
@@ -234,7 +252,7 @@ class NexDataApp(ctk.CTk):
                                   "This can interrupt browser background apps or downloads. Allow this and scan again?", parent=self):
             return
         self.loading = True
-        for button in (self.open_button, self.scan_button, self.resolve_button):
+        for button in (self.open_button, self.scan_button, self.resolve_button, self.scan_mode):
             button.configure(state="disabled")
         self.status_label.configure(text="Requesting a normal exit from the browsers holding these files...")
         self.progress.grid()
@@ -272,6 +290,7 @@ class NexDataApp(ctk.CTk):
         self.source_mode = source_mode
         self.source_label.configure(text="REAL PC SCAN | App folders and available browser metadata. Social accounts and phones require your own exports." if source_mode == "pc" else "YOUR SELECTED IMPORTS | Showing only the files you selected; their origin is not independently verified.")
         self.pending_paths = list(paths)
+        self.scan_mode.configure(state="disabled")
         self.resolve_button.configure(state="disabled")
         self.scan_button.configure(state="disabled")
         self.open_button.configure(state="disabled")
@@ -303,6 +322,7 @@ class NexDataApp(ctk.CTk):
         self.open_button.configure(state="normal")
         self.scan_button.configure(state="normal")
         self.resolve_button.configure(state="normal")
+        self.scan_mode.configure(state="normal")
 
     def load_failed(self, message):
         self.finish_loading()
@@ -319,18 +339,22 @@ class NexDataApp(ctk.CTk):
                 for child in self.tabs.tab(name).winfo_children():
                     child.destroy()
             self.render_footprint(charts)
+            self.render_coverage()
             self.render_knowledge()
             self.render_circle(charts)
             self.render_findings()
             self.render_actions()
-            self.status_label.configure(text=f"Audit complete | {count} file(s) | {len(result.get('records') or [])} records | {len(result.get('findings') or [])} findings")
+            partial = audit_is_partial(result)
+            state = "Partial coverage" if partial else "Supported checks finished"
+            self.status_label.configure(text=f"{state} | {count} inputs | {len(result.get('records') or [])} records | {len(result.get('findings') or [])} findings")
+            self.source_label.configure(text=("REAL PC DATA" if self.source_mode == "pc" else "USER-SELECTED IMPORTS") + " | See Scan coverage for limits and unprovided sources. No missing data is guessed.")
             self.show_errors(error_text(result.get("errors")))
             if any(error.get("blocked_by") for error in result.get("errors") or []):
                 self.resolve_button.grid()
             else:
                 self.resolve_button.grid_remove()
-            mode = "Real PC scan complete" if self.source_mode == "pc" else "User imports"
-            self.title("NexData - Personal Data Footprint Auditor | " + mode + (" (partial)" if result.get("errors") else ""))
+            mode = "Real PC scan finished" if self.source_mode == "pc" else "User imports"
+            self.title("NexData - Personal Data Footprint Auditor | " + mode + (" (partial coverage)" if partial else " (supported checks)"))
         except Exception as exc:
             self.status_label.configure(text="Some audit views could not be displayed.")
             self.show_errors(error_text(result.get("errors")) + f"\nDisplay error: {exc}")
@@ -380,9 +404,9 @@ class NexDataApp(ctk.CTk):
         stats.grid(row=0, column=0, sticky="ew", pady=8)
         summary = self.result.get("summary") or {}
         if self.source_mode == "pc":
-            values = [("App folders measured", summary.get("laptopDataApps", 0)),
-                      ("App data measured (GB)", f"{summary.get('laptopDataBytes', 0) / 1_000_000_000:.2f}"),
-                      ("Browser tracker domains", summary.get("trackersFound", 0) if "chrome" in self.result.get("coverage", {}) else "Unavailable")]
+            values = [("App folders reported", summary.get("laptopDataApps", 0)),
+                      ("Selected app data (GB; + = lower bound)", storage_display(self.result)),
+                      ("Browser tracker indicators (+ = partial)", tracker_display(self.result))]
         else:
             messages = any(r.get("category") == "message" for r in self.result.get("records") or [])
             values = [("Services found in imports", summary.get("servicesFound", 0)),
@@ -396,8 +420,8 @@ class NexDataApp(ctk.CTk):
             self.label(card, title, color=MUTED, size=13)
         plot = ctk.CTkFrame(page, fg_color=PANEL)
         plot.grid(row=1, column=0, sticky="nsew")
-        self.label(plot, "Your data connections", bold=True, size=17)
-        self.label(plot, "White: you     Red: advertiser     Orange: service     Cyan: person", color=MUTED, size=12)
+        self.label(plot, "Connections in stored browser metadata", bold=True, size=17)
+        self.label(plot, "White: you     Red: advertiser     Orange: service     Cyan: person     Purple: tracker indicator. Not live network traffic.", color=MUTED, size=12)
         graph, positions, _ = charts
         fig, ax = self.new_figure(4.0)
         if graph:
@@ -410,6 +434,22 @@ class NexDataApp(ctk.CTk):
         ax.set_axis_off()
         fig.tight_layout(pad=0.5)
         self.mount_chart(plot, fig)
+
+    def render_coverage(self):
+        page = self.scroll_page("Scan coverage")
+        self.label(page, "What was checked, and what is missing", bold=True, size=20)
+        self.label(page, "A finished scan covers supported checks only. Folder/log limits, unreadable files and missing imports remain explicit below.", color=MUTED, size=13)
+        palette = {"scanned": "#206348", "partial": "#986c28", "unavailable": "#a94450",
+                   "not_provided": "#536174", "not_assessed": "#536174"}
+        for row in coverage_rows(self.result):
+            card = self.card(page)
+            status = row.get("status", "not_assessed")
+            ctk.CTkLabel(card, text=STATUS_LABELS.get(status, status), fg_color=palette.get(status, "#536174"),
+                         corner_radius=7, width=110, height=24, font=("Segoe UI", 11, "bold")).pack(anchor="w", padx=16, pady=(10, 3))
+            self.label(card, row["name"], bold=True, size=16)
+            self.label(card, row["detail"], color=MUTED, size=13)
+            if row.get("source"):
+                self.label(card, row["source"], color=MUTED, size=11)
 
     def render_knowledge(self):
         page = self.scroll_page("What they know")
