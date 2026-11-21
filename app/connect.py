@@ -22,11 +22,6 @@ PLATFORMS = {
             "Click 'Create files'. When Meta emails you, download the zip - NexData imports it automatically.",
         ],
     },
-    "Facebook": {
-        "url": "https://accountscenter.facebook.com/info_and_permissions/dyi/",
-        "patterns": ["facebook-*.zip"],
-        "steps": ["Same as Instagram: Some of your information, Download to device, All time, JSON, Low quality."],
-    },
     "Google (Gmail, Chrome, YouTube)": {
         "url": "https://takeout.google.com/",
         "patterns": ["takeout-*.zip"],
