@@ -8,6 +8,7 @@ One bad file never stops the others: its error goes into "errors".
 from __future__ import annotations
 
 import zipfile
+import json
 from pathlib import Path
 
 from app.engine.records import ParseError, to_dict
@@ -15,7 +16,7 @@ from app.engine.rules import build_findings, build_graph
 import shutil
 import tempfile
 
-from app.parsers import instagram, spotify, whatsapp, mbox, chrome, ocr
+from app.parsers import instagram, spotify, whatsapp, mbox, chrome, ocr, deviceScan, iosPrivacy
 
 TMP = Path(__file__).resolve().parents[1] / ".cache" / "tmp"  # stays on the project drive
 
@@ -34,6 +35,21 @@ def _detect_and_parse(path: Path, wa_offset: int = 0):
     if chrome.is_profile(path):
         recs, cov = chrome.parse(path)
         return "chrome", recs, cov
+    if suffix == ".ndjson":
+        recs, cov, _ = iosPrivacy.parse(path)
+        return "ios", recs, cov
+    if suffix not in {".zip", ".mbox"}:
+        with path.open("rb") as stream:
+            looks_json = stream.read(256).lstrip(b"\xef\xbb\xbf \t\r\n").startswith(b"{")
+        if looks_json or suffix == ".json":
+            try:
+                data = json.loads(path.read_text(encoding="utf-8-sig"))
+            except (ValueError, UnicodeError):
+                raise ParseError("wrong_format", "Invalid JSON scan file", path.name) from None
+            if isinstance(data, dict) and ("laptop" in data or "android" in data):
+                recs, cov = deviceScan.parse(path, data)
+                return None, recs, cov  # One scan can cover both laptop and Android.
+            raise ParseError("wrong_format", "JSON is not a device scan", path.name)
     if suffix == ".zip":
         try:
             zf = zipfile.ZipFile(path)
@@ -101,8 +117,10 @@ def run(paths, progress=lambda *a: None, cancel=None) -> dict:
                 continue
             platform, recs, cov = _detect_and_parse(p, sum(r.platform == "whatsapp" for r in records))
             records += recs
-            prev = coverage.get(platform, {})
-            coverage[platform] = {k: ("found" if "found" in (v, prev.get(k)) else v) for k, v in cov.items()}
+            sections = cov if platform is None else {platform: cov}
+            for name, values in sections.items():
+                prev = coverage.get(name, {})
+                coverage[name] = {k: ("found" if "found" in (v, prev.get(k)) else v) for k, v in values.items()}
         except ParseError as e:
             errors.append(e.to_dict())
         except Exception as e:  # never crash the whole run on one file

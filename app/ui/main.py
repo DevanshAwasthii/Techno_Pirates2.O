@@ -1,9 +1,10 @@
 """Run with: D:\\NEXDATA\\.venv\\Scripts\\python.exe -m app.ui.main"""
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 import threading
+import json
 import webbrowser
 from tkinter import TclError, filedialog
 
@@ -116,6 +117,8 @@ class NexDataApp(ctk.CTk):
         self.minsize(1000, 680)
         self.configure(fg_color=BG)
         self.result = {}
+        self.loaded_paths = []
+        self.pending_paths = []
         self.records_by_id = {}
         self.figures = []
         self.canvases = []
@@ -133,7 +136,9 @@ class NexDataApp(ctk.CTk):
         self.demo_button = ctk.CTkButton(top, text="Load demo persona", command=self.load_demo, width=160, fg_color="#217989", hover_color="#2b92a5")
         self.demo_button.grid(row=0, column=3, padx=10)
         self.open_button = ctk.CTkButton(top, text="Open files...", command=self.open_files, width=125)
-        self.open_button.grid(row=0, column=4, padx=(0, 22))
+        self.open_button.grid(row=0, column=4, padx=(0, 10))
+        self.scan_button = ctk.CTkButton(top, text="Scan this laptop", command=self.scan_laptop, width=145, fg_color="#217989")
+        self.scan_button.grid(row=0, column=5, padx=(0, 22))
 
         status = ctk.CTkFrame(self, fg_color="transparent")
         status.grid(row=1, column=0, sticky="ew", padx=22, pady=(10, 0))
@@ -164,19 +169,49 @@ class NexDataApp(ctk.CTk):
     def load_demo(self):
         try:
             paths = sorted(str(p.resolve()) for p in (ROOT / "samples").iterdir()
-                           if p.is_file() and p.name.startswith("persona_") and p.suffix.lower() in {".zip", ".txt", ".mbox", ".mp4"})
+                           if p.is_file() and p.name.startswith("persona_") and p.suffix.lower() in {".zip", ".txt", ".mbox", ".mp4", ".ndjson", ".json"})
         except OSError as exc:
             self.show_errors(str(exc))
             return
         if not paths:
-            self.show_errors("No persona_*.zip, persona_*.txt or persona_*.mbox files found in D:\\NEXDATA\\samples.")
+            self.show_errors("No supported persona_* files found in D:\\NEXDATA\\samples.")
             return
         self.load_paths(paths)
 
     def open_files(self):
-        paths = filedialog.askopenfilenames(parent=self, title="Open personal data exports", initialdir=str(ROOT / "samples"), filetypes=[("Data exports", "*.zip *.txt *.mbox"), ("All files", "*.*")])
+        paths = filedialog.askopenfilenames(parent=self, title="Open personal data exports", initialdir=str(ROOT / "samples"), filetypes=[("Data exports", "*.zip *.txt *.mbox *.mp4 *.mov *.mkv *.avi *.png *.jpg *.jpeg *.ndjson *.json"), ("All files", "*.*")])
         if paths:
             self.load_paths(paths)
+
+    def scan_laptop(self):
+        if self.loading or self.closing:
+            return
+        self.loading = True
+        for button in (self.demo_button, self.open_button, self.scan_button):
+            button.configure(state="disabled")
+        self.show_errors("")
+        self.status_label.configure(text="Scanning app folders and counting log patterns locally...")
+        self.progress.grid()
+        self.progress.start()
+
+        def worker():
+            try:
+                from scanner.scan import scan_laptop
+                scan = {"scanned_at": datetime.now(timezone.utc).isoformat(), "laptop": scan_laptop(), "android": None}
+                path = ROOT / ".cache" / "device_scan.json"
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(json.dumps(scan, indent=2) + "\n", encoding="utf-8")
+            except Exception as exc:
+                self.dispatch(self.load_failed, f"Laptop scan could not finish: {exc}")
+            else:
+                self.dispatch(self.scan_complete, path)
+
+        threading.Thread(target=worker, name="nexdata-device-scan", daemon=True).start()
+
+    def scan_complete(self, path):
+        paths = [p for p in self.loaded_paths if Path(p).resolve() != path.resolve()]
+        self.finish_loading()
+        self.load_paths(paths + [str(path)])
 
     def dispatch(self, callback, *args):
         if not self.closing:
@@ -189,6 +224,8 @@ class NexDataApp(ctk.CTk):
         if self.loading or self.closing:
             return
         self.loading = True
+        self.pending_paths = list(paths)
+        self.scan_button.configure(state="disabled")
         self.demo_button.configure(state="disabled")
         self.open_button.configure(state="disabled")
         self.show_errors("")
@@ -214,6 +251,7 @@ class NexDataApp(ctk.CTk):
         self.progress.grid_remove()
         self.demo_button.configure(state="normal")
         self.open_button.configure(state="normal")
+        self.scan_button.configure(state="normal")
 
     def load_failed(self, message):
         self.finish_loading()
@@ -223,6 +261,7 @@ class NexDataApp(ctk.CTk):
     def load_complete(self, result, charts, count):
         try:
             self.result = result
+            self.loaded_paths = list(self.pending_paths)
             self.records_by_id = {r.get("id"): r for r in result.get("records") or []}
             self.clear_figures()
             for name in TAB_NAMES:

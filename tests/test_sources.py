@@ -23,7 +23,7 @@ def titles(r):
 
 def test_all_platforms_parse_cleanly(full):
     assert full["errors"] == []
-    assert set(full["coverage"]) == {"instagram", "whatsapp", "spotify", "gmail", "chrome"}
+    assert set(full["coverage"]) == {"instagram", "whatsapp", "spotify", "gmail", "chrome", "device", "ios", "android"}
 
 
 def test_email_discovery_counts_accounts_not_newsletters(full):

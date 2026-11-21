@@ -1,0 +1,18 @@
+{"type": "access", "accessor": {"identifier": "com.burbn.instagram"}, "category": "location", "kind": "intervalBegin", "timeStamp": "2026-11-21T10:00:00+00:00"}
+{"type": "access", "accessor": {"identifier": "com.burbn.instagram"}, "category": "location", "kind": "intervalEnd", "timeStamp": "2026-11-21T10:00:00+00:00"}
+{"type": "access", "accessor": {"identifier": "net.whatsapp.WhatsApp"}, "category": "contacts", "kind": "intervalBegin", "timeStamp": "2026-11-21T10:00:00+00:00"}
+{"type": "access", "accessor": {"identifier": "net.whatsapp.WhatsApp"}, "category": "contacts", "kind": "intervalEnd", "timeStamp": "2026-11-21T10:00:00+00:00"}
+{"type": "access", "accessor": {"identifier": "in.swiggy.Swiggy"}, "category": "location", "kind": "intervalBegin", "timeStamp": "2026-11-21T10:00:00+00:00"}
+{"type": "access", "accessor": {"identifier": "in.swiggy.Swiggy"}, "category": "location", "kind": "intervalEnd", "timeStamp": "2026-11-21T10:00:00+00:00"}
+{"type": "access", "accessor": {"identifier": "com.truecaller.Truecaller"}, "category": "contacts", "kind": "intervalBegin", "timeStamp": "2026-11-21T10:00:00+00:00"}
+{"type": "access", "accessor": {"identifier": "com.truecaller.Truecaller"}, "category": "contacts", "kind": "intervalEnd", "timeStamp": "2026-11-21T10:00:00+00:00"}
+{"type": "access", "accessor": {"identifier": "com.burbn.instagram"}, "category": "camera", "kind": "intervalBegin", "timeStamp": "2026-11-21T10:00:00+00:00"}
+{"type": "access", "accessor": {"identifier": "com.burbn.instagram"}, "category": "camera", "kind": "intervalEnd", "timeStamp": "2026-11-21T10:00:00+00:00"}
+{"type": "access", "accessor": {"identifier": "net.whatsapp.WhatsApp"}, "category": "microphone", "kind": "intervalBegin", "timeStamp": "2026-11-21T10:00:00+00:00"}
+{"type": "access", "accessor": {"identifier": "net.whatsapp.WhatsApp"}, "category": "microphone", "kind": "intervalEnd", "timeStamp": "2026-11-21T10:00:00+00:00"}
+{"type": "networkActivity", "bundleID": "com.burbn.instagram", "domain": "graph.facebook.com", "domainOwner": "Meta", "hits": 42, "timeStamp": "2026-11-21T10:00:00+00:00", "context": "foreground"}
+{"type": "networkActivity", "bundleID": "in.swiggy.Swiggy", "domain": "api.appsflyer.com", "domainOwner": "AppsFlyer", "hits": 15, "timeStamp": "2026-11-21T10:00:00+00:00", "context": "foreground"}
+{"type": "networkActivity", "bundleID": "in.swiggy.Swiggy", "domain": "events.uxcam.com", "domainOwner": "UXCam", "hits": 8, "timeStamp": "2026-11-21T10:00:00+00:00", "context": "foreground"}
+{"type": "networkActivity", "bundleID": "com.truecaller.Truecaller", "domain": "api.branch.io", "domainOwner": "Branch", "hits": 11, "timeStamp": "2026-11-21T10:00:00+00:00", "context": "foreground"}
+{"type": "networkActivity", "bundleID": "net.whatsapp.WhatsApp", "domain": "whatsapp.net", "domainOwner": "WhatsApp", "hits": 22, "timeStamp": "2026-11-21T10:00:00+00:00", "context": "foreground"}
+{"type": "access", "accessor": {"identifier": "com.old.location"}, "category": "location", "kind": "intervalBegin", "timeStamp": "2026-10-01T09:00:00+00:00"}

@@ -727,6 +727,256 @@
    }
   },
   {
+   "id": "ds-fb66aa6964da-00001",
+   "platform": "device",
+   "category": "device",
+   "item": "WhatsApp holds 2.40 GB of app data",
+   "timestamp": "2026-11-21T10:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_device_scan.json",
+   "recordRef": "laptop.apps[0] path=C:\\Users\\Riya\\AppData\\Local\\WhatsApp",
+   "meta": {
+    "source": "laptop_store",
+    "app": "WhatsApp",
+    "path": "C:\\Users\\Riya\\AppData\\Local\\WhatsApp",
+    "bytes": 2400000000,
+    "files": 842,
+    "partial": false
+   }
+  },
+  {
+   "id": "ds-fb66aa6964da-00002",
+   "platform": "device",
+   "category": "device",
+   "item": "Google holds 1.80 GB of app data",
+   "timestamp": "2026-11-21T10:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_device_scan.json",
+   "recordRef": "laptop.apps[1] path=C:\\Users\\Riya\\AppData\\Local\\Google",
+   "meta": {
+    "source": "laptop_store",
+    "app": "Google",
+    "path": "C:\\Users\\Riya\\AppData\\Local\\Google",
+    "bytes": 1800000000,
+    "files": 2150,
+    "partial": false
+   }
+  },
+  {
+   "id": "ds-fb66aa6964da-00003",
+   "platform": "device",
+   "category": "device",
+   "item": "Spotify holds 0.60 GB of app data",
+   "timestamp": "2026-11-21T10:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_device_scan.json",
+   "recordRef": "laptop.apps[2] path=C:\\Users\\Riya\\AppData\\Roaming\\Spotify",
+   "meta": {
+    "source": "laptop_store",
+    "app": "Spotify",
+    "path": "C:\\Users\\Riya\\AppData\\Roaming\\Spotify",
+    "bytes": 600000000,
+    "files": 530,
+    "partial": false
+   }
+  },
+  {
+   "id": "ds-fb66aa6964da-00004",
+   "platform": "device",
+   "category": "device",
+   "item": "WhatsApp log: 4 email, 6 IP, 3 phone matches",
+   "timestamp": "2026-11-21T10:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_device_scan.json",
+   "recordRef": "laptop.logs[0]",
+   "meta": {
+    "source": "device_log",
+    "app": "WhatsApp",
+    "path": "C:\\Users\\Riya\\AppData\\Local\\WhatsApp\\logs\\app.log",
+    "emails": 4,
+    "ips": 6,
+    "phones": 3
+   }
+  },
+  {
+   "id": "ds-fb66aa6964da-00005",
+   "platform": "device",
+   "category": "device",
+   "item": "Google log: 0 email, 12 IP, 0 phone matches",
+   "timestamp": "2026-11-21T10:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_device_scan.json",
+   "recordRef": "laptop.logs[1]",
+   "meta": {
+    "source": "device_log",
+    "app": "Google",
+    "path": "C:\\Users\\Riya\\AppData\\Local\\Google\\debug.log",
+    "emails": 0,
+    "ips": 12,
+    "phones": 0
+   }
+  },
+  {
+   "id": "ds-fb66aa6964da-00006",
+   "platform": "device",
+   "category": "device",
+   "item": "27 recent-file shortcuts on this laptop",
+   "timestamp": "2026-11-21T10:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_device_scan.json",
+   "recordRef": "laptop.recent_files",
+   "meta": {
+    "source": "device_scan",
+    "recent_files": 27
+   }
+  },
+  {
+   "id": "ds-fb66aa6964da-00007",
+   "platform": "android",
+   "category": "device",
+   "item": "in.swiggy.android has sensitive permissions: camera, location",
+   "timestamp": "2026-11-21T10:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_device_scan.json",
+   "recordRef": "android.apps[0].granted",
+   "meta": {
+    "source": "android_permissions",
+    "app": "in.swiggy.android",
+    "permissions": [
+     "camera",
+     "location"
+    ],
+    "device": "Demo Android - Riya"
+   }
+  },
+  {
+   "id": "ds-fb66aa6964da-00008",
+   "platform": "android",
+   "category": "location",
+   "item": "in.swiggy.android accessed location",
+   "timestamp": "2026-11-20T17:10:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_device_scan.json",
+   "recordRef": "android.apps[0].last_access.location",
+   "meta": {
+    "source": "sensor_access",
+    "app": "in.swiggy.android",
+    "sensor": "location"
+   }
+  },
+  {
+   "id": "ds-fb66aa6964da-00009",
+   "platform": "android",
+   "category": "device",
+   "item": "com.truecaller has sensitive permissions: contacts, location, microphone",
+   "timestamp": "2026-11-21T10:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_device_scan.json",
+   "recordRef": "android.apps[1].granted",
+   "meta": {
+    "source": "android_permissions",
+    "app": "com.truecaller",
+    "permissions": [
+     "contacts",
+     "location",
+     "microphone"
+    ],
+    "device": "Demo Android - Riya"
+   }
+  },
+  {
+   "id": "ds-fb66aa6964da-00010",
+   "platform": "android",
+   "category": "location",
+   "item": "com.truecaller accessed location",
+   "timestamp": "2026-11-19T08:30:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_device_scan.json",
+   "recordRef": "android.apps[1].last_access.location",
+   "meta": {
+    "source": "sensor_access",
+    "app": "com.truecaller",
+    "sensor": "location"
+   }
+  },
+  {
+   "id": "ds-fb66aa6964da-00011",
+   "platform": "android",
+   "category": "device",
+   "item": "com.truecaller accessed microphone",
+   "timestamp": "2026-11-20T10:30:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_device_scan.json",
+   "recordRef": "android.apps[1].last_access.microphone",
+   "meta": {
+    "source": "sensor_access",
+    "app": "com.truecaller",
+    "sensor": "microphone"
+   }
+  },
+  {
+   "id": "ds-fb66aa6964da-00012",
+   "platform": "android",
+   "category": "device",
+   "item": "com.truecaller accessed contacts",
+   "timestamp": "2026-11-21T10:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_device_scan.json",
+   "recordRef": "android.apps[1].last_access.contacts",
+   "meta": {
+    "source": "sensor_access",
+    "app": "com.truecaller",
+    "sensor": "contacts"
+   }
+  },
+  {
+   "id": "ds-fb66aa6964da-00013",
+   "platform": "android",
+   "category": "device",
+   "item": "net.one97.paytm has sensitive permissions: location",
+   "timestamp": "2026-11-21T10:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_device_scan.json",
+   "recordRef": "android.apps[2].granted",
+   "meta": {
+    "source": "android_permissions",
+    "app": "net.one97.paytm",
+    "permissions": [
+     "location"
+    ],
+    "device": "Demo Android - Riya"
+   }
+  },
+  {
+   "id": "ds-fb66aa6964da-00014",
+   "platform": "android",
+   "category": "location",
+   "item": "net.one97.paytm accessed location",
+   "timestamp": "2026-10-01T09:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_device_scan.json",
+   "recordRef": "android.apps[2].last_access.location",
+   "meta": {
+    "source": "sensor_access",
+    "app": "net.one97.paytm",
+    "sensor": "location"
+   }
+  },
+  {
    "id": "gm-acco-00001",
    "platform": "gmail",
    "category": "account",
@@ -7128,6 +7378,208 @@
    }
   },
   {
+   "id": "ios-348272557fe5-000001",
+   "platform": "ios",
+   "category": "location",
+   "item": "com.burbn.instagram accessed location",
+   "timestamp": "2026-11-21T10:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_ios_privacy.ndjson",
+   "recordRef": "line 1",
+   "meta": {
+    "source": "sensor_access",
+    "app": "com.burbn.instagram",
+    "sensor": "location"
+   }
+  },
+  {
+   "id": "ios-348272557fe5-000003",
+   "platform": "ios",
+   "category": "device",
+   "item": "net.whatsapp.WhatsApp accessed contacts",
+   "timestamp": "2026-11-21T10:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_ios_privacy.ndjson",
+   "recordRef": "line 3",
+   "meta": {
+    "source": "sensor_access",
+    "app": "net.whatsapp.WhatsApp",
+    "sensor": "contacts"
+   }
+  },
+  {
+   "id": "ios-348272557fe5-000005",
+   "platform": "ios",
+   "category": "location",
+   "item": "in.swiggy.Swiggy accessed location",
+   "timestamp": "2026-11-21T10:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_ios_privacy.ndjson",
+   "recordRef": "line 5",
+   "meta": {
+    "source": "sensor_access",
+    "app": "in.swiggy.Swiggy",
+    "sensor": "location"
+   }
+  },
+  {
+   "id": "ios-348272557fe5-000007",
+   "platform": "ios",
+   "category": "device",
+   "item": "com.truecaller.Truecaller accessed contacts",
+   "timestamp": "2026-11-21T10:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_ios_privacy.ndjson",
+   "recordRef": "line 7",
+   "meta": {
+    "source": "sensor_access",
+    "app": "com.truecaller.Truecaller",
+    "sensor": "contacts"
+   }
+  },
+  {
+   "id": "ios-348272557fe5-000009",
+   "platform": "ios",
+   "category": "device",
+   "item": "com.burbn.instagram accessed camera",
+   "timestamp": "2026-11-21T10:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_ios_privacy.ndjson",
+   "recordRef": "line 9",
+   "meta": {
+    "source": "sensor_access",
+    "app": "com.burbn.instagram",
+    "sensor": "camera"
+   }
+  },
+  {
+   "id": "ios-348272557fe5-000011",
+   "platform": "ios",
+   "category": "device",
+   "item": "net.whatsapp.WhatsApp accessed microphone",
+   "timestamp": "2026-11-21T10:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_ios_privacy.ndjson",
+   "recordRef": "line 11",
+   "meta": {
+    "source": "sensor_access",
+    "app": "net.whatsapp.WhatsApp",
+    "sensor": "microphone"
+   }
+  },
+  {
+   "id": "ios-348272557fe5-000013",
+   "platform": "ios",
+   "category": "device",
+   "item": "com.burbn.instagram contacted graph.facebook.com (42 hits)",
+   "timestamp": "2026-11-21T10:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_ios_privacy.ndjson",
+   "recordRef": "line 13",
+   "meta": {
+    "source": "ios_network",
+    "app": "com.burbn.instagram",
+    "domain": "graph.facebook.com",
+    "hits": 42,
+    "domainOwner": "Meta"
+   }
+  },
+  {
+   "id": "ios-348272557fe5-000014",
+   "platform": "ios",
+   "category": "device",
+   "item": "in.swiggy.Swiggy contacted api.appsflyer.com (15 hits)",
+   "timestamp": "2026-11-21T10:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_ios_privacy.ndjson",
+   "recordRef": "line 14",
+   "meta": {
+    "source": "ios_network",
+    "app": "in.swiggy.Swiggy",
+    "domain": "api.appsflyer.com",
+    "hits": 15,
+    "domainOwner": "AppsFlyer"
+   }
+  },
+  {
+   "id": "ios-348272557fe5-000015",
+   "platform": "ios",
+   "category": "device",
+   "item": "in.swiggy.Swiggy contacted events.uxcam.com (8 hits)",
+   "timestamp": "2026-11-21T10:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_ios_privacy.ndjson",
+   "recordRef": "line 15",
+   "meta": {
+    "source": "ios_network",
+    "app": "in.swiggy.Swiggy",
+    "domain": "events.uxcam.com",
+    "hits": 8,
+    "domainOwner": "UXCam"
+   }
+  },
+  {
+   "id": "ios-348272557fe5-000016",
+   "platform": "ios",
+   "category": "device",
+   "item": "com.truecaller.Truecaller contacted api.branch.io (11 hits)",
+   "timestamp": "2026-11-21T10:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_ios_privacy.ndjson",
+   "recordRef": "line 16",
+   "meta": {
+    "source": "ios_network",
+    "app": "com.truecaller.Truecaller",
+    "domain": "api.branch.io",
+    "hits": 11,
+    "domainOwner": "Branch"
+   }
+  },
+  {
+   "id": "ios-348272557fe5-000017",
+   "platform": "ios",
+   "category": "device",
+   "item": "net.whatsapp.WhatsApp contacted whatsapp.net (22 hits)",
+   "timestamp": "2026-11-21T10:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_ios_privacy.ndjson",
+   "recordRef": "line 17",
+   "meta": {
+    "source": "ios_network",
+    "app": "net.whatsapp.WhatsApp",
+    "domain": "whatsapp.net",
+    "hits": 22,
+    "domainOwner": "WhatsApp"
+   }
+  },
+  {
+   "id": "ios-348272557fe5-000018",
+   "platform": "ios",
+   "category": "location",
+   "item": "com.old.location accessed location",
+   "timestamp": "2026-10-01T09:00:00+00:00",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_ios_privacy.ndjson",
+   "recordRef": "line 18",
+   "meta": {
+    "source": "sensor_access",
+    "app": "com.old.location",
+    "sensor": "location"
+   }
+  },
+  {
    "id": "sp-inte-00001",
    "platform": "spotify",
    "category": "interest",
@@ -12750,6 +13202,67 @@
    }
   },
   {
+   "id": "F-022",
+   "layer": 5,
+   "title": "4 apps accessed your location in the last 7 days",
+   "detail": "Observed access events across iOS and Android. The same app on two platforms counts as two app installations; permission alone does not prove use.",
+   "priority": "high",
+   "category": "location",
+   "platforms": [
+    "android",
+    "ios"
+   ],
+   "metric": {
+    "value": 4,
+    "unit": "apps"
+   },
+   "evidence": [
+    "ds-fb66aa6964da-00008",
+    "ds-fb66aa6964da-00010",
+    "ios-348272557fe5-000001",
+    "ios-348272557fe5-000005"
+   ],
+   "action": {
+    "steps": [
+     "iPhone: Settings > Privacy & Security > Location Services > select the app",
+     "Choose Never or While Using the App; turn off Precise Location where unnecessary",
+     "Android: Settings > Privacy > Permission manager > Location > select the app",
+     "Choose Don't allow or Allow only while using the app; turn off precise location"
+    ],
+    "link": ""
+   }
+  },
+  {
+   "id": "F-023",
+   "layer": 5,
+   "title": "3 apps send data to session-recording or tracking services",
+   "detail": "App Privacy Report shows connections to known tracking or session-recording domains. A connection alone does not prove that screen contents were recorded.",
+   "priority": "high",
+   "category": "device",
+   "platforms": [
+    "ios"
+   ],
+   "metric": {
+    "value": 3,
+    "unit": "apps"
+   },
+   "evidence": [
+    "ios-348272557fe5-000013",
+    "ios-348272557fe5-000014",
+    "ios-348272557fe5-000015",
+    "ios-348272557fe5-000016"
+   ],
+   "action": {
+    "steps": [
+     "iPhone: Settings > Privacy & Security > App Privacy Report",
+     "Open App Network Activity > select an app > review the listed domains",
+     "Settings > Privacy & Security > Tracking > turn off Allow Apps to Request to Track",
+     "Review the app's privacy settings; uninstall apps whose data sharing you do not accept"
+    ],
+    "link": ""
+   }
+  },
+  {
    "id": "F-005",
    "layer": 3,
    "title": "Your phone number appears in 2 messages",
@@ -12898,6 +13411,34 @@
      "Use a different network (mobile data) for accounts you want kept apart",
      "Log out unknown sessions on every platform listed",
      "Consider a trusted VPN on shared Wi-Fi"
+    ],
+    "link": ""
+   }
+  },
+  {
+   "id": "F-025",
+   "layer": 5,
+   "title": "2 log files contain your email or IP address",
+   "detail": "Only email, IPv4 and Indian-phone pattern counts were retained. These are pattern matches, not verified identities; no matched values were saved.",
+   "priority": "high",
+   "category": "device",
+   "platforms": [
+    "device"
+   ],
+   "metric": {
+    "value": 2,
+    "unit": "log files"
+   },
+   "evidence": [
+    "ds-fb66aa6964da-00004",
+    "ds-fb66aa6964da-00005"
+   ],
+   "action": {
+    "steps": [
+     "Open each app listed in the evidence > Settings > Privacy or Diagnostics",
+     "Turn off optional diagnostic logging and sharing where available",
+     "Close the app; use its Clear logs or Clear diagnostics option if offered",
+     "Review the listed log paths before sharing support bundles"
     ],
     "link": ""
    }
@@ -13367,6 +13908,35 @@
     ],
     "link": "https://accountscenter.instagram.com/"
    }
+  },
+  {
+   "id": "F-024",
+   "layer": 5,
+   "title": "3 apps hold 4.80 GB of your data on this laptop",
+   "detail": "Measured data in the largest app folders under AppData. File contents were not collected.",
+   "priority": "medium",
+   "category": "device",
+   "platforms": [
+    "device"
+   ],
+   "metric": {
+    "value": 3,
+    "unit": "apps"
+   },
+   "evidence": [
+    "ds-fb66aa6964da-00001",
+    "ds-fb66aa6964da-00002",
+    "ds-fb66aa6964da-00003"
+   ],
+   "action": {
+    "steps": [
+     "Windows: Settings > System > Storage > Cleanup recommendations",
+     "Review Temporary files before selecting Remove files",
+     "Open each listed app > Settings > Storage or Cache > clear data you no longer need",
+     "Settings > Apps > Installed apps > uninstall unused apps; back up needed data first"
+    ],
+    "link": ""
+   }
   }
  ],
  "coverage": {
@@ -13374,6 +13944,18 @@
    "location": "found",
    "interest": "not_assessed",
    "contact": "not_assessed",
+   "activity": "found"
+  },
+  "device": {
+   "location": "not_assessed",
+   "interest": "not_assessed",
+   "contact": "found",
+   "activity": "found"
+  },
+  "android": {
+   "location": "found",
+   "interest": "not_assessed",
+   "contact": "found",
    "activity": "found"
   },
   "gmail": {
@@ -13385,6 +13967,12 @@
   "instagram": {
    "location": "found",
    "interest": "found",
+   "contact": "found",
+   "activity": "found"
+  },
+  "ios": {
+   "location": "found",
+   "interest": "not_assessed",
    "contact": "found",
    "activity": "found"
   },
@@ -13500,7 +14088,12 @@
     }
    }
   ],
-  "sensitiveHits": 11
+  "sensitiveHits": 11,
+  "recentLocationApps": 4,
+  "mobileTrackingApps": 3,
+  "laptopDataApps": 3,
+  "laptopDataBytes": 4800000000,
+  "logsWithIdentifiers": 2
  },
  "graph": {
   "nodes": [

@@ -5,14 +5,16 @@ Steps reflect app menus as of Nov 2026; the presenter verifies them on real apps
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+from datetime import datetime, timedelta, timezone
 
 from app.engine.records import Finding
 from app.engine.messages import scan_text, closeness
+from app.parsers.chrome import TRACKERS
 
 IG_CENTER = "https://accountscenter.instagram.com/"
 
 
-def build_findings(records) -> tuple[list[Finding], dict]:
+def build_findings(records, now=None) -> tuple[list[Finding], dict]:
     by = defaultdict(list)
     for r in records:
         by[(r.platform, r.category, r.meta.get("source"))].append(r)
@@ -198,6 +200,73 @@ def build_findings(records) -> tuple[list[Finding], dict]:
                               "Settings > Story, live and location > Hide story from", "Review close friends list"],
                     "link": IG_CENTER})
 
+    now = now or datetime.now(timezone.utc)
+    if now.tzinfo is None:
+        now = now.replace(tzinfo=timezone.utc)
+    recent_location = []
+    for r in records:
+        if r.platform not in {"ios", "android"} or r.meta.get("source") != "sensor_access" or r.meta.get("sensor") != "location":
+            continue
+        try:
+            stamp = datetime.fromisoformat((r.timestamp or "").replace("Z", "+00:00"))
+            if stamp.tzinfo is None:
+                continue
+            if now - timedelta(days=7) <= stamp <= now:
+                recent_location.append(r)
+        except (ValueError, TypeError, OverflowError):
+            continue
+    location_apps = {(r.platform, r.meta["app"]) for r in recent_location}
+    if location_apps:
+        add(layer=5, title=f"{len(location_apps)} apps accessed your location in the last 7 days",
+            detail="Observed access events across iOS and Android. The same app on two platforms counts as two app installations; permission alone does not prove use.",
+            priority="high", category="location", platforms=sorted({r.platform for r in recent_location}),
+            metric={"value": len(location_apps), "unit": "apps"}, evidence=[r.id for r in recent_location],
+            action={"steps": ["iPhone: Settings > Privacy & Security > Location Services > select the app",
+                              "Choose Never or While Using the App; turn off Precise Location where unnecessary",
+                              "Android: Settings > Privacy > Permission manager > Location > select the app",
+                              "Choose Don't allow or Allow only while using the app; turn off precise location"], "link": ""})
+
+    tracking_domains = set(TRACKERS) | {"uxcam.com", "smartlook.com", "clarity.ms", "appsflyer.com", "branch.io", "adjust.com"}
+    mobile_tracking = [r for r in records if r.platform == "ios" and r.meta.get("source") == "ios_network"
+                       and any(r.meta["domain"] == domain or r.meta["domain"].endswith("." + domain) for domain in tracking_domains)]
+    tracking_apps = {(r.platform, r.meta["app"]) for r in mobile_tracking}
+    if tracking_apps:
+        add(layer=5, title=f"{len(tracking_apps)} apps send data to session-recording or tracking services",
+            detail="App Privacy Report shows connections to known tracking or session-recording domains. A connection alone does not prove that screen contents were recorded.",
+            priority="high", category="device", platforms=["ios"],
+            metric={"value": len(tracking_apps), "unit": "apps"}, evidence=[r.id for r in mobile_tracking],
+            action={"steps": ["iPhone: Settings > Privacy & Security > App Privacy Report",
+                              "Open App Network Activity > select an app > review the listed domains",
+                              "Settings > Privacy & Security > Tracking > turn off Allow Apps to Request to Track",
+                              "Review the app's privacy settings; uninstall apps whose data sharing you do not accept"], "link": ""})
+
+    stores = [r for r in records if r.platform == "device" and r.meta.get("source") == "laptop_store"]
+    data_bytes = sum(r.meta["bytes"] for r in stores)
+    if stores:
+        partial = any(r.meta.get("partial") for r in stores)
+        add(layer=5, title=f"{len(stores)} apps hold {data_bytes / 1_000_000_000:.2f} GB of your data on this laptop",
+            detail="Measured data in the largest app folders under AppData. File contents were not collected." +
+                   (" The scan was incomplete; sizes are lower bounds." if partial else ""),
+            priority="medium", category="device", platforms=["device"],
+            metric={"value": len(stores), "unit": "apps"}, evidence=[r.id for r in stores],
+            action={"steps": ["Windows: Settings > System > Storage > Cleanup recommendations",
+                              "Review Temporary files before selecting Remove files",
+                              "Open each listed app > Settings > Storage or Cache > clear data you no longer need",
+                              "Settings > Apps > Installed apps > uninstall unused apps; back up needed data first"], "link": ""})
+
+    identifying_logs = [r for r in records if r.platform == "device" and r.meta.get("source") == "device_log"
+                        and (r.meta.get("emails", 0) or r.meta.get("ips", 0))]
+    log_paths = {r.meta["path"] for r in identifying_logs}
+    if log_paths:
+        add(layer=5, title=f"{len(log_paths)} log files contain your email or IP address",
+            detail="Only email, IPv4 and Indian-phone pattern counts were retained. These are pattern matches, not verified identities; no matched values were saved.",
+            priority="high", category="device", platforms=["device"],
+            metric={"value": len(log_paths), "unit": "log files"}, evidence=[r.id for r in identifying_logs],
+            action={"steps": ["Open each app listed in the evidence > Settings > Privacy or Diagnostics",
+                              "Turn off optional diagnostic logging and sharing where available",
+                              "Close the app; use its Clear logs or Clear diagnostics option if offered",
+                              "Review the listed log paths before sharing support bundles"], "link": ""})
+
     order = {"high": 0, "medium": 1, "low": 2}
     out.sort(key=lambda f: (order[f.priority], -f.metric["value"]))
     summary = {
@@ -207,6 +276,11 @@ def build_findings(records) -> tuple[list[Finding], dict]:
         "sessionRecorders": len(replay),
         "topPeople": [{k: p[k] for k in ("name", "score", "signals")} for p in people[:10]],
         "sensitiveHits": sum(len(v) for v in sensitive.values()),
+        "recentLocationApps": len(location_apps),
+        "mobileTrackingApps": len(tracking_apps),
+        "laptopDataApps": len(stores),
+        "laptopDataBytes": data_bytes,
+        "logsWithIdentifiers": len(log_paths),
     }
     return out, summary
 

@@ -1,0 +1,97 @@
+{
+ "scanned_at": "2026-11-21T10:00:00+00:00",
+ "laptop": {
+  "apps": [
+   {
+    "name": "WhatsApp",
+    "path": "C:\\Users\\Riya\\AppData\\Local\\WhatsApp",
+    "bytes": 2400000000,
+    "files": 842,
+    "last_modified": "2026-11-21T10:00:00+00:00"
+   },
+   {
+    "name": "Google",
+    "path": "C:\\Users\\Riya\\AppData\\Local\\Google",
+    "bytes": 1800000000,
+    "files": 2150,
+    "last_modified": "2026-11-21T10:00:00+00:00"
+   },
+   {
+    "name": "Spotify",
+    "path": "C:\\Users\\Riya\\AppData\\Roaming\\Spotify",
+    "bytes": 600000000,
+    "files": 530,
+    "last_modified": "2026-11-21T10:00:00+00:00"
+   }
+  ],
+  "logs": [
+   {
+    "app": "WhatsApp",
+    "path": "C:\\Users\\Riya\\AppData\\Local\\WhatsApp\\logs\\app.log",
+    "emails": 4,
+    "ips": 6,
+    "phones": 3
+   },
+   {
+    "app": "Google",
+    "path": "C:\\Users\\Riya\\AppData\\Local\\Google\\debug.log",
+    "emails": 0,
+    "ips": 12,
+    "phones": 0
+   },
+   {
+    "app": "Spotify",
+    "path": "C:\\Users\\Riya\\AppData\\Roaming\\Spotify\\client.log",
+    "emails": 0,
+    "ips": 0,
+    "phones": 0
+   }
+  ],
+  "recent_files": 27,
+  "partial": false
+ },
+ "android": {
+  "device": "Demo Android - Riya",
+  "apps": [
+   {
+    "package": "in.swiggy.android",
+    "granted": [
+     "android.permission.ACCESS_FINE_LOCATION",
+     "android.permission.CAMERA"
+    ],
+    "last_access": {
+     "location": "2026-11-20T17:10:00+00:00",
+     "camera": null,
+     "microphone": null,
+     "contacts": null
+    }
+   },
+   {
+    "package": "com.truecaller",
+    "granted": [
+     "android.permission.READ_CONTACTS",
+     "android.permission.RECORD_AUDIO",
+     "android.permission.ACCESS_COARSE_LOCATION"
+    ],
+    "last_access": {
+     "location": "2026-11-19T08:30:00+00:00",
+     "camera": null,
+     "microphone": "2026-11-20T10:30:00+00:00",
+     "contacts": "2026-11-21T10:00:00+00:00"
+    }
+   },
+   {
+    "package": "net.one97.paytm",
+    "granted": [
+     "android.permission.ACCESS_FINE_LOCATION"
+    ],
+    "last_access": {
+     "location": "2026-10-01T09:00:00+00:00",
+     "camera": null,
+     "microphone": null,
+     "contacts": null
+    }
+   }
+  ]
+ }
+}
