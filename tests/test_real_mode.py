@@ -62,7 +62,7 @@ def test_live_profiles_have_unique_ids_and_full_source_paths(tmp_path):
     assert all(Path(r["sourceFile"]).is_absolute() for r in result["records"])
     assert result["summary"]["trackersFound"] == 12
     assert result["summary"]["sessionRecorders"] == 6
-    assert "6 sites have session-replay cookie indicators" in {f["title"] for f in result["findings"]}
+    assert "6 sites may use session-recording tools (cookie indicators)" in {f["title"] for f in result["findings"]}
 
 
 def test_locked_source_keeps_other_metadata_and_reports_problem(tmp_path, monkeypatch):
@@ -85,7 +85,7 @@ def test_live_cookie_indicators_do_not_claim_proven_recording():
     records = [Record("cookie", "chrome", "account", "cookie indicator", None,
                       meta={"source": "session_replay", "domain": "example.test", "vendor": "Hotjar", "live_profile": True})]
     findings, _ = build_findings(records)
-    assert findings[0].title == "1 sites have session-replay cookie indicators"
+    assert findings[0].title == "1 sites may use session-recording tools (cookie indicators)"
     assert "does not prove" in findings[0].detail
 
 

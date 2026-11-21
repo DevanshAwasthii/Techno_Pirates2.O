@@ -43,5 +43,5 @@ def test_access_log_ip_links_with_other_platforms(tmp_path):
     from pathlib import Path
     sp = Path(__file__).resolve().parents[1] / "samples" / "persona_spotify.zip"  # synthetic, uses 49.37.12.88
     r = pipeline.run([_zip(tmp_path, [(1, 1, "49.37.12.88", "No")] * 3, []), sp])
-    home = next(f for f in r["findings"] if "know your home network" in f["title"])
+    home = next(f for f in r["findings"] if "Same IP seen by" in f["title"])
     assert {"google", "spotify"} <= set(home["platforms"])

@@ -179,7 +179,7 @@ def parse(profile: Path, src: str | None = None, warnings=None, source_coverage=
             add("account", f"Tracker cookie from {base}", None, str(cookies.relative_to(profile)) if live else cookies.name, f"cookies host_key in {sorted(hosts)[:3]}",
                 domain=base, source="tracker")
         for site, vendor in sorted(replay.items()):
-            item = f"{site} has a cookie associated with {vendor}" if live else f"{site} records your session with {vendor}"
+            item = f"{site} has a cookie associated with {vendor}; may use session-recording tools"
             add("account", item, None, str(cookies.relative_to(profile)) if live else cookies.name, f"cookies host_key={site}",
                 domain=site, source="session_replay", vendor=vendor)
 

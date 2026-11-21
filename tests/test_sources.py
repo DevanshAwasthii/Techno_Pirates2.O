@@ -53,7 +53,7 @@ def test_body_welcome_alone_is_not_an_account(tmp_path):
 
 
 def test_cross_platform_home_ip(full):
-    t = next(x for x in titles(full) if "know your home network" in x)
+    t = next(x for x in titles(full) if "Same IP seen by" in x)
     f = next(f for f in full["findings"] if f["title"] == t)
     assert set(f["platforms"]) == {"instagram", "spotify"}
 

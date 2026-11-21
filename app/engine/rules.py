@@ -59,7 +59,7 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
         ips = Counter(r.meta["ip"] for r in logins)
         home_ip, home_n = ips.most_common(1)[0]
         add(layer=2, title=f"Logins from {len(ips)} different IP addresses",
-            detail=f"Most logins ({home_n}) came from {home_ip}, likely your home network; IPs reveal your approximate city.",
+            detail=f"Most logins ({home_n}) came from {home_ip}, the most frequently observed IP. IPs may belong to VPN, shared or mobile networks; they do not establish a home or location.",
             priority="medium", category="location", platforms=["instagram"],
             metric={"value": len(ips), "unit": "IP addresses"}, evidence=[r.id for r in logins],
             action={"steps": ["Open Instagram > Settings > Accounts Center > Password and security",
@@ -74,8 +74,8 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
                 sensitive[label].append(r.id)
                 sens_platforms[label].add(r.platform)
     for label, ids in sorted(sensitive.items(), key=lambda kv: -len(kv[1])):
-        add(layer=3, title=f"Your {label.lower()} appears in {len(ids)} message{'s' if len(ids) != 1 else ''}",
-            detail="Anyone with access to these chats, or the platform itself, can read it.",
+        add(layer=3, title=f"{label} pattern appears in imported messages ({len(ids)} message{'s' if len(ids) != 1 else ''})",
+            detail="Pattern matches do not establish whose details these are. Recipients and anyone with access to the device or export may see the message contents; an imported message does not establish platform access to encrypted chats.",
             priority="high", category="message", platforms=sorted(sens_platforms[label]),
             metric={"value": len(ids), "unit": "messages"}, evidence=ids,
             action={"steps": ["Open each chat in the evidence list", "Long-press the message > Unsend / Delete for everyone",
@@ -151,8 +151,7 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
         add(layer=2, title=f"Google logged your account activity from {len(g_ips)} IP addresses{where}",
             detail=f"{total:,} logged activities. Most from {top.meta['ip']}"
                    + (f" ({top.meta['place']})" if top.meta.get("place") else "") + ". "
-                   + ("" if places else "Google's export left the city columns blank, but each IP still maps to an approximate city. ")
-                   + "IP addresses reveal where you are and which networks you use.",
+                   + "IP observations may reflect VPN, shared or mobile networks; they do not establish a home or physical location.",
             priority="high", category="location", platforms=["google"],
             metric={"value": len(g_ips), "unit": "IP addresses"}, evidence=[r.id for r in g_ips][:500],
             action={"steps": ["Open myaccount.google.com/device-activity and sign out devices you don't recognise",
@@ -180,7 +179,7 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
             action={"steps": ["spotify.com > Account > Privacy settings", "Turn off 'Process my personal data for tailored ads'",
                               "Turn off 'Process my Facebook data'"], "link": "https://www.spotify.com/account/privacy/"})
 
-    # L4 connection: same IP seen by more than one platform = shared home network
+    # Matching observations support only an account-linkage inference.
     ip_platforms = defaultdict(set); ip_ids = defaultdict(list)
     for r in records:
         if r.category == "location" and r.meta.get("ip"):
@@ -188,8 +187,8 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
     shared = {ip: ps for ip, ps in ip_platforms.items() if len(ps) > 1}
     if shared:
         ip, ps = max(shared.items(), key=lambda kv: (len(kv[1]), len(ip_ids[kv[0]])))
-        add(layer=4, title=f"{len(ps)} platforms know your home network",
-            detail=f"IP {ip} appears in {', '.join(sorted(ps))} records. Matching IPs link your accounts to one household and city.",
+        add(layer=4, title=f"Same IP seen by {len(ps)} platforms",
+            detail=f"IP {ip} appears in {', '.join(sorted(ps))} records. Account linkage is an inference: VPN, shared or mobile networks can reuse an IP across unrelated people and times.",
             priority="high", category="location", platforms=sorted(ps),
             metric={"value": len(ps), "unit": "platforms"}, evidence=ip_ids[ip],
             action={"steps": ["Use a different network (mobile data) for accounts you want kept apart",
@@ -202,8 +201,8 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
             groups[r.meta["chat"]].update(r.meta["senders"])
     if groups:
         everyone = set().union(*groups.values())
-        add(layer=3, title=f"{len(everyone)} people can see your number in {len(groups)} WhatsApp group{'s' if len(groups) != 1 else ''}",
-            detail="Every group member sees your phone number and profile photo, and can save or forward them.",
+        add(layer=3, title=f"At least {len(everyone)} observed participants in {len(groups)} WhatsApp group{'s' if len(groups) != 1 else ''}",
+            detail="Observed senders (including the exporter) are a lower bound on participants; silent members may be absent. Phone-number visibility depends on group type, and profile-photo visibility depends on privacy settings.",
             priority="medium", category="contact", platforms=["whatsapp"],
             metric={"value": len(everyone), "unit": "people"}, evidence=[r.id for r in wa if r.meta.get("group")][:200],
             action={"steps": ["WhatsApp > Settings > Privacy > Groups > My contacts", "Privacy > Profile photo > My contacts",
@@ -213,10 +212,8 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
     replay_count = len({r.meta["domain"] for r in replay})
     if replay:
         vendors = sorted({r.meta["vendor"] for r in replay})
-        live = any(r.meta.get("live_profile") for r in replay)
-        add(layer=1, title=f"{replay_count} sites have session-replay cookie indicators" if live else f"{len(replay)} sites recorded your clicks and typing",
-            detail=(f"Cookie names associated with {', '.join(vendors)} were found locally. This indicates a tool may be present; it does not prove your clicks, typing or screen contents were recorded."
-                    if live else f"Session-replay tools ({', '.join(vendors)}) record mouse movement, scrolling and what you type, then replay it for the site owner."),
+        add(layer=1, title=f"{replay_count} sites may use session-recording tools (cookie indicators)",
+            detail=f"Cookie names associated with {len(vendors)} distinct vendors ({', '.join(vendors)}) appear for {replay_count} distinct sites. This indicates a site may use session-recording tools; it does not prove clicks, typing or screen contents were recorded or transmitted.",
             priority="high", category="activity", platforms=["chrome"],
             metric={"value": replay_count, "unit": "sites"}, evidence=[r.id for r in replay],
             action={"steps": ["Install uBlock Origin and enable the 'EasyPrivacy' filter list",
@@ -228,10 +225,9 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
     trackers = [r for r in by[("chrome", "account", "tracker")] if r.id not in first_party]
     tracker_count = len({r.meta["domain"] for r in trackers})
     if trackers:
-        live = any(r.meta.get("live_profile") for r in trackers)
-        add(layer=1, title=f"{tracker_count} known tracker domains appear in browser cookies" if live else f"{len(trackers)} ad and analytics companies track you across sites",
-            detail=("Cookie names and domains were observed locally. Their presence alone does not establish what data was sent or whether cross-site tracking occurred."
-                    if live else "Their cookies let them follow you from site to site and build an advertising profile."),
+        vendors = {r.meta.get("vendor") or r.meta["domain"] for r in trackers}
+        add(layer=1, title=f"{tracker_count} known tracker domains appear in browser cookies",
+            detail=f"Cookie indicators for {len(vendors)} distinct vendors were observed across {tracker_count} distinct domains. Presence alone does not establish what data was sent or whether cross-site tracking occurred.",
             priority="medium", category="activity", platforms=["chrome"],
             metric={"value": tracker_count, "unit": "trackers"}, evidence=[r.id for r in trackers],
             action={"steps": ["Chrome > Settings > Privacy and security > Third-party cookies > Block third-party cookies",
@@ -255,7 +251,7 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
     if feed:
         friends = {r.meta["person"] for r in feed}
         add(layer=3, title=f"Instagram showed you what {len(friends)} friends liked",
-            detail="Your feed exposes friends' likes to you - and yours to them. Every like is visible to your followers.",
+            detail="The imported capture shows these likes. Other likes and their audience are not established; visibility depends on privacy settings.",
             priority="medium", category="activity", platforms=["instagram"],
             metric={"value": len(friends), "unit": "friends"}, evidence=[r.id for r in feed],
             action={"steps": ["Instagram > Settings > Activity in Friends tab > turn off",
@@ -265,7 +261,7 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
     if viewers:
         who = {r.meta["person"] for r in viewers}
         add(layer=3, title=f"{len(who)} people watch your WhatsApp status",
-            detail="Status viewers form your inner circle; each one sees where you are and what you do.",
+            detail="These viewers were observed in an imported status capture. Views do not establish relationship closeness or location; viewers see only the shared content, subject to privacy settings.",
             priority="medium", category="contact", platforms=["whatsapp"],
             metric={"value": len(who), "unit": "people"}, evidence=[r.id for r in viewers],
             action={"steps": ["WhatsApp > Settings > Privacy > Status", "Choose 'My contacts except...' or 'Only share with...'",
@@ -274,8 +270,8 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
     people = closeness(records)
     if people:
         top = people[:5]
-        add(layer=3, title=f"Your top {len(top)} people are visible from your activity alone",
-            detail="Likes, comments and messages rank who you are closest to: " + ", ".join(p["name"] for p in top) + ".",
+        add(layer=3, title=f"Most interactions with {len(top)} people in your imports",
+            detail="Weighted likes, comments and messages show the most interactions with: " + ", ".join(p["name"] for p in top) + ".",
             priority="medium", category="contact",
             platforms=sorted({r.platform for r in records if r.meta.get("person")}),
             metric={"value": len(top), "unit": "people"}, evidence=[e for p in top for e in p["evidence"][:20]],

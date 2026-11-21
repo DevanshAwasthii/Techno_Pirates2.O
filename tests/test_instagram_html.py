@@ -61,7 +61,7 @@ def test_html_export_parses_like_json(tmp_path):
     t = [f["title"] for f in r["findings"]]
     assert "3 advertisers target you with your own data" in t
     assert "Instagram stores your precise last known location" in t
-    assert any(x.startswith("Your phone number appears in 1 message") for x in t)  # reel id in link not counted
+    assert any(x.startswith("Phone number pattern appears in imported messages (1 message") for x in t)  # reel id in link not counted
     recs = r["records"]
     assert sum(1 for x in recs if x["meta"].get("action") == "like") == 2  # incl. like with deleted owner
     adv = {x["meta"]["domain"]: x["meta"]["uploaded_list"] for x in recs if x["meta"].get("source") == "advertiser"}

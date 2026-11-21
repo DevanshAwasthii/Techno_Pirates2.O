@@ -17,9 +17,10 @@ def res():
 
 def test_chrome_findings(res):
     assert res["errors"] == []
+    assert all("records your session" not in r["item"] for r in res["records"])
     t = [f["title"] for f in res["findings"]]
-    assert "6 sites recorded your clicks and typing" in t
-    assert any(x.startswith("12 ad and analytics") for x in t)
+    assert "6 sites may use session-recording tools (cookie indicators)" in t
+    assert any(x.startswith("12 known tracker domains") for x in t)
     assert any(x.startswith("6 sites can access your location, camera or microphone") for x in t)
     assert res["summary"]["sessionRecorders"] == 6 and res["summary"]["trackersFound"] == 12
 
