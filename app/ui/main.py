@@ -24,6 +24,24 @@ from app.engine.coverage import STATUS_LABELS, coverage_rows, audit_is_partial, 
 ROOT = Path(__file__).resolve().parents[2]
 
 
+SETTINGS = ROOT / ".cache" / "settings.json"  # local, gitignored; preferences only, never personal data
+
+
+def load_settings() -> dict:
+    try:
+        return json.loads(SETTINGS.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+
+
+def save_settings(data: dict):
+    try:
+        SETTINGS.parent.mkdir(parents=True, exist_ok=True)
+        SETTINGS.write_text(json.dumps(data), encoding="utf-8")
+    except OSError:
+        pass  # a preference that can't be saved just means the user is asked again
+
+
 def default_report_path():
     documents = Path.home() / "Documents"
     return (documents if documents.is_dir() else ROOT) / "NexData_report.pdf"
@@ -187,7 +205,9 @@ class NexDataApp(ctk.CTk):
         self.scan_mode.set("Quick (20s)")
         self.scan_mode.grid(row=0, column=3, padx=8)
         self.open_button.grid(row=0, column=4, padx=(4, 10))
-        self.scan_button = ctk.CTkButton(top, text="Scan this PC", command=self.scan_laptop, width=145, fg_color="#217989")
+        self.auto_close_tried = False
+        self.auto_close_var = ctk.BooleanVar(value=bool(load_settings().get("auto_close_browsers")))
+        self.scan_button = ctk.CTkButton(top, text="Scan this PC", command=self.manual_scan, width=145, fg_color="#217989")
         self.scan_button.grid(row=0, column=5, padx=(0, 8))
         ctk.CTkButton(top, text="Get my data", command=self.open_connect, width=130, fg_color="#5b3f8f").grid(row=0, column=6, padx=(0, 22))
 
@@ -202,6 +222,8 @@ class NexDataApp(ctk.CTk):
         self.resolve_button = ctk.CTkButton(status, text="Close browsers and rescan", command=self.resolve_browser_locks, width=210, fg_color="#8b5b24")
         self.resolve_button.grid(row=3, column=0, sticky="w", pady=(6, 4))
         self.resolve_button.grid_remove()
+        ctk.CTkCheckBox(status, text="Close Chrome/Edge automatically when scanning", variable=self.auto_close_var,
+                        command=self.toggle_auto_close, text_color=MUTED).grid(row=3, column=1, sticky="e", pady=(6, 4))
         self.error_label = ctk.CTkLabel(status, text="", text_color="#ff9b9b", justify="left", anchor="w", wraplength=1180)
         self.error_label.grid(row=1, column=0, columnspan=2, sticky="ew")
         self.error_label.grid_remove()
@@ -308,14 +330,61 @@ class NexDataApp(ctk.CTk):
         self.finish_loading()
         self.load_paths(paths, source_mode="pc")
 
-    def resolve_browser_locks(self):
+    def ask_auto_close(self):
+        """First-time consent for closing browsers during scans. Returns True to close now."""
+        win = ctk.CTkToplevel(self)
+        win.title("Close Chrome/Edge to finish the scan?")
+        win.geometry("560x260")
+        win.transient(self)
+        win.grab_set()
+        ctk.CTkLabel(win, text="Chrome/Edge lock the cookies file, so trackers and session-recording tools can't be checked.\n\n"
+                               "NexData can close them normally (tabs are restored when you reopen them). "
+                               "Save any unfinished work in the browser first.",
+                     wraplength=520, justify="left", text_color=TEXT).pack(padx=20, pady=(18, 10), anchor="w")
+        remember = ctk.BooleanVar(value=True)
+        ctk.CTkCheckBox(win, text="Remember my choice for future scans", variable=remember).pack(padx=20, anchor="w")
+        choice = {"close": False}
+
+        def done(close):
+            choice["close"] = close
+            if remember.get():
+                save_settings({**load_settings(), "auto_close_browsers": close})
+                self.auto_close_var.set(close)
+            win.destroy()
+
+        row = ctk.CTkFrame(win, fg_color="transparent")
+        row.pack(pady=18)
+        ctk.CTkButton(row, text="Close browsers and scan", command=lambda: done(True), fg_color="#8b5b24").pack(side="left", padx=8)
+        ctk.CTkButton(row, text="Skip cookies", command=lambda: done(False)).pack(side="left", padx=8)
+        self.wait_window(win)
+        return choice["close"]
+
+    def toggle_auto_close(self):
+        save_settings({**load_settings(), "auto_close_browsers": bool(self.auto_close_var.get())})
+
+    def manual_scan(self):
+        self.auto_close_tried = False
+        self.scan_laptop()
+
+    def maybe_auto_close(self):
+        """After a scan blocked by a browser lock: close browsers once per scan if the user allowed it."""
+        if self.auto_close_tried or self.loading or self.closing:
+            return
+        self.auto_close_tried = True
+        pref = load_settings().get("auto_close_browsers")
+        if pref is None:
+            pref = self.ask_auto_close()
+        if pref:
+            self.resolve_browser_locks(confirmed=True)
+
+    def resolve_browser_locks(self, confirmed=False):
         if self.loading or self.closing:
             return
         processes = {p["pid"]: p for error in self.result.get("errors") or [] for p in error.get("blocked_by", [])}
         if not processes:
             self.scan_laptop()
             return
-        if not messagebox.askyesno("Close browser background processes?",
+        if not confirmed and not messagebox.askyesno("Close browser background processes?",
                                   "NexData identified Chrome/Edge processes holding browser data files.\n\n"
                                   "Close visible browser windows first. NexData will try a normal exit. If Windows refuses, it may stop only the verified background browser processes.\n\n"
                                   "This can interrupt browser background apps or downloads. Allow this and scan again?", parent=self):
@@ -420,6 +489,8 @@ class NexDataApp(ctk.CTk):
             self.show_errors(error_text(result.get("errors")))
             if any(error.get("blocked_by") for error in result.get("errors") or []):
                 self.resolve_button.grid()
+                if self.source_mode == "pc":
+                    self.after(300, self.maybe_auto_close)
             else:
                 self.resolve_button.grid_remove()
             mode = "Real PC scan finished" if self.source_mode == "pc" else "User imports"
