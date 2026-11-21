@@ -15,6 +15,9 @@ import networkx as nx
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib import pyplot as plt
+
+# Names in Hindi/Bengali/other Indian scripts and emoji: fall back to Windows fonts that have those glyphs
+plt.rcParams["font.family"] = ["DejaVu Sans", "Nirmala UI", "Segoe UI Emoji", "Segoe UI Symbol"]
 from fpdf import FPDF
 
 import webbrowser
