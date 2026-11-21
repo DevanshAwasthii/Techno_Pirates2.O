@@ -6,6 +6,7 @@ shows what to tick, and the watcher imports the export as soon as the browser fi
 from __future__ import annotations
 
 import fnmatch
+import hashlib
 import time
 from pathlib import Path
 
@@ -65,7 +66,7 @@ def matches(name: str) -> str | None:
 
 
 class DownloadWatcher:
-    """Poll a folder; report each export once, only after its size stops changing (download finished).
+    """Poll a folder; report each size/mtime generation after at least three seconds unchanged.
 
     Files already present when watching starts are ignored, so old exports are never re-imported unasked.
     ponytail: polling every few seconds, not OS file events; fine for one Downloads folder.
@@ -74,8 +75,8 @@ class DownloadWatcher:
     def __init__(self, folder: Path, now: float | None = None):
         self.folder = Path(folder)
         self.started = time.time() if now is None else now
-        self.sizes: dict[Path, int] = {}
-        self.reported: set[Path] = set()
+        self.observed: dict[Path, tuple[tuple[int, int], float]] = {}
+        self.reported: dict[Path, tuple[int, int]] = {}
 
     def poll(self) -> list[tuple[str, Path]]:
         ready = []
@@ -84,7 +85,7 @@ class DownloadWatcher:
         except OSError:
             return ready
         for p in entries:
-            if p in self.reported or not p.is_file():
+            if not p.is_file():
                 continue
             platform = matches(p.name)
             if not platform:
@@ -95,24 +96,30 @@ class DownloadWatcher:
                 continue
             if st.st_mtime < self.started:
                 continue
-            if self.sizes.get(p) == st.st_size and st.st_size > 0:
-                self.reported.add(p)
+            generation = (st.st_size, st.st_mtime_ns)
+            previous, since = self.observed.get(p, (None, 0))
+            if previous != generation:
+                self.observed[p] = (generation, time.monotonic())
+            elif (st.st_size > 0 and time.monotonic() - since >= 3.0
+                  and self.reported.get(p) != generation):
+                self.reported[p] = generation
                 ready.append((platform, p))
-            else:
-                self.sizes[p] = st.st_size  # first sight or still growing: check again next poll
+        present = set(entries)
+        self.observed = {p: v for p, v in self.observed.items() if p in present}
+        self.reported = {p: v for p, v in self.reported.items() if p in present}
         return ready
 
 
 def file_key(p: Path) -> str:
     """Identity of one downloaded export: same name re-downloaded with new content counts as new."""
     st = p.stat()
-    return f"{p.name}|{st.st_size}|{int(st.st_mtime)}"
+    return f"{p.name}|{st.st_size}|{st.st_mtime_ns}"
 
 
 def recent_exports(folder: Path, imported: set[str], days: int = 7, now: float | None = None) -> list[tuple[str, Path]]:
-    """Finished exports downloaded in the last `days` that were never imported. Duplicate copies (same size) once."""
+    """Finished exports downloaded in the last `days` that were never imported. Byte-identical copies once."""
     now = time.time() if now is None else now
-    out, sizes = [], set()
+    out, fingerprints = [], set()
     try:
         entries = sorted(Path(folder).iterdir(), key=lambda p: p.name)
     except OSError:
@@ -127,9 +134,14 @@ def recent_exports(folder: Path, imported: set[str], days: int = 7, now: float |
             continue
         if st.st_size == 0 or now - st.st_mtime > days * 86400 or file_key(p) in imported:
             continue
-        if (platform, st.st_size) in sizes:  # 'takeout-x.zip' and 'takeout-x (1).zip' downloaded twice
+        try:
+            with p.open("rb") as stream:
+                fingerprint = hashlib.file_digest(stream, "sha256").hexdigest()
+        except OSError:
             continue
-        sizes.add((platform, st.st_size))
+        if (platform, fingerprint) in fingerprints:
+            continue
+        fingerprints.add((platform, fingerprint))
         out.append((platform, p))
     return out
 

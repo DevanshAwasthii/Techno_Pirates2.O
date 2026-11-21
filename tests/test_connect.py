@@ -18,14 +18,19 @@ def test_every_platform_has_steps_and_patterns():
         assert cfg["steps"] and cfg["patterns"], name
 
 
-def test_waits_for_finished_download_and_reports_once(tmp_path):
+def test_waits_for_finished_download_and_reports_once(tmp_path, monkeypatch):
+    clock = [0.0]
+    monkeypatch.setattr(time, "monotonic", lambda: clock[0])
     w = DownloadWatcher(tmp_path, now=time.time() - 5)
     f = tmp_path / "instagram-me.zip"
     f.write_bytes(b"x" * 10)
     assert w.poll() == []  # first sight: size not yet confirmed stable
     f.write_bytes(b"x" * 20)
     assert w.poll() == []  # still growing
-    assert w.poll() == [("Instagram", f)]  # stable: report
+    clock[0] = 2.99
+    assert w.poll() == []
+    clock[0] = 3.0
+    assert w.poll() == [("Instagram", f)]  # stable for three seconds: report
     assert w.poll() == []  # never twice
 
 
@@ -52,3 +57,41 @@ def test_google_requests_only_supported_products_and_labels_exclusions():
     excluded = next(s for s in google["steps"] if s.startswith("Not analysed:"))
     assert all(product in excluded for product in ("Chrome Takeout", "YouTube", "My Activity", "other Takeout products"))
     assert "Facebook" not in PLATFORMS
+
+
+def test_equal_size_different_content_both_offered_and_copies_deduplicated(tmp_path):
+    from app.connect import recent_exports
+    a = tmp_path / "takeout-a.zip"
+    b = tmp_path / "takeout-b.zip"
+    c = tmp_path / "takeout-c.zip"
+    a.write_bytes(b"synthetic A")
+    b.write_bytes(b"synthetic B")
+    c.write_bytes(a.read_bytes())
+    assert {p for _, p in recent_exports(tmp_path, set())} == {a, b}
+
+
+def test_replaced_file_is_reported_after_new_stability_window(tmp_path, monkeypatch):
+    from app.connect import file_key
+    clock = [0.0]
+    monkeypatch.setattr(time, "monotonic", lambda: clock[0])
+    w = DownloadWatcher(tmp_path, now=time.time() - 5)
+    p = tmp_path / "spotify.zip"
+    p.write_bytes(b"synthetic")
+    assert w.poll() == []
+    clock[0] = 3
+    assert w.poll() == [("Spotify", p)]
+    old_key, old_stamp = file_key(p), p.stat().st_mtime_ns
+    p.write_bytes(b"different")  # same size, newer mtime
+    os.utime(p, ns=(old_stamp + 1_000_000, old_stamp + 1_000_000))
+    assert file_key(p) != old_key
+    assert w.poll() == []
+    clock[0] = 5.99
+    assert w.poll() == []
+    clock[0] = 6
+    assert w.poll() == [("Spotify", p)]
+    assert w.poll() == []
+    p.write_bytes(b"different and larger")
+    assert w.poll() == []
+    clock[0] = 9
+    assert w.poll() == [("Spotify", p)]
+
