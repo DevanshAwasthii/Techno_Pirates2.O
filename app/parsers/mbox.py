@@ -106,11 +106,11 @@ def parse(path: str, src: str = "mail.mbox", source_coverage=None):
                            sourceFile=src, recordRef=f"message {i + 1}",
                            meta={"domain": dom_out, "source": source, "email_kind": kind, "sender": name or addr}))
     box.close()
+    if not recs and not skipped:
+        raise ParseError("wrong_format", "No account emails found in this mailbox", src)
     if source_coverage is not None:
         source_coverage.append({"name": src, "source": src, "platform": "gmail", "kind": "gmail_mail",
                                 "status": "scanned", "records": len(recs), "skipped_spam_trash": skipped,
                                 "detail": f"{len(recs)} account/newsletter records extracted; {skipped} spam/trash emails ignored. Other mail was not assessed."})
-    if not recs and not skipped:
-        raise ParseError("wrong_format", "No account emails found in this mailbox", src)
-    cov = {"location": "not_assessed", "interest": "not_assessed", "contact": "not_assessed", "activity": "found"}
+    cov = {"location": "not_assessed", "interest": "not_assessed", "contact": "not_assessed", "activity": "found" if recs else "not_found"}
     return recs, cov

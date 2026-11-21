@@ -114,3 +114,8 @@ def test_mbox_ignores_spam_trash_and_reports_coverage(tmp_path):
     assert result["errors"] == []
     assert result["records"] == []
     assert result["sourceCoverage"][0]["skipped_spam_trash"] == 2
+    assert result["coverage"]["gmail"]["activity"] == "not_found"
+    p.write_text("From x@shop.com Mon Jan 01 00:00:00 2024\nFrom: x@shop.com\nSubject: Ordinary note\n\nHello\n")
+    result = pipeline.run([p])
+    assert result["errors"][0]["code"] == "wrong_format"
+    assert result["sourceCoverage"][0]["status"] == "unavailable"
