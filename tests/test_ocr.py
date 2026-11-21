@@ -165,3 +165,39 @@ def test_repeated_line_in_distinct_consecutive_frames_counted_once(tmp_path):
 def test_unchanged_video_frames_are_skipped():
     assert [sec for sec, _ in ocr.frames(FEED)] == [0, 2, 4, 6, 8]
     assert [sec for sec, _ in ocr.frames(STATUS)] == [0, 5]
+
+
+def test_same_platform_recordings_get_unique_ids(tmp_path):
+    import shutil
+    a, b = tmp_path / "a" / "feed.mp4", tmp_path / "b" / "feed.mp4"  # same name, different folders
+    for p in (a, b):
+        p.parent.mkdir()
+        shutil.copyfile(FEED, p)
+    r = pipeline.run([a, b])
+    ids = [x["id"] for x in r["records"]]
+    assert len(ids) == len(set(ids))
+    known = set(ids)
+    for f in r["findings"]:
+        assert set(f["evidence"]) <= known
+    by_id = {x["id"]: x for x in r["records"]}
+    srcs = {by_id[i]["sourceFile"] for i in ids}
+    assert srcs == {"feed.mp4"}  # both sources kept, distinguished by id namespace not name
+
+
+def _header_change_video(path):
+    w = cv2.VideoWriter(str(path), cv2.VideoWriter_fourcc(*"mp4v"), 1, (720, 1280))
+    for sec in range(4):
+        img = np.zeros((1280, 720, 3), np.uint8)
+        header = "My status" if sec < 2 else "Viewed by 6"  # only the header changes at second 2
+        cv2.putText(img, header, (40, 90), cv2.FONT_HERSHEY_SIMPLEX, 1.4, (255, 255, 255), 3)
+        for k, name in enumerate(["Arjun Das", "Meera K", "Kabir Roy"]):
+            cv2.putText(img, name, (40, 300 + 160 * k), cv2.FONT_HERSHEY_SIMPLEX, 1.4, (255, 255, 255), 3)
+        w.write(img)
+    w.release()
+
+
+def test_header_only_change_is_not_skipped(tmp_path):
+    p = tmp_path / "header.mp4"
+    _header_change_video(p)
+    secs = [s for s, _ in ocr.frames(p)]
+    assert secs == [0, 2]  # identical held frame skipped, header-only change kept

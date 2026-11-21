@@ -8,6 +8,7 @@ Names are snapped to known people from the other exports (rapidfuzz), fixing OCR
 """
 from __future__ import annotations
 
+import hashlib
 import re
 from pathlib import Path
 
@@ -31,10 +32,18 @@ def _ocr():
     return _engine
 
 
-def _ahash(frame) -> int:
-    g = cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), (16, 16), interpolation=cv2.INTER_AREA)
-    bits = (g > g.mean()).flatten()
-    return int("".join("1" if b else "0" for b in bits), 2)
+THUMB = (90, 160)  # w, h: keeps text strokes visible, unlike a 16x16 whole-screen hash
+PIXEL_DELTA = 40  # grey levels; video compression noise stays well below this
+CHANGED_FRACTION = 0.001  # ~14 thumbnail pixels: one changed word in a header is enough
+
+
+def _thumb(frame):
+    return cv2.resize(cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY), THUMB, interpolation=cv2.INTER_AREA)
+
+
+def _changed(a, b) -> bool:
+    """True when any part of the screen changed meaningfully (local text change counts, global noise does not)."""
+    return (cv2.absdiff(a, b) > PIXEL_DELTA).mean() > CHANGED_FRACTION
 
 
 def frames(path: Path):
@@ -60,9 +69,9 @@ def frames(path: Path):
             ok, f = cap.read()
             if not ok:
                 break
-            h = _ahash(f)
-            if last is None or bin(h ^ last).count("1") > 6:
-                last = h
+            t = _thumb(f)
+            if last is None or _changed(t, last):
+                last = t
                 yield sec, f
             sec += 1
     finally:
@@ -96,6 +105,8 @@ def parse(path: Path, known_people: list[str] | None = None):
     path = Path(path)
     known = list(known_people or [])
     recs, n, seen = [], 0, set()
+    # per-source namespace: two recordings of the same platform must not produce the same record id
+    tag = hashlib.sha1(str(path.resolve()).lower().encode("utf-8")).hexdigest()[:6]
     all_text = []
 
     def add(platform, item, sec, **meta):
@@ -105,7 +116,7 @@ def parse(path: Path, known_people: list[str] | None = None):
             return
         seen.add(key)
         n += 1
-        recs.append(Record(f"oc-{platform[:2]}-{n:05d}", platform, "activity", item, None, "recorded", None,
+        recs.append(Record(f"oc-{platform[:2]}-{tag}-{n:05d}", platform, "activity", item, None, "recorded", None,
                            path.name, f"frame at {sec}s", meta))
 
     for sec, f in frames(path):
