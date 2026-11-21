@@ -39,6 +39,23 @@ def _h(v) -> str:
         return v or ""
 
 
+# Google's own security mail when a third-party app gets account access / Sign in with Google
+GOOGLE_GRANT = re.compile(r"(?P<app>[\w .&'-]{2,40}?)\s+(?:was granted access to|now has access to|connected to) your Google Account"
+                          r"|signed in to (?P<app2>[\w .&'-]{2,40}) (?:with|using) Google", re.I)
+BODY_RX = re.compile(r"verify your( \w+)? (email|account)|confirm your( \w+)? (email|account)|activate your account"
+                     r"|reset your password|complete your registration", re.I)
+BODY_BYTES = 20_000  # ponytail: first 20 KB of text/plain is enough for "verify your email"; raise if misses appear
+
+
+def _body(msg) -> str:
+    """First text/plain part, decoded, truncated. Attachments and HTML-only mail are skipped."""
+    part = next((p for p in msg.walk() if p.get_content_type() == "text/plain" and not p.get_filename()), None)
+    if part is None:
+        return ""
+    raw = part.get_payload(decode=True) or b""
+    return raw[:BODY_BYTES].decode(part.get_content_charset() or "utf-8", errors="replace")
+
+
 def classify(subject: str) -> str | None:
     s = subject.lower()
     for kind, rx in KINDS.items():
@@ -55,23 +72,33 @@ def parse(path: str, src: str = "mail.mbox"):
     recs, n = [], 0
     for i, msg in enumerate(box):
         subject = _h(msg.get("Subject"))
-        kind = classify(subject)
-        if not kind:
-            continue  # newsletters and personal mail are not proof of an account
         name, addr = parseaddr(_h(msg.get("From")))
         if "@" not in addr:
             continue
         dom = base_domain(addr)
         if dom in PERSONAL:
             continue
+        grant = GOOGLE_GRANT.search(subject) if dom == "google.com" else None
+        kind = classify(subject)
+        if not kind and not grant:
+            # vague subject ("Hi Riya"): the body often says "verify your email". Strict list only: promos say "welcome" too.
+            kind = "signup" if BODY_RX.search(_body(msg)) else None
+        if grant:
+            source, kind, dom_out = "google_signin", "signin_with_google", (grant.group("app") or grant.group("app2")).strip()
+        elif kind:
+            source, dom_out = "email", dom
+        elif msg.get("List-Unsubscribe"):
+            source, kind, dom_out = "newsletter", "subscription", dom  # on a mailing list: they hold your email
+        else:
+            continue  # personal mail is not proof of an account
         try:
             ts = parsedate_to_datetime(msg.get("Date")).strftime("%Y-%m-%dT%H:%M:%S%z")
         except Exception:
             ts = None
         n += 1
-        recs.append(Record(f"gm-acco-{n:05d}", PLATFORM, "account", f"{dom}: {subject[:90]}", ts,
+        recs.append(Record(f"gm-acco-{n:05d}", PLATFORM, "account", f"{dom_out}: {subject[:90]}", ts,
                            sourceFile=src, recordRef=f"message {i + 1}",
-                           meta={"domain": dom, "source": "email", "email_kind": kind, "sender": name or addr}))
+                           meta={"domain": dom_out, "source": source, "email_kind": kind, "sender": name or addr}))
     box.close()
     if not recs:
         raise ParseError("wrong_format", "No account emails found in this mailbox", src)

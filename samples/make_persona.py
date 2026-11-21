@@ -164,11 +164,25 @@ services = [
 ]
 noise = [("Arjun Das", "arjun.das@gmail.com", "notes for tomorrow"), ("Medium Daily", "noreply@medium.com", "Top stories for you"),
          ("Swiggy", "promo@swiggy.in", "50% off tonight only!")]
+extra = [  # (name, addr, subject, body, list_unsubscribe)
+    ("Zepto Cafe", "hello@zeptocafe.in", "Hi Riya", "Please verify your email address to start ordering.", False),
+    ("Google", "no-reply@accounts.google.com", "Truecaller was granted access to your Google Account", "", False),
+    ("Google", "no-reply@accounts.google.com", "Canva was granted access to your Google Account", "", False),
+    ("Google", "no-reply@accounts.google.com", "QuizMaster Pro was granted access to your Google Account", "", False),
+    ("The Hindu", "newsletters@thehindu.co.in", "Morning digest", "Today's headlines", True),
+    ("Product Hunt", "hello@producthunt.com", "Top products today", "This week's launches", True),
+]
 mb = []
 for k, (name, addr, subj) in enumerate(services + noise):
     d = datetime(2021, 1, 1) + timedelta(days=37 * k)
+    unsub = f"List-Unsubscribe: <mailto:unsub@{addr.split('@')[1]}>\n" if addr.startswith(("noreply@medium", "promo@")) else ""
     mb.append(f"From {addr} {d.strftime('%a %b %d %H:%M:%S %Y')}\nFrom: {name} <{addr}>\nTo: riya.sen@gmail.com\n"
-              f"Subject: {subj}\nDate: {d.strftime('%a, %d %b %Y %H:%M:%S +0530')}\n\nHello Riya,\n\n")
+              f"Subject: {subj}\nDate: {d.strftime('%a, %d %b %Y %H:%M:%S +0530')}\n{unsub}\nHello Riya,\n\n")
+for k, (name, addr, subj, body, unsub) in enumerate(extra):
+    d = datetime(2025, 3, 1) + timedelta(days=11 * k)
+    hdr = f"List-Unsubscribe: <mailto:unsub@{addr.split('@')[1]}>\n" if unsub else ""
+    mb.append(f"From {addr} {d.strftime('%a %b %d %H:%M:%S %Y')}\nFrom: {name} <{addr}>\nTo: riya.sen@gmail.com\n"
+              f"Subject: {subj}\nDate: {d.strftime('%a, %d %b %Y %H:%M:%S +0530')}\n{hdr}\n{body}\n\n")
 (DIR / "persona_gmail.mbox").write_text("".join(mb), encoding="utf-8")
 
 # ---- Chrome profile (zipped Default folder): History, Network/Cookies, Login Data, Preferences ----

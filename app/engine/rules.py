@@ -95,6 +95,32 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
                               "No delete option: email the service's privacy contact asking for erasure under India's DPDP Act 2023",
                               "Change reused passwords on the services you keep"], "link": ""})
 
+    lists = by[("gmail", "account", "newsletter")]
+    if lists:
+        senders = {r.meta["domain"] for r in lists}
+        add(layer=1, title=f"{len(senders)} mailing lists hold your email address",
+            detail="Each list sender stores your address and often shares it with marketing partners.",
+            priority="low", category="account", platforms=["gmail"],
+            metric={"value": len(senders), "unit": "senders"}, evidence=[r.id for r in lists],
+            action={"steps": ["Open one email from each sender in the evidence list", "Click 'Unsubscribe' at the bottom",
+                              "Gmail: open the email > three-dot menu > Unsubscribe"], "link": ""})
+
+    if by[("gmail", "account", "email")] or lists or any(r.platform == "google" for r in records):
+        grants = by[("gmail", "account", "google_signin")]
+        apps = sorted({r.meta["domain"] for r in grants})
+        evidence = [r.id for r in grants] or [r.id for r in by[("gmail", "account", "email")][:5]]
+        add(layer=1,
+            title=f"{len(apps)} apps are connected to your Google account" if apps
+            else "Check which apps use Sign in with Google",
+            detail=("Google security emails show these apps got access: " + ", ".join(apps) + ". " if apps else
+                    "Google exports do not list apps you signed into with Google, so check them directly. ")
+                   + "Connected apps can keep reading your profile, email or contacts until removed.",
+            priority="high" if apps else "low", category="account", platforms=["gmail"],
+            metric={"value": len(apps), "unit": "apps"}, evidence=evidence,
+            action={"steps": ["Open myaccount.google.com/connections", "Review 'Third-party apps and services'",
+                              "Click each app you don't use > Delete all connections"],
+                    "link": "https://myaccount.google.com/connections"})
+
     segs = by[("spotify", "interest", None)]
     if segs:
         add(layer=2, title=f"Spotify sorted you into {len(segs)} ad segments",

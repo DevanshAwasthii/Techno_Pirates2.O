@@ -28,10 +28,28 @@ def test_all_platforms_parse_cleanly(full):
 
 def test_email_discovery_counts_accounts_not_newsletters(full):
     t = next(x for x in titles(full) if "services have your email" in x)
-    assert t.startswith("41 ")  # 41 account emails; promo, newsletter and personal mail excluded
-    domains = {r["meta"]["domain"] for r in full["records"] if r["platform"] == "gmail"}
-    assert "medium.com" not in domains and "gmail.com" not in domains
-    assert "irctc.co.in" in domains  # co.in handled as a second-level domain
+    assert t.startswith("42 ")  # 41 subject matches + 1 found from the body; newsletters and personal mail excluded
+    accounts = {r["meta"]["domain"] for r in full["records"] if r["platform"] == "gmail" and r["meta"]["source"] == "email"}
+    assert "medium.com" not in accounts and "gmail.com" not in accounts
+    assert "irctc.co.in" in accounts  # co.in handled as a second-level domain
+    assert "zeptocafe.in" in accounts  # vague subject, "verify your email" in body
+
+
+def test_newsletters_and_google_connections(full):
+    t = titles(full)
+    assert "4 mailing lists hold your email address" in t  # medium, swiggy promo, thehindu, producthunt
+    g = next(f for f in full["findings"] if "connected to your Google account" in f["title"])
+    assert g["title"].startswith("3 apps") and g["priority"] == "high"
+    apps = {r["meta"]["domain"] for r in full["records"] if r["meta"].get("source") == "google_signin"}
+    assert apps == {"Truecaller", "Canva", "QuizMaster Pro"}
+
+
+def test_body_welcome_alone_is_not_an_account(tmp_path):
+    p = tmp_path / "m.mbox"
+    p.write_text("From a@shop.com Mon Jan 01 00:00:00 2024\nFrom: Shop <a@shop.com>\nSubject: Hi\n\nWelcome to our sale!\n\n"
+                 "From b@app.io Mon Jan 01 00:00:00 2024\nFrom: App <b@app.io>\nSubject: Hi\n\nPlease confirm your email\n\n")
+    doms = {r.meta["domain"] for r in mbox.parse(str(p))[0]}
+    assert doms == {"app.io"}
 
 
 def test_cross_platform_home_ip(full):

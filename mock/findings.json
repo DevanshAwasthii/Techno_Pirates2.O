@@ -1674,6 +1674,142 @@
    }
   },
   {
+   "id": "gm-acco-00042",
+   "platform": "gmail",
+   "category": "account",
+   "item": "medium.com: Top stories for you",
+   "timestamp": "2025-04-04T00:00:00+0530",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_gmail.mbox",
+   "recordRef": "message 43",
+   "meta": {
+    "domain": "medium.com",
+    "source": "newsletter",
+    "email_kind": "subscription",
+    "sender": "Medium Daily"
+   }
+  },
+  {
+   "id": "gm-acco-00043",
+   "platform": "gmail",
+   "category": "account",
+   "item": "swiggy.in: 50% off tonight only!",
+   "timestamp": "2025-05-11T00:00:00+0530",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_gmail.mbox",
+   "recordRef": "message 44",
+   "meta": {
+    "domain": "swiggy.in",
+    "source": "newsletter",
+    "email_kind": "subscription",
+    "sender": "Swiggy"
+   }
+  },
+  {
+   "id": "gm-acco-00044",
+   "platform": "gmail",
+   "category": "account",
+   "item": "zeptocafe.in: Hi Riya",
+   "timestamp": "2025-03-01T00:00:00+0530",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_gmail.mbox",
+   "recordRef": "message 45",
+   "meta": {
+    "domain": "zeptocafe.in",
+    "source": "email",
+    "email_kind": "signup",
+    "sender": "Zepto Cafe"
+   }
+  },
+  {
+   "id": "gm-acco-00045",
+   "platform": "gmail",
+   "category": "account",
+   "item": "Truecaller: Truecaller was granted access to your Google Account",
+   "timestamp": "2025-03-12T00:00:00+0530",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_gmail.mbox",
+   "recordRef": "message 46",
+   "meta": {
+    "domain": "Truecaller",
+    "source": "google_signin",
+    "email_kind": "signin_with_google",
+    "sender": "Google"
+   }
+  },
+  {
+   "id": "gm-acco-00046",
+   "platform": "gmail",
+   "category": "account",
+   "item": "Canva: Canva was granted access to your Google Account",
+   "timestamp": "2025-03-23T00:00:00+0530",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_gmail.mbox",
+   "recordRef": "message 47",
+   "meta": {
+    "domain": "Canva",
+    "source": "google_signin",
+    "email_kind": "signin_with_google",
+    "sender": "Google"
+   }
+  },
+  {
+   "id": "gm-acco-00047",
+   "platform": "gmail",
+   "category": "account",
+   "item": "QuizMaster Pro: QuizMaster Pro was granted access to your Google Account",
+   "timestamp": "2025-04-03T00:00:00+0530",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_gmail.mbox",
+   "recordRef": "message 48",
+   "meta": {
+    "domain": "QuizMaster Pro",
+    "source": "google_signin",
+    "email_kind": "signin_with_google",
+    "sender": "Google"
+   }
+  },
+  {
+   "id": "gm-acco-00048",
+   "platform": "gmail",
+   "category": "account",
+   "item": "thehindu.co.in: Morning digest",
+   "timestamp": "2025-04-14T00:00:00+0530",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_gmail.mbox",
+   "recordRef": "message 49",
+   "meta": {
+    "domain": "thehindu.co.in",
+    "source": "newsletter",
+    "email_kind": "subscription",
+    "sender": "The Hindu"
+   }
+  },
+  {
+   "id": "gm-acco-00049",
+   "platform": "gmail",
+   "category": "account",
+   "item": "producthunt.com: Top products today",
+   "timestamp": "2025-04-25T00:00:00+0530",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_gmail.mbox",
+   "recordRef": "message 50",
+   "meta": {
+    "domain": "producthunt.com",
+    "source": "newsletter",
+    "email_kind": "subscription",
+    "sender": "Product Hunt"
+   }
+  },
+  {
    "id": "ig-cont-00001",
    "platform": "instagram",
    "category": "contact",
@@ -12983,15 +13119,15 @@
   {
    "id": "F-012",
    "layer": 1,
-   "title": "41 services have your email address",
-   "detail": "Found from signup, password-reset, receipt and security emails. 41 appear only once - likely forgotten accounts.",
+   "title": "42 services have your email address",
+   "detail": "Found from signup, password-reset, receipt and security emails. 42 appear only once - likely forgotten accounts.",
    "priority": "high",
    "category": "account",
    "platforms": [
     "gmail"
    ],
    "metric": {
-    "value": 41,
+    "value": 42,
     "unit": "services"
    },
    "evidence": [
@@ -13035,7 +13171,8 @@
     "gm-acco-00038",
     "gm-acco-00039",
     "gm-acco-00040",
-    "gm-acco-00041"
+    "gm-acco-00041",
+    "gm-acco-00044"
    ],
    "action": {
     "steps": [
@@ -13139,7 +13276,7 @@
    }
   },
   {
-   "id": "F-016",
+   "id": "F-018",
    "layer": 1,
    "title": "6 sites recorded your clicks and typing",
    "detail": "Session-replay tools (FullStory, Hotjar, LogRocket, Microsoft Clarity) record mouse movement, scrolling and what you type, then replay it for the site owner.",
@@ -13170,7 +13307,7 @@
    }
   },
   {
-   "id": "F-018",
+   "id": "F-020",
    "layer": 5,
    "title": "6 sites can access your location, camera or microphone",
    "detail": "4 location, 2 camera, 1 microphone permissions are allowed in your browser.",
@@ -13202,7 +13339,7 @@
    }
   },
   {
-   "id": "F-022",
+   "id": "F-024",
    "layer": 5,
    "title": "4 apps accessed your location in the last 7 days",
    "detail": "Observed access events across iOS and Android. The same app on two platforms counts as two app installations; permission alone does not prove use.",
@@ -13233,7 +13370,35 @@
    }
   },
   {
-   "id": "F-023",
+   "id": "F-014",
+   "layer": 1,
+   "title": "3 apps are connected to your Google account",
+   "detail": "Google security emails show these apps got access: Canva, QuizMaster Pro, Truecaller. Connected apps can keep reading your profile, email or contacts until removed.",
+   "priority": "high",
+   "category": "account",
+   "platforms": [
+    "gmail"
+   ],
+   "metric": {
+    "value": 3,
+    "unit": "apps"
+   },
+   "evidence": [
+    "gm-acco-00045",
+    "gm-acco-00046",
+    "gm-acco-00047"
+   ],
+   "action": {
+    "steps": [
+     "Open myaccount.google.com/connections",
+     "Review 'Third-party apps and services'",
+     "Click each app you don't use > Delete all connections"
+    ],
+    "link": "https://myaccount.google.com/connections"
+   }
+  },
+  {
+   "id": "F-025",
    "layer": 5,
    "title": "3 apps send data to session-recording or tracking services",
    "detail": "App Privacy Report shows connections to known tracking or session-recording domains. A connection alone does not prove that screen contents were recorded.",
@@ -13375,7 +13540,7 @@
    }
   },
   {
-   "id": "F-014",
+   "id": "F-016",
    "layer": 4,
    "title": "2 platforms know your home network",
    "detail": "IP 49.37.12.88 appears in instagram, spotify records. Matching IPs link your accounts to one household and city.",
@@ -13416,7 +13581,7 @@
    }
   },
   {
-   "id": "F-025",
+   "id": "F-027",
    "layer": 5,
    "title": "2 log files contain your email or IP address",
    "detail": "Only email, IPv4 and Indian-phone pattern counts were retained. These are pattern matches, not verified identities; no matched values were saved.",
@@ -13522,7 +13687,7 @@
    }
   },
   {
-   "id": "F-017",
+   "id": "F-019",
    "layer": 1,
    "title": "12 ad and analytics companies track you across sites",
    "detail": "Their cookies let them follow you from site to site and build an advertising profile.",
@@ -13590,7 +13755,7 @@
    }
   },
   {
-   "id": "F-013",
+   "id": "F-015",
    "layer": 2,
    "title": "Spotify sorted you into 8 ad segments",
    "detail": "Segments include: Spotify Commuters, Spotify Students, Budget Conscious Shoppers, Bollywood Fans, Online Food Delivery Users, Late Night Listeners. Some come from advertiser data, not your listening.",
@@ -13623,7 +13788,7 @@
    }
   },
   {
-   "id": "F-015",
+   "id": "F-017",
    "layer": 3,
    "title": "8 people can see your number in 1 WhatsApp group",
    "detail": "Every group member sees your phone number and profile photo, and can save or forward them.",
@@ -13678,7 +13843,7 @@
    }
   },
   {
-   "id": "F-020",
+   "id": "F-022",
    "layer": 3,
    "title": "6 people watch your WhatsApp status",
    "detail": "Status viewers form your inner circle; each one sees where you are and what you do.",
@@ -13709,7 +13874,7 @@
    }
   },
   {
-   "id": "F-021",
+   "id": "F-023",
    "layer": 3,
    "title": "Your top 5 people are visible from your activity alone",
    "detail": "Likes, comments and messages rank who you are closest to: meera_k, arjun.das, rahul.k, tanvi.m, ishaan_g.",
@@ -13882,7 +14047,7 @@
    }
   },
   {
-   "id": "F-019",
+   "id": "F-021",
    "layer": 3,
    "title": "Instagram showed you what 3 friends liked",
    "detail": "Your feed exposes friends' likes to you - and yours to them. Every like is visible to your followers.",
@@ -13910,7 +14075,7 @@
    }
   },
   {
-   "id": "F-024",
+   "id": "F-026",
    "layer": 5,
    "title": "3 apps hold 4.80 GB of your data on this laptop",
    "detail": "Measured data in the largest app folders under AppData. File contents were not collected.",
@@ -13934,6 +14099,35 @@
      "Review Temporary files before selecting Remove files",
      "Open each listed app > Settings > Storage or Cache > clear data you no longer need",
      "Settings > Apps > Installed apps > uninstall unused apps; back up needed data first"
+    ],
+    "link": ""
+   }
+  },
+  {
+   "id": "F-013",
+   "layer": 1,
+   "title": "4 mailing lists hold your email address",
+   "detail": "Each list sender stores your address and often shares it with marketing partners.",
+   "priority": "low",
+   "category": "account",
+   "platforms": [
+    "gmail"
+   ],
+   "metric": {
+    "value": 4,
+    "unit": "senders"
+   },
+   "evidence": [
+    "gm-acco-00042",
+    "gm-acco-00043",
+    "gm-acco-00048",
+    "gm-acco-00049"
+   ],
+   "action": {
+    "steps": [
+     "Open one email from each sender in the evidence list",
+     "Click 'Unsubscribe' at the bottom",
+     "Gmail: open the email > three-dot menu > Unsubscribe"
     ],
     "link": ""
    }
@@ -13990,7 +14184,7 @@
   }
  },
  "summary": {
-  "servicesFound": 61,
+  "servicesFound": 68,
   "trackersFound": 12,
   "sessionRecorders": 6,
   "topPeople": [
@@ -14424,6 +14618,48 @@
    {
     "id": "svc:desiforum.co.in",
     "label": "desiforum.co.in",
+    "type": "service",
+    "size": 10
+   },
+   {
+    "id": "svc:medium.com",
+    "label": "medium.com",
+    "type": "service",
+    "size": 10
+   },
+   {
+    "id": "svc:zeptocafe.in",
+    "label": "zeptocafe.in",
+    "type": "service",
+    "size": 10
+   },
+   {
+    "id": "svc:Truecaller",
+    "label": "Truecaller",
+    "type": "service",
+    "size": 10
+   },
+   {
+    "id": "svc:Canva",
+    "label": "Canva",
+    "type": "service",
+    "size": 10
+   },
+   {
+    "id": "svc:QuizMaster Pro",
+    "label": "QuizMaster Pro",
+    "type": "service",
+    "size": 10
+   },
+   {
+    "id": "svc:thehindu.co.in",
+    "label": "thehindu.co.in",
+    "type": "service",
+    "size": 10
+   },
+   {
+    "id": "svc:producthunt.com",
+    "label": "producthunt.com",
     "type": "service",
     "size": 10
    },
@@ -15186,6 +15422,78 @@
     "label": "email",
     "evidence": [
      "gm-acco-00041"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:medium.com",
+    "weight": 1,
+    "label": "newsletter",
+    "evidence": [
+     "gm-acco-00042"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:swiggy.in",
+    "weight": 1,
+    "label": "newsletter",
+    "evidence": [
+     "gm-acco-00043"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:zeptocafe.in",
+    "weight": 1,
+    "label": "email",
+    "evidence": [
+     "gm-acco-00044"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:Truecaller",
+    "weight": 1,
+    "label": "google_signin",
+    "evidence": [
+     "gm-acco-00045"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:Canva",
+    "weight": 1,
+    "label": "google_signin",
+    "evidence": [
+     "gm-acco-00046"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:QuizMaster Pro",
+    "weight": 1,
+    "label": "google_signin",
+    "evidence": [
+     "gm-acco-00047"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:thehindu.co.in",
+    "weight": 1,
+    "label": "newsletter",
+    "evidence": [
+     "gm-acco-00048"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:producthunt.com",
+    "weight": 1,
+    "label": "newsletter",
+    "evidence": [
+     "gm-acco-00049"
     ]
    },
    {
