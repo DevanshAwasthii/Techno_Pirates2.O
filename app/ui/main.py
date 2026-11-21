@@ -4,6 +4,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from pathlib import Path
 import threading
+import time
 import math
 import json
 import webbrowser
@@ -184,7 +185,8 @@ class NexDataApp(ctk.CTk):
         self.configure(fg_color=BG)
         self.result = {}
         self.source_mode = "pc"
-        self.loaded_paths = []
+        # exports imported in earlier sessions stay part of the analysis while the files still exist
+        self.loaded_paths = [p for p in load_settings().get("library", []) if Path(p).is_file()]
         self.pending_paths = []
         self.records_by_id = {}
         self.figures = []
@@ -238,6 +240,7 @@ class NexDataApp(ctk.CTk):
         self.after(150, self.scan_laptop)
         self.watcher = DownloadWatcher(downloads_folder())
         self.auto_queue = []
+        self.reopen_paths = []
         self.recent_offered = False
         self.after(5000, self.poll_downloads)
         self.after(4000, self.offer_recent_exports)
@@ -263,7 +266,8 @@ class NexDataApp(ctk.CTk):
                 done.add(file_key(Path(p)))
             except OSError:
                 pass
-        save_settings({**settings, "imported": sorted(done)[-500:]})
+        library = list(dict.fromkeys([*settings.get("library", []), *map(str, paths)]))
+        save_settings({**settings, "imported": sorted(done)[-500:], "library": library[-200:]})
         self.load_paths(list(dict.fromkeys([*map(str, self.loaded_paths), *map(str, paths)])))
 
     def offer_recent_exports(self):
@@ -326,7 +330,7 @@ class NexDataApp(ctk.CTk):
     def open_files(self):
         paths = filedialog.askopenfilenames(parent=self, title="Open personal data exports", initialdir=str(Path.home() / "Downloads"), filetypes=[("Data exports", "*.zip *.txt *.mbox *.mp4 *.mov *.mkv *.avi *.png *.jpg *.jpeg *.ndjson *.json"), ("All files", "*.*")])
         if paths:
-            self.load_paths(paths)
+            self.import_exports(paths)  # remembered: included in every later scan
 
     def scan_laptop(self):
         if self.loading or self.closing:
@@ -431,9 +435,19 @@ class NexDataApp(ctk.CTk):
 
         def worker():
             try:
-                from scanner.browser_access import close_browsers
-                close_browsers(list(processes.values()), allow_background_stop=True)
+                from scanner.browser_access import close_browser_windows, close_browsers
+                # Windows first: while any window is open the browser restarts the lock-holding process.
+                self.reopen_paths = close_browser_windows()
+                time.sleep(1.5)  # let the browser finish its normal shutdown
+                close_browsers(list(processes.values()), allow_background_stop=True)  # leftovers; exited PIDs are skipped
             except (OSError, RuntimeError) as exc:
+                if self.reopen_paths:  # never leave the user's browser closed after a failed attempt
+                    from scanner.browser_access import reopen_browsers
+                    paths, self.reopen_paths = self.reopen_paths, []
+                    try:
+                        reopen_browsers(paths)
+                    except OSError:
+                        pass
                 self.dispatch(self.load_failed, str(exc))
             else:
                 self.dispatch(self.browser_locks_resolved)
@@ -522,10 +536,16 @@ class NexDataApp(ctk.CTk):
             self.show_errors(error_text(result.get("errors")))
             if any(error.get("blocked_by") for error in result.get("errors") or []):
                 self.resolve_button.grid()
-                if self.source_mode == "pc":
-                    self.after(300, self.maybe_auto_close)
+                self.after(300, self.maybe_auto_close)  # PC data is part of every run, imports included
             else:
                 self.resolve_button.grid_remove()
+            if self.reopen_paths:  # browsers we closed for this scan come back with their tabs
+                paths, self.reopen_paths = self.reopen_paths, []
+                try:
+                    from scanner.browser_access import reopen_browsers
+                    reopen_browsers(paths)
+                except OSError as exc:
+                    self.show_errors(f"Could not reopen your browser automatically: {exc}")
             mode = "Real PC scan finished" if self.source_mode == "pc" else "User imports"
             self.title("NexData - Personal Data Footprint Auditor | " + mode + (" (partial coverage)" if partial else " (supported checks)"))
         except Exception as exc:

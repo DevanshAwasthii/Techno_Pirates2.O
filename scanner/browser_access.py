@@ -242,3 +242,73 @@ def close_browsers(processes, *, allow_background_stop=False):
             return
         time.sleep(0.2)
     raise RuntimeError("A browser is still running. It was not force-closed; exit it fully and rescan.")
+
+
+def close_browser_windows(timeout=20.0):
+    """Ask every visible Chrome/Edge window to close, exactly like clicking its X (WM_CLOSE).
+
+    Needed because the Cookies lock belongs to a background network process that the browser
+    restarts at once while any window is open. Returns the executable paths that were running,
+    so the caller can reopen them with their last session. Never terminates anything itself.
+    """
+    if os.name != "nt":
+        raise OSError("Browser window closing is available on Windows only")
+    user = ctypes.WinDLL("user32", use_last_error=True)
+    callback_type = ctypes.WINFUNCTYPE(w.BOOL, w.HWND, w.LPARAM)
+    user.EnumWindows.argtypes = [callback_type, w.LPARAM]
+    user.IsWindowVisible.argtypes = [w.HWND]
+    user.GetWindowThreadProcessId.argtypes = [w.HWND, ctypes.POINTER(w.DWORD)]
+    user.PostMessageW.argtypes = [w.HWND, w.UINT, w.WPARAM, w.LPARAM]
+    _, kernel = _apis()
+
+    def browser_windows():
+        found = []
+
+        @callback_type
+        def visit(hwnd, param):
+            owner = w.DWORD()
+            user.GetWindowThreadProcessId(hwnd, ctypes.byref(owner))
+            if user.IsWindowVisible(hwnd):
+                found.append((hwnd, owner.value))
+            return True
+        user.EnumWindows(visit, 0)
+        out, cache = [], {}
+        for hwnd, pid in found:
+            if pid not in cache:
+                cache[pid] = _image_path(kernel, pid)
+            path = cache[pid]
+            if path and Path(path).name.lower() in BROWSERS:
+                out.append((hwnd, path))
+        return out
+
+    windows = browser_windows()
+    paths = sorted({p for _, p in windows})
+    for hwnd, _ in windows:
+        user.PostMessageW(hwnd, 0x0010, 0, 0)  # WM_CLOSE: normal close, the browser saves its session
+    deadline = time.monotonic() + timeout
+    while time.monotonic() < deadline and browser_windows():
+        time.sleep(0.3)
+    if browser_windows():
+        raise RuntimeError("A browser window did not close (it may be asking a question). Close it and scan again.")
+    return paths
+
+
+def _image_path(kernel, pid):
+    handle = kernel.OpenProcess(0x1000, False, pid)  # query only
+    if not handle:
+        return None
+    try:
+        size = w.DWORD(32768)
+        buf = ctypes.create_unicode_buffer(size.value)
+        return buf.value if kernel.QueryFullProcessImageNameW(handle, 0, buf, ctypes.byref(size)) else None
+    finally:
+        kernel.CloseHandle(handle)
+
+
+def reopen_browsers(paths):
+    """Start each browser again with its previous tabs."""
+    import subprocess
+    for path in paths:
+        if Path(path).name.lower() in BROWSERS and Path(path).is_file():
+            subprocess.Popen([path, "--restore-last-session"], close_fds=True,
+                             creationflags=getattr(subprocess, "DETACHED_PROCESS", 0))

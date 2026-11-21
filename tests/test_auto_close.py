@@ -58,3 +58,21 @@ def test_first_time_asks(app):
     app.ask_auto_close = lambda: asked.append(1) or False
     app.maybe_auto_close()
     assert asked == [1] and app.calls == []
+
+
+def test_reopen_only_starts_real_browsers(tmp_path, monkeypatch):
+    import subprocess
+    from scanner import browser_access
+    started = []
+    monkeypatch.setattr(subprocess, "Popen", lambda args, **k: started.append(args))
+    fake = tmp_path / "chrome.exe"; fake.write_bytes(b"")
+    other = tmp_path / "evil.exe"; other.write_bytes(b"")
+    browser_access.reopen_browsers([str(fake), str(other), str(tmp_path / "msedge.exe")])  # last one missing
+    assert started == [[str(fake), "--restore-last-session"]]
+
+
+def test_imports_are_remembered_in_library(app, tmp_path):
+    z = tmp_path / "instagram-x.zip"; z.write_bytes(b"PK")
+    app.load_paths = lambda paths, *a: None
+    app.import_exports([z])
+    assert str(z) in ui.load_settings()["library"]
