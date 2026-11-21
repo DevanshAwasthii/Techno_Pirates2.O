@@ -16,6 +16,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib import pyplot as plt
 from fpdf import FPDF
 
+import webbrowser
+
+from app.connect import PLATFORMS, DownloadWatcher, downloads_folder
 from app.engine.coverage import STATUS_LABELS, coverage_rows, audit_is_partial, tracker_display, storage_display, chat_display
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -185,7 +188,8 @@ class NexDataApp(ctk.CTk):
         self.scan_mode.grid(row=0, column=3, padx=8)
         self.open_button.grid(row=0, column=4, padx=(4, 10))
         self.scan_button = ctk.CTkButton(top, text="Scan this PC", command=self.scan_laptop, width=145, fg_color="#217989")
-        self.scan_button.grid(row=0, column=5, padx=(0, 22))
+        self.scan_button.grid(row=0, column=5, padx=(0, 8))
+        ctk.CTkButton(top, text="Get my data", command=self.open_connect, width=130, fg_color="#5b3f8f").grid(row=0, column=6, padx=(0, 22))
 
         status = ctk.CTkFrame(self, fg_color="transparent")
         status.grid(row=1, column=0, sticky="ew", padx=22, pady=(10, 0))
@@ -210,6 +214,52 @@ class NexDataApp(ctk.CTk):
             page.grid_columnconfigure(0, weight=1)
             page.grid_rowconfigure(0, weight=1)
         self.after(150, self.scan_laptop)
+        self.watcher = DownloadWatcher(downloads_folder())
+        self.auto_queue = []
+        self.after(5000, self.poll_downloads)
+
+    def poll_downloads(self):
+        """Import finished exports that land in Downloads while the app is open."""
+        if self.closing:
+            return
+        for platform, path in self.watcher.poll():
+            self.auto_queue.append(path)
+            self.status_label.configure(text=f"New {platform} export found in Downloads: {path.name}. Importing...")
+        if self.auto_queue and not self.loading:
+            merged = list(dict.fromkeys([*map(str, self.loaded_paths), *map(str, self.auto_queue)]))
+            self.auto_queue = []
+            self.load_paths(merged)
+        self.after(5000, self.poll_downloads)
+
+    def open_connect(self):
+        win = ctk.CTkToplevel(self)
+        win.title("Get my data")
+        win.geometry("940x580")
+        win.transient(self)
+        win.configure(fg_color=BG)
+        ctk.CTkLabel(win, text="Request your data - NexData imports it automatically", font=("Segoe UI", 18, "bold"),
+                     text_color=TEXT).pack(anchor="w", padx=20, pady=(18, 4))
+        ctk.CTkLabel(win, text=f"Keep NexData open. Finished downloads in {downloads_folder()} are picked up within seconds.",
+                     text_color=MUTED, wraplength=700, justify="left").pack(anchor="w", padx=20)
+        picker = ctk.CTkSegmentedButton(win, values=list(PLATFORMS), command=lambda n: show(n))
+        picker.pack(fill="x", padx=20, pady=(12, 0))
+        body = ctk.CTkScrollableFrame(win, fg_color=PANEL)
+        body.pack(fill="both", expand=True, padx=20, pady=14)
+
+        def show(name):
+            for w in body.winfo_children():
+                w.destroy()
+            cfg = PLATFORMS[name]
+            ctk.CTkLabel(body, text=name, font=("Segoe UI", 16, "bold"), text_color=CYAN).pack(anchor="w", padx=12, pady=(10, 6))
+            for i, step in enumerate(cfg["steps"], 1):
+                ctk.CTkLabel(body, text=f"{i}. {step}", text_color=TEXT, wraplength=660, justify="left").pack(anchor="w", padx=12, pady=3)
+            if cfg["url"]:
+                ctk.CTkButton(body, text="Open the request page in my browser",
+                              command=lambda u=cfg["url"]: webbrowser.open(u)).pack(anchor="w", padx=12, pady=12)
+
+        first = next(iter(PLATFORMS))
+        picker.set(first)
+        show(first)
 
     def show_errors(self, message):
         self.error_label.configure(text=message)
