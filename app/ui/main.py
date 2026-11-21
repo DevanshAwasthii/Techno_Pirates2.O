@@ -138,19 +138,47 @@ def service_findings(result, service):
     return [f for f in result.get("findings") or [] if ids.intersection(f.get("evidence") or [])]
 
 
+def report_fonts(pdf):
+    """Embed available Windows Unicode fonts, skipping missing or unusable files."""
+    folder = Path(os.environ.get("WINDIR", "C:/Windows")) / "Fonts"
+    families = []
+    for filename in ("ARIALUNI.ttf", "Nirmala.ttc", "seguiemj.ttf", "arial.ttf"):
+        path = folder / filename
+        if not path.is_file():
+            continue
+        family = f"Unicode{len(families)}"
+        try:
+            pdf.add_font(family, fname=str(path))
+        except Exception:  # damaged/unsupported collection: try the next installed font
+            continue
+        families.append(family)
+    if families:
+        pdf.set_fallback_fonts(families[1:], exact_match=False)
+        try:
+            import uharfbuzz
+        except ImportError:
+            pass
+        else:
+            pdf.set_text_shaping(True)
+    return families[0] if families else None
+
+
 def report_bytes(result):
-    """Use a core PDF font; unsupported characters are deliberately replaced."""
+    """Embed Unicode fonts from Windows; preserve text as escapes if none are usable."""
     pdf = FPDF()
+    family = report_fonts(pdf)
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
 
     def line(text, size=11, bold=False):
-        pdf.set_font("Helvetica", "B" if bold else "", size)
-        safe = str(text).encode("latin-1", "replace").decode("latin-1")
+        pdf.set_font(family or "Helvetica", "" if family else ("B" if bold else ""), size)
+        safe = str(text) if family else str(text).encode("ascii", "backslashreplace").decode("ascii")
         pdf.multi_cell(w=0, h=6 if size < 15 else 9, text=safe, new_x="LMARGIN", new_y="NEXT", wrapmode="CHAR")
 
     line("NexData - Personal Data Footprint Auditor", 18, True)
     line("Offline report - nothing leaves this device")
+    if not family:
+        line("Unicode fonts unavailable: non-ASCII text is preserved as Unicode escape sequences.")
     line("Source: this PC and any user-selected imports" if result.get("sourceMode") == "pc" else "Source: user-selected imports")
     line("Social interests and relationships require actual account exports; they are not guessed from this PC.")
     line(datetime.now().strftime("Generated %Y-%m-%d %H:%M"))

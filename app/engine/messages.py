@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 from collections import Counter, defaultdict
 
 # Order matters: longest first. Card (16) before Aadhaar (12) before phone (10); taken spans are not re-counted.
@@ -39,7 +40,10 @@ WEIGHTS = {"message": 3, "comment": 2, "like": 1, "tag": 3, "status_view": 2, "f
 def person_key(name: str) -> str:
     """'Arjun Das', 'arjun.das' and 'arjun_das' are the same person across platforms.
     ponytail: name-based merge; wrong for two different people with the same name, add a manual merge list if needed."""
-    return re.sub(r"[^a-z0-9]", "", (name or "").lower())
+    raw = name or ""
+    normalized = unicodedata.normalize("NFKC", raw).casefold()
+    key = "".join(c for c in normalized if unicodedata.category(c)[0] in "LMN")
+    return key or raw
 
 
 def closeness(records) -> list[dict]:

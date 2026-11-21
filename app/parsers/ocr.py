@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import re
+import unicodedata
 from pathlib import Path
 
 import cv2
@@ -94,6 +95,11 @@ NOISE = {"my status", "updates", "status", "recent updates", "viewed updates", "
          "search", "following", "for you", "today", "yesterday", "liked by", "viewed by"}
 
 
+def status_name(line: str) -> bool:
+    return (1 <= len(line) <= 41 and line[0].isalpha()
+            and all(unicodedata.category(c)[0] in "LMN" or c in " .'-\u200c\u200d" for c in line))
+
+
 def snap(name: str, known: list[str]) -> str:
     if not known:
         return name
@@ -130,7 +136,7 @@ def parse(path: Path, known_people: list[str] | None = None):
                 if line.lower() in NOISE or TIME_LINE.match(line) or VIEWED_BY.search(line):
                     continue
                 nxt = lines[i + 1] if i + 1 < len(lines) else ""
-                if TIME_LINE.match(nxt) and re.match(r"^[A-Za-z][\w .'-]{1,40}$", line):
+                if TIME_LINE.match(nxt) and status_name(line):
                     who = snap(line, known)
                     if mine:
                         add("whatsapp", f"{who} viewed your status ({nxt})", sec, person=who, action="status_view", capture="ocr")
