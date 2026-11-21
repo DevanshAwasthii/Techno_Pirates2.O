@@ -357,7 +357,7 @@ class NexDataApp(ctk.CTk):
                      text_color=TEXT).pack(anchor="w", padx=20, pady=(18, 4))
         ctk.CTkLabel(win, text=f"Keep NexData open. Finished downloads in {downloads_folder()} are picked up within seconds.",
                      text_color=MUTED, wraplength=700, justify="left").pack(anchor="w", padx=20)
-        picker = ctk.CTkSegmentedButton(win, values=list(PLATFORMS), command=lambda n: show(n))
+        picker = ctk.CTkSegmentedButton(win, values=[*PLATFORMS, "Remembered exports"], command=lambda n: show(n))
         picker.pack(fill="x", padx=20, pady=(12, 0))
         body = ctk.CTkScrollableFrame(win, fg_color=PANEL)
         body.pack(fill="both", expand=True, padx=20, pady=14)
@@ -365,6 +365,9 @@ class NexDataApp(ctk.CTk):
         def show(name):
             for w in body.winfo_children():
                 w.destroy()
+            if name == "Remembered exports":
+                self.render_library(body)
+                return
             cfg = PLATFORMS[name]
             ctk.CTkLabel(body, text=name, font=("Segoe UI", 16, "bold"), text_color=CYAN).pack(anchor="w", padx=12, pady=(10, 6))
             for i, step in enumerate(cfg["steps"], 1):
@@ -376,6 +379,45 @@ class NexDataApp(ctk.CTk):
         first = next(iter(PLATFORMS))
         picker.set(first)
         show(first)
+
+    def forget_exports(self, paths=None):
+        """Forget saved references and queued imports; never delete export files."""
+        settings = load_settings()
+        library = settings.get("library", [])
+        removed = library if paths is None else list(map(str, paths))
+        identities = {os.path.normcase(os.path.abspath(p)) for p in removed}
+        def keep(p):
+            return os.path.normcase(os.path.abspath(p)) not in identities
+        remaining = [p for p in library if keep(p)]
+        remaining_names = {Path(p).name for p in remaining}
+        removed_names = {Path(p).name for p in removed} - remaining_names
+        imported = [] if paths is None else [key for key in settings.get("imported", [])
+                                             if key.split("|", 1)[0] not in removed_names]
+        save_settings({**settings, "library": remaining, "imported": imported})
+        self.loaded_paths = [p for p in self.loaded_paths if keep(p)]
+        self.pending_paths = [p for p in self.pending_paths if keep(p)]
+        self.auto_queue = [p for p in self.auto_queue if keep(p)]
+        if self.loading:
+            self.cancel_audit()  # an in-flight result must not reintroduce forgotten inputs
+
+    def render_library(self, body):
+        for child in body.winfo_children():
+            child.destroy()
+        self.label(body, "Remembered exports", bold=True, size=18)
+        self.label(body, "Remove saved references here. Re-audit to refresh current results.", color=MUTED, size=12)
+        library = load_settings().get("library", [])
+
+        def forget(paths=None):
+            self.forget_exports(paths)
+            self.render_library(body)
+
+        ctk.CTkButton(body, text="Forget all", command=forget).pack(anchor="w", padx=16, pady=8)
+        if not library:
+            self.label(body, "No remembered exports.", color=MUTED)
+        for path in library:
+            card = self.card(body)
+            self.label(card, path + (" (file missing)" if not Path(path).is_file() else ""), size=12)
+            ctk.CTkButton(card, text="Remove", width=90, command=lambda p=path: forget([p])).pack(anchor="w", padx=16, pady=8)
 
     def show_errors(self, message):
         self.error_label.configure(text=message)
