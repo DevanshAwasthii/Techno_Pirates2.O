@@ -35,7 +35,7 @@ def test_discover_numbered_real_browser_profiles(tmp_path, monkeypatch):
     assert set(chrome.default_profiles()) == set(expected)
 
 
-def test_query_uses_original_database_read_only(tmp_path):
+def test_query_preserves_original_database_and_selects_metadata_read_only(tmp_path):
     db = tmp_path / "History"
     with sqlite3.connect(db) as con:
         con.execute("CREATE TABLE metadata (domain TEXT, secret TEXT)")
@@ -87,3 +87,68 @@ def test_live_cookie_indicators_do_not_claim_proven_recording():
     findings, _ = build_findings(records)
     assert findings[0].title == "1 sites have session-replay cookie indicators"
     assert "does not prove" in findings[0].detail
+
+
+@pytest.mark.parametrize("filename", ["History", "Cookies", "Login Data"])
+def test_browser_snapshot_includes_uncheckpointed_wal(tmp_path, monkeypatch, filename):
+    db = tmp_path / filename
+    writer = sqlite3.connect(db)
+    try:
+        assert writer.execute("PRAGMA journal_mode=WAL").fetchone()[0] == "wal"
+        writer.execute("CREATE TABLE metadata (domain TEXT)")
+        writer.commit()
+        writer.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        writer.execute("INSERT INTO metadata VALUES ('recent.example')")
+        writer.commit()
+        # Prove this row has not reached the main database file.
+        isolated = tmp_path / "main-only"
+        isolated.write_bytes(db.read_bytes())
+        with sqlite3.connect(isolated) as old:
+            assert old.execute("SELECT domain FROM metadata").fetchall() == []
+        observed = []
+        connect = sqlite3.connect
+        def inspect_snapshot(database, *args, **kwargs):
+            from urllib.parse import urlsplit, unquote
+            copied = Path(unquote(urlsplit(database).path).lstrip('/'))
+            assert copied != db
+            assert Path(str(copied) + "-wal").exists()
+            assert Path(str(copied) + "-shm").exists()
+            observed.append(copied.parent)
+            return connect(database, *args, **kwargs)
+        monkeypatch.setattr(chrome, "TMP", tmp_path / "snapshots")
+        monkeypatch.setattr(sqlite3, "connect", inspect_snapshot)
+        assert chrome._query(db, "SELECT domain FROM metadata") == [("recent.example",)]
+        assert observed and all(not p.exists() for p in observed)
+        with pytest.raises(sqlite3.OperationalError):
+            chrome._query(db, "SELECT domain FROM absent_table")
+        assert all(not p.exists() for p in observed)
+        assert Path(str(db) + "-wal").exists()
+    finally:
+        writer.close()
+
+
+def test_snapshot_copies_journal_and_cleans_up_on_copy_failure(tmp_path, monkeypatch):
+    db = tmp_path / "History"
+    with sqlite3.connect(db) as con:
+        con.execute("CREATE TABLE metadata (domain TEXT)")
+    journal = db.with_name(db.name + "-journal")
+    journal.write_bytes(b"")  # SQLite permits an empty, non-hot rollback journal.
+    monkeypatch.setattr(chrome, "TMP", tmp_path / "snapshots")
+    copy = chrome.shutil.copy2
+    copied = []
+    def observe(source, target):
+        copied.append(Path(target))
+        return copy(source, target)
+    monkeypatch.setattr(chrome.shutil, "copy2", observe)
+    assert chrome._query(db, "SELECT domain FROM metadata") == []
+    assert any(p.name == "History-journal" for p in copied)
+    assert all(not p.parent.exists() for p in copied)
+    def fail(source, target):
+        if str(source).endswith("-journal"):
+            raise PermissionError("synthetic side-file lock")
+        return observe(source, target)
+    monkeypatch.setattr(chrome.shutil, "copy2", fail)
+    with pytest.raises(PermissionError, match="side-file lock"):
+        chrome._query(db, "SELECT domain FROM metadata")
+    assert all(not p.parent.exists() for p in copied)
+    assert journal.exists()

@@ -1,7 +1,8 @@
 """Chrome / Edge profile parser: History, Cookies, Login Data, Preferences.
 
 Reads only domains, names and counts. Never reads cookie values or password values.
-Databases are opened read-only. Locked sources are reported; secret-bearing databases are never copied.
+Databases and SQLite side files are copied to a short-lived local folder and queried read-only.
+Copies are removed on success or failure; locked sources are reported.
 """
 from __future__ import annotations
 
@@ -9,6 +10,8 @@ import json
 import os
 import hashlib
 import sqlite3
+import shutil
+import tempfile
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -78,12 +81,20 @@ def _base(host: str) -> str:
 
 
 def _query(db: Path, sql: str):
-    """Select metadata from the original database without copying secret columns."""
-    con = sqlite3.connect(db.resolve().as_uri() + "?mode=ro", uri=True, timeout=2)
-    try:
-        return con.execute(sql).fetchall()
-    finally:
-        con.close()
+    """Query a local snapshot including committed writes still in SQLite side files."""
+    TMP.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="browser-", dir=TMP) as folder:
+        snapshot = Path(folder) / db.name
+        shutil.copy2(db, snapshot)
+        for suffix in ("-wal", "-shm", "-journal"):
+            side = db.with_name(db.name + suffix)
+            if side.exists():
+                shutil.copy2(side, snapshot.with_name(snapshot.name + suffix))
+        con = sqlite3.connect(snapshot.resolve().as_uri() + "?mode=ro", uri=True, timeout=2)
+        try:
+            return con.execute(sql).fetchall()
+        finally:
+            con.close()
 
 
 def parse(profile: Path, src: str | None = None, warnings=None, source_coverage=None):
