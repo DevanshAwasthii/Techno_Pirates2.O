@@ -122,6 +122,35 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
                               "Click each app you don't use > Delete all connections"],
                     "link": "https://myaccount.google.com/connections"})
 
+    g_ips = [r for r in records if r.platform == "google" and r.category == "location" and r.meta.get("ip")]
+    if g_ips:
+        places = {r.meta["place"] for r in g_ips if r.meta.get("place")}
+        total = sum(r.meta.get("count", 1) for r in g_ips)
+        top = max(g_ips, key=lambda r: r.meta.get("count", 0))
+        where = f" in {len(places)} place{'s' if len(places) != 1 else ''}" if places else ""
+        add(layer=2, title=f"Google logged your account activity from {len(g_ips)} IP addresses{where}",
+            detail=f"{total:,} logged activities. Most from {top.meta['ip']}"
+                   + (f" ({top.meta['place']})" if top.meta.get("place") else "") + ". "
+                   + ("" if places else "Google's export left the city columns blank, but each IP still maps to an approximate city. ")
+                   + "IP addresses reveal where you are and which networks you use.",
+            priority="high", category="location", platforms=["google"],
+            metric={"value": len(g_ips), "unit": "IP addresses"}, evidence=[r.id for r in g_ips][:500],
+            action={"steps": ["Open myaccount.google.com/device-activity and sign out devices you don't recognise",
+                              "Turn on 2-Step Verification: myaccount.google.com/signinoptions/two-step-verification",
+                              "Use mobile data or a trusted VPN on public Wi-Fi"],
+                    "link": "https://myaccount.google.com/device-activity"})
+    g_dev = [r for r in records if r.platform == "google" and r.category == "device"]
+    if g_dev:
+        located = [r for r in records if r.platform == "google" and r.category == "location" and r.meta.get("place") and not r.meta.get("ip")]
+        add(layer=5, title=f"{len(g_dev)} device{'s have' if len(g_dev) != 1 else ' has'} accessed your Google account",
+            detail=(f"Google keeps a last known location for {len(located)} of them. " if located else "")
+                   + "Old phones and shared computers keep access until you remove them.",
+            priority="medium", category="device", platforms=["google"],
+            metric={"value": len(g_dev), "unit": "devices"}, evidence=[r.id for r in g_dev + located],
+            action={"steps": ["Open myaccount.google.com/device-activity", "Select each old or unknown device > Sign out",
+                              "Change your password if any device is unfamiliar"],
+                    "link": "https://myaccount.google.com/device-activity"})
+
     segs = by[("spotify", "interest", None)]
     if segs:
         add(layer=2, title=f"Spotify sorted you into {len(segs)} ad segments",

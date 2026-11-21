@@ -17,7 +17,7 @@ from app.engine.rules import build_findings, build_graph
 import shutil
 import tempfile
 
-from app.parsers import instagram, spotify, whatsapp, mbox, chrome, ocr, deviceScan, iosPrivacy
+from app.parsers import instagram, spotify, whatsapp, mbox, chrome, ocr, google_access, deviceScan, iosPrivacy
 
 TMP = Path(__file__).resolve().parents[1] / ".cache" / "tmp"  # stays on the project drive
 
@@ -82,15 +82,22 @@ def _detect_and_parse(path: Path, wa_offset: int = 0, warnings=None, source_cove
                     recs, cov = chrome.parse(prof, path.name)
                 return "chrome", recs, cov
             boxes = [n for n in zf.namelist() if n.lower().endswith(".mbox")]
-            if boxes:  # Takeout: mailbox needs a real file, extract to project-drive temp
-                TMP.mkdir(parents=True, exist_ok=True)
-                with tempfile.NamedTemporaryFile(dir=TMP, suffix=".mbox", delete=False) as out:
-                    shutil.copyfileobj(zf.open(boxes[0]), out)
-                try:
-                    recs, cov = mbox.parse(out.name, boxes[0], source_coverage=source_coverage)
-                finally:
-                    Path(out.name).unlink(missing_ok=True)
-                return "gmail", recs, cov
+            access = google_access.has_access_logs(zf)
+            if boxes or access:  # Takeout: a zip may hold several products; parse every supported one
+                recs, cov = [], {}
+                if access:
+                    recs, cov = google_access.parse(zf, path.name)
+                if boxes:  # mailbox needs a real file, extract to project-drive temp
+                    TMP.mkdir(parents=True, exist_ok=True)
+                    with tempfile.NamedTemporaryFile(dir=TMP, suffix=".mbox", delete=False) as out:
+                        shutil.copyfileobj(zf.open(boxes[0]), out)
+                    try:
+                        mrecs, mcov = mbox.parse(out.name, boxes[0], source_coverage=source_coverage)
+                    finally:
+                        Path(out.name).unlink(missing_ok=True)
+                    recs += mrecs
+                    cov = {k: "found" if "found" in (v, cov.get(k)) else cov.get(k, v) for k, v in mcov.items()} if cov else mcov
+                return ("google" if access else "gmail"), recs, cov
     elif suffix == ".txt":
         recs, _ = whatsapp.parse_text(_wa_text(path.read_bytes()), path.name, wa_offset)
         return "whatsapp", recs, _wa_cov()
