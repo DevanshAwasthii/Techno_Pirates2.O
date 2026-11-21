@@ -1,6 +1,732 @@
 {
  "records": [
   {
+   "id": "ch-acti-00001",
+   "platform": "chrome",
+   "category": "activity",
+   "item": "Visited youtube.com 403 times",
+   "timestamp": "2026-11-01T22:00:00Z",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "History",
+   "recordRef": "urls host=youtube.com",
+   "meta": {
+    "domain": "youtube.com",
+    "visits": 403
+   }
+  },
+  {
+   "id": "ch-acti-00002",
+   "platform": "chrome",
+   "category": "activity",
+   "item": "Visited instagram.com 203 times",
+   "timestamp": "2026-11-02T22:00:00Z",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "History",
+   "recordRef": "urls host=instagram.com",
+   "meta": {
+    "domain": "instagram.com",
+    "visits": 203
+   }
+  },
+  {
+   "id": "ch-acti-00003",
+   "platform": "chrome",
+   "category": "activity",
+   "item": "Visited web.whatsapp.com 136 times",
+   "timestamp": "2026-11-03T22:00:00Z",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "History",
+   "recordRef": "urls host=web.whatsapp.com",
+   "meta": {
+    "domain": "web.whatsapp.com",
+    "visits": 136
+   }
+  },
+  {
+   "id": "ch-acti-00004",
+   "platform": "chrome",
+   "category": "activity",
+   "item": "Visited amazon.in 103 times",
+   "timestamp": "2026-11-04T22:00:00Z",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "History",
+   "recordRef": "urls host=amazon.in",
+   "meta": {
+    "domain": "amazon.in",
+    "visits": 103
+   }
+  },
+  {
+   "id": "ch-acti-00005",
+   "platform": "chrome",
+   "category": "activity",
+   "item": "Visited flipkart.com 83 times",
+   "timestamp": "2026-11-05T22:00:00Z",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "History",
+   "recordRef": "urls host=flipkart.com",
+   "meta": {
+    "domain": "flipkart.com",
+    "visits": 83
+   }
+  },
+  {
+   "id": "ch-acti-00006",
+   "platform": "chrome",
+   "category": "activity",
+   "item": "Visited zomato.com 69 times",
+   "timestamp": "2026-11-06T22:00:00Z",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "History",
+   "recordRef": "urls host=zomato.com",
+   "meta": {
+    "domain": "zomato.com",
+    "visits": 69
+   }
+  },
+  {
+   "id": "ch-acti-00007",
+   "platform": "chrome",
+   "category": "activity",
+   "item": "Visited chatgpt.com 60 times",
+   "timestamp": "2026-11-07T22:00:00Z",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "History",
+   "recordRef": "urls host=chatgpt.com",
+   "meta": {
+    "domain": "chatgpt.com",
+    "visits": 60
+   }
+  },
+  {
+   "id": "ch-acti-00008",
+   "platform": "chrome",
+   "category": "activity",
+   "item": "Visited geeksforgeeks.org 53 times",
+   "timestamp": "2026-11-08T22:00:00Z",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "History",
+   "recordRef": "urls host=geeksforgeeks.org",
+   "meta": {
+    "domain": "geeksforgeeks.org",
+    "visits": 53
+   }
+  },
+  {
+   "id": "ch-acti-00009",
+   "platform": "chrome",
+   "category": "activity",
+   "item": "Visited github.com 47 times",
+   "timestamp": "2026-11-09T22:00:00Z",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "History",
+   "recordRef": "urls host=github.com",
+   "meta": {
+    "domain": "github.com",
+    "visits": 47
+   }
+  },
+  {
+   "id": "ch-acti-00010",
+   "platform": "chrome",
+   "category": "activity",
+   "item": "Visited cricbuzz.com 43 times",
+   "timestamp": "2026-11-10T22:00:00Z",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "History",
+   "recordRef": "urls host=cricbuzz.com",
+   "meta": {
+    "domain": "cricbuzz.com",
+    "visits": 43
+   }
+  },
+  {
+   "id": "ch-acti-00011",
+   "platform": "chrome",
+   "category": "activity",
+   "item": "Visited myntra.com 39 times",
+   "timestamp": "2026-11-11T22:00:00Z",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "History",
+   "recordRef": "urls host=myntra.com",
+   "meta": {
+    "domain": "myntra.com",
+    "visits": 39
+   }
+  },
+  {
+   "id": "ch-acti-00012",
+   "platform": "chrome",
+   "category": "activity",
+   "item": "Visited practo.com 36 times",
+   "timestamp": "2026-11-12T22:00:00Z",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "History",
+   "recordRef": "urls host=practo.com",
+   "meta": {
+    "domain": "practo.com",
+    "visits": 36
+   }
+  },
+  {
+   "id": "ch-acti-00013",
+   "platform": "chrome",
+   "category": "activity",
+   "item": "Visited irctc.co.in 33 times",
+   "timestamp": "2026-11-13T22:00:00Z",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "History",
+   "recordRef": "urls host=irctc.co.in",
+   "meta": {
+    "domain": "irctc.co.in",
+    "visits": 33
+   }
+  },
+  {
+   "id": "ch-acti-00014",
+   "platform": "chrome",
+   "category": "activity",
+   "item": "Visited naukri.com 31 times",
+   "timestamp": "2026-11-14T22:00:00Z",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "History",
+   "recordRef": "urls host=naukri.com",
+   "meta": {
+    "domain": "naukri.com",
+    "visits": 31
+   }
+  },
+  {
+   "id": "ch-acti-00015",
+   "platform": "chrome",
+   "category": "activity",
+   "item": "Downloaded aadhaar_card.pdf from uidai.gov.in",
+   "timestamp": "2026-06-03T00:00:00Z",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "History",
+   "recordRef": "downloads",
+   "meta": {
+    "domain": "uidai.gov.in",
+    "action": "download"
+   }
+  },
+  {
+   "id": "ch-acti-00016",
+   "platform": "chrome",
+   "category": "activity",
+   "item": "Downloaded resume_riya.pdf from docs.google.com",
+   "timestamp": "2026-09-09T00:00:00Z",
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "History",
+   "recordRef": "downloads",
+   "meta": {
+    "domain": "docs.google.com",
+    "action": "download"
+   }
+  },
+  {
+   "id": "ch-acco-00017",
+   "platform": "chrome",
+   "category": "account",
+   "item": "Tracker cookie from adnxs.com",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Cookies",
+   "recordRef": "cookies host_key in ['.adnxs.com']",
+   "meta": {
+    "domain": "adnxs.com",
+    "source": "tracker"
+   }
+  },
+  {
+   "id": "ch-acco-00018",
+   "platform": "chrome",
+   "category": "account",
+   "item": "Tracker cookie from amazon-adsystem.com",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Cookies",
+   "recordRef": "cookies host_key in ['.amazon-adsystem.com']",
+   "meta": {
+    "domain": "amazon-adsystem.com",
+    "source": "tracker"
+   }
+  },
+  {
+   "id": "ch-acco-00019",
+   "platform": "chrome",
+   "category": "account",
+   "item": "Tracker cookie from clarity.ms",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Cookies",
+   "recordRef": "cookies host_key in ['.clarity.ms']",
+   "meta": {
+    "domain": "clarity.ms",
+    "source": "tracker"
+   }
+  },
+  {
+   "id": "ch-acco-00020",
+   "platform": "chrome",
+   "category": "account",
+   "item": "Tracker cookie from criteo.com",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Cookies",
+   "recordRef": "cookies host_key in ['.criteo.com']",
+   "meta": {
+    "domain": "criteo.com",
+    "source": "tracker"
+   }
+  },
+  {
+   "id": "ch-acco-00021",
+   "platform": "chrome",
+   "category": "account",
+   "item": "Tracker cookie from doubleclick.net",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Cookies",
+   "recordRef": "cookies host_key in ['.doubleclick.net']",
+   "meta": {
+    "domain": "doubleclick.net",
+    "source": "tracker"
+   }
+  },
+  {
+   "id": "ch-acco-00022",
+   "platform": "chrome",
+   "category": "account",
+   "item": "Tracker cookie from facebook.com",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Cookies",
+   "recordRef": "cookies host_key in ['.facebook.com']",
+   "meta": {
+    "domain": "facebook.com",
+    "source": "tracker"
+   }
+  },
+  {
+   "id": "ch-acco-00023",
+   "platform": "chrome",
+   "category": "account",
+   "item": "Tracker cookie from google-analytics.com",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Cookies",
+   "recordRef": "cookies host_key in ['.google-analytics.com']",
+   "meta": {
+    "domain": "google-analytics.com",
+    "source": "tracker"
+   }
+  },
+  {
+   "id": "ch-acco-00024",
+   "platform": "chrome",
+   "category": "account",
+   "item": "Tracker cookie from linkedin.com",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Cookies",
+   "recordRef": "cookies host_key in ['.linkedin.com']",
+   "meta": {
+    "domain": "linkedin.com",
+    "source": "tracker"
+   }
+  },
+  {
+   "id": "ch-acco-00025",
+   "platform": "chrome",
+   "category": "account",
+   "item": "Tracker cookie from pubmatic.com",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Cookies",
+   "recordRef": "cookies host_key in ['.pubmatic.com']",
+   "meta": {
+    "domain": "pubmatic.com",
+    "source": "tracker"
+   }
+  },
+  {
+   "id": "ch-acco-00026",
+   "platform": "chrome",
+   "category": "account",
+   "item": "Tracker cookie from scorecardresearch.com",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Cookies",
+   "recordRef": "cookies host_key in ['.scorecardresearch.com']",
+   "meta": {
+    "domain": "scorecardresearch.com",
+    "source": "tracker"
+   }
+  },
+  {
+   "id": "ch-acco-00027",
+   "platform": "chrome",
+   "category": "account",
+   "item": "Tracker cookie from taboola.com",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Cookies",
+   "recordRef": "cookies host_key in ['.taboola.com']",
+   "meta": {
+    "domain": "taboola.com",
+    "source": "tracker"
+   }
+  },
+  {
+   "id": "ch-acco-00028",
+   "platform": "chrome",
+   "category": "account",
+   "item": "Tracker cookie from tiktok.com",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Cookies",
+   "recordRef": "cookies host_key in ['.tiktok.com']",
+   "meta": {
+    "domain": "tiktok.com",
+    "source": "tracker"
+   }
+  },
+  {
+   "id": "ch-acco-00029",
+   "platform": "chrome",
+   "category": "account",
+   "item": "flipkart.com records your session with LogRocket",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Cookies",
+   "recordRef": "cookies host_key=flipkart.com",
+   "meta": {
+    "domain": "flipkart.com",
+    "source": "session_replay",
+    "vendor": "LogRocket"
+   }
+  },
+  {
+   "id": "ch-acco-00030",
+   "platform": "chrome",
+   "category": "account",
+   "item": "myntra.com records your session with Hotjar",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Cookies",
+   "recordRef": "cookies host_key=myntra.com",
+   "meta": {
+    "domain": "myntra.com",
+    "source": "session_replay",
+    "vendor": "Hotjar"
+   }
+  },
+  {
+   "id": "ch-acco-00031",
+   "platform": "chrome",
+   "category": "account",
+   "item": "naukri.com records your session with Microsoft Clarity",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Cookies",
+   "recordRef": "cookies host_key=naukri.com",
+   "meta": {
+    "domain": "naukri.com",
+    "source": "session_replay",
+    "vendor": "Microsoft Clarity"
+   }
+  },
+  {
+   "id": "ch-acco-00032",
+   "platform": "chrome",
+   "category": "account",
+   "item": "practo.com records your session with Hotjar",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Cookies",
+   "recordRef": "cookies host_key=practo.com",
+   "meta": {
+    "domain": "practo.com",
+    "source": "session_replay",
+    "vendor": "Hotjar"
+   }
+  },
+  {
+   "id": "ch-acco-00033",
+   "platform": "chrome",
+   "category": "account",
+   "item": "shop.lenskart.com records your session with FullStory",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Cookies",
+   "recordRef": "cookies host_key=shop.lenskart.com",
+   "meta": {
+    "domain": "shop.lenskart.com",
+    "source": "session_replay",
+    "vendor": "FullStory"
+   }
+  },
+  {
+   "id": "ch-acco-00034",
+   "platform": "chrome",
+   "category": "account",
+   "item": "zomato.com records your session with Microsoft Clarity",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Cookies",
+   "recordRef": "cookies host_key=zomato.com",
+   "meta": {
+    "domain": "zomato.com",
+    "source": "session_replay",
+    "vendor": "Microsoft Clarity"
+   }
+  },
+  {
+   "id": "ch-acco-00035",
+   "platform": "chrome",
+   "category": "account",
+   "item": "Saved login for zomato.com",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Login Data",
+   "recordRef": "logins origin_url",
+   "meta": {
+    "domain": "zomato.com",
+    "source": "saved_login"
+   }
+  },
+  {
+   "id": "ch-acco-00036",
+   "platform": "chrome",
+   "category": "account",
+   "item": "Saved login for irctc.co.in",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Login Data",
+   "recordRef": "logins origin_url",
+   "meta": {
+    "domain": "irctc.co.in",
+    "source": "saved_login"
+   }
+  },
+  {
+   "id": "ch-acco-00037",
+   "platform": "chrome",
+   "category": "account",
+   "item": "Saved login for instagram.com",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Login Data",
+   "recordRef": "logins origin_url",
+   "meta": {
+    "domain": "instagram.com",
+    "source": "saved_login"
+   }
+  },
+  {
+   "id": "ch-acco-00038",
+   "platform": "chrome",
+   "category": "account",
+   "item": "Saved login for naukri.com",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Login Data",
+   "recordRef": "logins origin_url",
+   "meta": {
+    "domain": "naukri.com",
+    "source": "saved_login"
+   }
+  },
+  {
+   "id": "ch-acco-00039",
+   "platform": "chrome",
+   "category": "account",
+   "item": "Saved login for oldgamesite.net",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Login Data",
+   "recordRef": "logins origin_url",
+   "meta": {
+    "domain": "oldgamesite.net",
+    "source": "saved_login"
+   }
+  },
+  {
+   "id": "ch-acco-00040",
+   "platform": "chrome",
+   "category": "account",
+   "item": "Saved login for coursera.org",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Login Data",
+   "recordRef": "logins origin_url",
+   "meta": {
+    "domain": "coursera.org",
+    "source": "saved_login"
+   }
+  },
+  {
+   "id": "ch-devi-00041",
+   "platform": "chrome",
+   "category": "device",
+   "item": "zomato.com can use your location",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Preferences",
+   "recordRef": "content_settings.geolocation",
+   "meta": {
+    "domain": "zomato.com",
+    "permission": "location"
+   }
+  },
+  {
+   "id": "ch-devi-00042",
+   "platform": "chrome",
+   "category": "device",
+   "item": "swiggy.com can use your location",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Preferences",
+   "recordRef": "content_settings.geolocation",
+   "meta": {
+    "domain": "swiggy.com",
+    "permission": "location"
+   }
+  },
+  {
+   "id": "ch-devi-00043",
+   "platform": "chrome",
+   "category": "device",
+   "item": "maps.google.com can use your location",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Preferences",
+   "recordRef": "content_settings.geolocation",
+   "meta": {
+    "domain": "maps.google.com",
+    "permission": "location"
+   }
+  },
+  {
+   "id": "ch-devi-00044",
+   "platform": "chrome",
+   "category": "device",
+   "item": "randomquiz.io can use your location",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Preferences",
+   "recordRef": "content_settings.geolocation",
+   "meta": {
+    "domain": "randomquiz.io",
+    "permission": "location"
+   }
+  },
+  {
+   "id": "ch-devi-00045",
+   "platform": "chrome",
+   "category": "device",
+   "item": "meet.google.com can use your camera",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Preferences",
+   "recordRef": "content_settings.media_stream_camera",
+   "meta": {
+    "domain": "meet.google.com",
+    "permission": "camera"
+   }
+  },
+  {
+   "id": "ch-devi-00046",
+   "platform": "chrome",
+   "category": "device",
+   "item": "omegle-clone.xyz can use your camera",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Preferences",
+   "recordRef": "content_settings.media_stream_camera",
+   "meta": {
+    "domain": "omegle-clone.xyz",
+    "permission": "camera"
+   }
+  },
+  {
+   "id": "ch-devi-00047",
+   "platform": "chrome",
+   "category": "device",
+   "item": "meet.google.com can use your microphone",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Preferences",
+   "recordRef": "content_settings.media_stream_mic",
+   "meta": {
+    "domain": "meet.google.com",
+    "permission": "microphone"
+   }
+  },
+  {
+   "id": "ch-devi-00048",
+   "platform": "chrome",
+   "category": "device",
+   "item": "cricbuzz.com can use your notifications",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "Preferences",
+   "recordRef": "content_settings.notifications",
+   "meta": {
+    "domain": "cricbuzz.com",
+    "permission": "notifications"
+   }
+  },
+  {
    "id": "gm-acco-00001",
    "platform": "gmail",
    "category": "account",
@@ -11687,6 +12413,69 @@
    }
   },
   {
+   "id": "F-016",
+   "layer": 1,
+   "title": "6 sites recorded your clicks and typing",
+   "detail": "Session-replay tools (FullStory, Hotjar, LogRocket, Microsoft Clarity) record mouse movement, scrolling and what you type, then replay it for the site owner.",
+   "priority": "high",
+   "category": "activity",
+   "platforms": [
+    "chrome"
+   ],
+   "metric": {
+    "value": 6,
+    "unit": "sites"
+   },
+   "evidence": [
+    "ch-acco-00029",
+    "ch-acco-00030",
+    "ch-acco-00031",
+    "ch-acco-00032",
+    "ch-acco-00033",
+    "ch-acco-00034"
+   ],
+   "action": {
+    "steps": [
+     "Install uBlock Origin and enable the 'EasyPrivacy' filter list",
+     "Chrome > Settings > Privacy and security > Third-party cookies > Block third-party cookies",
+     "Delete existing data: Settings > Privacy > Delete browsing data > Cookies"
+    ],
+    "link": "chrome://settings/privacy"
+   }
+  },
+  {
+   "id": "F-018",
+   "layer": 5,
+   "title": "6 sites can access your location, camera or microphone",
+   "detail": "4 location, 2 camera, 1 microphone permissions are allowed in your browser.",
+   "priority": "high",
+   "category": "device",
+   "platforms": [
+    "chrome"
+   ],
+   "metric": {
+    "value": 6,
+    "unit": "sites"
+   },
+   "evidence": [
+    "ch-devi-00041",
+    "ch-devi-00042",
+    "ch-devi-00043",
+    "ch-devi-00044",
+    "ch-devi-00045",
+    "ch-devi-00046",
+    "ch-devi-00047"
+   ],
+   "action": {
+    "steps": [
+     "Chrome > Settings > Privacy and security > Site settings",
+     "Open Location, Camera and Microphone; remove every site you don't trust",
+     "Set the default to 'Don't allow sites to ...'"
+    ],
+    "link": "chrome://settings/content"
+   }
+  },
+  {
    "id": "F-005",
    "layer": 3,
    "title": "Your phone number appears in 2 messages",
@@ -11918,6 +12707,42 @@
    }
   },
   {
+   "id": "F-017",
+   "layer": 1,
+   "title": "12 ad and analytics companies track you across sites",
+   "detail": "Their cookies let them follow you from site to site and build an advertising profile.",
+   "priority": "medium",
+   "category": "activity",
+   "platforms": [
+    "chrome"
+   ],
+   "metric": {
+    "value": 12,
+    "unit": "trackers"
+   },
+   "evidence": [
+    "ch-acco-00017",
+    "ch-acco-00018",
+    "ch-acco-00019",
+    "ch-acco-00020",
+    "ch-acco-00021",
+    "ch-acco-00022",
+    "ch-acco-00023",
+    "ch-acco-00024",
+    "ch-acco-00025",
+    "ch-acco-00026",
+    "ch-acco-00027",
+    "ch-acco-00028"
+   ],
+   "action": {
+    "steps": [
+     "Chrome > Settings > Privacy and security > Third-party cookies > Block third-party cookies",
+     "Settings > Privacy > Ad privacy > turn off Ad topics, Site-suggested ads, Ad measurement"
+    ],
+    "link": "chrome://settings/adPrivacy"
+   }
+  },
+  {
    "id": "F-003",
    "layer": 2,
    "title": "Instagram labelled you with 8 interests",
@@ -12038,7 +12863,7 @@
    }
   },
   {
-   "id": "F-016",
+   "id": "F-019",
    "layer": 3,
    "title": "Your top 5 people are visible from your activity alone",
    "detail": "Likes, comments and messages rank who you are closest to: meera_k, arjun.das, rahul.k, tanvi.m, ishaan_g.",
@@ -12212,6 +13037,12 @@
   }
  ],
  "coverage": {
+  "chrome": {
+   "location": "found",
+   "interest": "not_assessed",
+   "contact": "not_assessed",
+   "activity": "found"
+  },
   "gmail": {
    "location": "not_assessed",
    "interest": "not_assessed",
@@ -12238,9 +13069,9 @@
   }
  },
  "summary": {
-  "servicesFound": 60,
-  "trackersFound": 0,
-  "sessionRecorders": 0,
+  "servicesFound": 61,
+  "trackersFound": 12,
+  "sessionRecorders": 6,
   "topPeople": [
    {
     "name": "meera_k",
@@ -12332,21 +13163,111 @@
     "size": 40
    },
    {
-    "id": "svc:swiggy.in",
-    "label": "swiggy.in",
-    "type": "service",
+    "id": "svc:adnxs.com",
+    "label": "adnxs.com",
+    "type": "tracker",
     "size": 10
    },
    {
-    "id": "svc:zomato.com",
-    "label": "zomato.com",
-    "type": "service",
+    "id": "svc:amazon-adsystem.com",
+    "label": "amazon-adsystem.com",
+    "type": "tracker",
+    "size": 10
+   },
+   {
+    "id": "svc:clarity.ms",
+    "label": "clarity.ms",
+    "type": "tracker",
+    "size": 10
+   },
+   {
+    "id": "svc:criteo.com",
+    "label": "criteo.com",
+    "type": "tracker",
+    "size": 10
+   },
+   {
+    "id": "svc:doubleclick.net",
+    "label": "doubleclick.net",
+    "type": "tracker",
+    "size": 10
+   },
+   {
+    "id": "svc:facebook.com",
+    "label": "facebook.com",
+    "type": "tracker",
+    "size": 10
+   },
+   {
+    "id": "svc:google-analytics.com",
+    "label": "google-analytics.com",
+    "type": "tracker",
+    "size": 10
+   },
+   {
+    "id": "svc:linkedin.com",
+    "label": "linkedin.com",
+    "type": "tracker",
+    "size": 10
+   },
+   {
+    "id": "svc:pubmatic.com",
+    "label": "pubmatic.com",
+    "type": "tracker",
+    "size": 10
+   },
+   {
+    "id": "svc:scorecardresearch.com",
+    "label": "scorecardresearch.com",
+    "type": "tracker",
+    "size": 10
+   },
+   {
+    "id": "svc:taboola.com",
+    "label": "taboola.com",
+    "type": "tracker",
+    "size": 10
+   },
+   {
+    "id": "svc:tiktok.com",
+    "label": "tiktok.com",
+    "type": "tracker",
+    "size": 10
+   },
+   {
+    "id": "svc:flipkart.com",
+    "label": "flipkart.com",
+    "type": "tracker",
     "size": 10
    },
    {
     "id": "svc:myntra.com",
     "label": "myntra.com",
-    "type": "service",
+    "type": "tracker",
+    "size": 10
+   },
+   {
+    "id": "svc:naukri.com",
+    "label": "naukri.com",
+    "type": "tracker",
+    "size": 10
+   },
+   {
+    "id": "svc:practo.com",
+    "label": "practo.com",
+    "type": "tracker",
+    "size": 10
+   },
+   {
+    "id": "svc:shop.lenskart.com",
+    "label": "shop.lenskart.com",
+    "type": "tracker",
+    "size": 10
+   },
+   {
+    "id": "svc:zomato.com",
+    "label": "zomato.com",
+    "type": "tracker",
     "size": 10
    },
    {
@@ -12356,20 +13277,32 @@
     "size": 10
    },
    {
+    "id": "svc:instagram.com",
+    "label": "instagram.com",
+    "type": "service",
+    "size": 10
+   },
+   {
+    "id": "svc:oldgamesite.net",
+    "label": "oldgamesite.net",
+    "type": "service",
+    "size": 10
+   },
+   {
+    "id": "svc:coursera.org",
+    "label": "coursera.org",
+    "type": "service",
+    "size": 10
+   },
+   {
+    "id": "svc:swiggy.in",
+    "label": "swiggy.in",
+    "type": "service",
+    "size": 10
+   },
+   {
     "id": "svc:paytm.com",
     "label": "paytm.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:naukri.com",
-    "label": "naukri.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:practo.com",
-    "label": "practo.com",
     "type": "service",
     "size": 10
    },
@@ -12394,12 +13327,6 @@
    {
     "id": "svc:duolingo.com",
     "label": "duolingo.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:coursera.org",
-    "label": "coursera.org",
     "type": "service",
     "size": 10
    },
@@ -12436,12 +13363,6 @@
    {
     "id": "svc:cred.club",
     "label": "cred.club",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:instagram.com",
-    "label": "instagram.com",
     "type": "service",
     "size": 10
    },
@@ -12500,12 +13421,6 @@
     "size": 10
    },
    {
-    "id": "svc:flipkart.com",
-    "label": "flipkart.com",
-    "type": "service",
-    "size": 10
-   },
-   {
     "id": "svc:makemytrip.com",
     "label": "makemytrip.com",
     "type": "service",
@@ -12514,12 +13429,6 @@
    {
     "id": "svc:netflix.com",
     "label": "netflix.com",
-    "type": "service",
-    "size": 10
-   },
-   {
-    "id": "svc:linkedin.com",
-    "label": "linkedin.com",
     "type": "service",
     "size": 10
    },
@@ -12753,6 +13662,222 @@
    }
   ],
   "edges": [
+   {
+    "source": "user",
+    "target": "svc:adnxs.com",
+    "weight": 1,
+    "label": "tracker",
+    "evidence": [
+     "ch-acco-00017"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:amazon-adsystem.com",
+    "weight": 1,
+    "label": "tracker",
+    "evidence": [
+     "ch-acco-00018"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:clarity.ms",
+    "weight": 1,
+    "label": "tracker",
+    "evidence": [
+     "ch-acco-00019"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:criteo.com",
+    "weight": 1,
+    "label": "tracker",
+    "evidence": [
+     "ch-acco-00020"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:doubleclick.net",
+    "weight": 1,
+    "label": "tracker",
+    "evidence": [
+     "ch-acco-00021"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:facebook.com",
+    "weight": 1,
+    "label": "tracker",
+    "evidence": [
+     "ch-acco-00022"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:google-analytics.com",
+    "weight": 1,
+    "label": "tracker",
+    "evidence": [
+     "ch-acco-00023"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:linkedin.com",
+    "weight": 1,
+    "label": "tracker",
+    "evidence": [
+     "ch-acco-00024"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:pubmatic.com",
+    "weight": 1,
+    "label": "tracker",
+    "evidence": [
+     "ch-acco-00025"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:scorecardresearch.com",
+    "weight": 1,
+    "label": "tracker",
+    "evidence": [
+     "ch-acco-00026"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:taboola.com",
+    "weight": 1,
+    "label": "tracker",
+    "evidence": [
+     "ch-acco-00027"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:tiktok.com",
+    "weight": 1,
+    "label": "tracker",
+    "evidence": [
+     "ch-acco-00028"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:flipkart.com",
+    "weight": 1,
+    "label": "session_replay",
+    "evidence": [
+     "ch-acco-00029"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:myntra.com",
+    "weight": 1,
+    "label": "session_replay",
+    "evidence": [
+     "ch-acco-00030"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:naukri.com",
+    "weight": 1,
+    "label": "session_replay",
+    "evidence": [
+     "ch-acco-00031"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:practo.com",
+    "weight": 1,
+    "label": "session_replay",
+    "evidence": [
+     "ch-acco-00032"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:shop.lenskart.com",
+    "weight": 1,
+    "label": "session_replay",
+    "evidence": [
+     "ch-acco-00033"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:zomato.com",
+    "weight": 1,
+    "label": "session_replay",
+    "evidence": [
+     "ch-acco-00034"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:zomato.com",
+    "weight": 1,
+    "label": "saved_login",
+    "evidence": [
+     "ch-acco-00035"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:irctc.co.in",
+    "weight": 1,
+    "label": "saved_login",
+    "evidence": [
+     "ch-acco-00036"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:instagram.com",
+    "weight": 1,
+    "label": "saved_login",
+    "evidence": [
+     "ch-acco-00037"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:naukri.com",
+    "weight": 1,
+    "label": "saved_login",
+    "evidence": [
+     "ch-acco-00038"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:oldgamesite.net",
+    "weight": 1,
+    "label": "saved_login",
+    "evidence": [
+     "ch-acco-00039"
+    ]
+   },
+   {
+    "source": "user",
+    "target": "svc:coursera.org",
+    "weight": 1,
+    "label": "saved_login",
+    "evidence": [
+     "ch-acco-00040"
+    ]
+   },
    {
     "source": "user",
     "target": "svc:swiggy.in",

@@ -170,4 +170,54 @@ for k, (name, addr, subj) in enumerate(services + noise):
     mb.append(f"From {addr} {d.strftime('%a %b %d %H:%M:%S %Y')}\nFrom: {name} <{addr}>\nTo: riya.sen@gmail.com\n"
               f"Subject: {subj}\nDate: {d.strftime('%a, %d %b %Y %H:%M:%S +0530')}\n\nHello Riya,\n\n")
 (DIR / "persona_gmail.mbox").write_text("".join(mb), encoding="utf-8")
+
+# ---- Chrome profile (zipped Default folder): History, Network/Cookies, Login Data, Preferences ----
+import sqlite3  # noqa: E402
+import tempfile  # noqa: E402
+
+
+def webkit(dt):
+    return int((dt - datetime(1601, 1, 1)).total_seconds() * 1_000_000)
+
+
+with tempfile.TemporaryDirectory(dir=DIR) as d:
+    prof = Path(d) / "Default"; (prof / "Network").mkdir(parents=True)
+    con = sqlite3.connect(prof / "History")
+    con.execute("CREATE TABLE urls(url TEXT, title TEXT, visit_count INT, last_visit_time INT)")
+    con.execute("CREATE TABLE downloads(target_path TEXT, tab_url TEXT, start_time INT)")
+    sites = ["youtube.com", "instagram.com", "web.whatsapp.com", "amazon.in", "flipkart.com", "zomato.com", "chatgpt.com",
+             "geeksforgeeks.org", "github.com", "cricbuzz.com", "myntra.com", "practo.com", "irctc.co.in", "naukri.com"]
+    for k, s in enumerate(sites):
+        con.execute("INSERT INTO urls VALUES(?,?,?,?)", (f"https://www.{s}/", s, 400 // (k + 1) + 3, webkit(datetime(2026, 11, 1 + k % 20, 22))))
+    con.execute("INSERT INTO downloads VALUES(?,?,?)", (r"C:\Users\Riya\Downloads\aadhaar_card.pdf", "https://uidai.gov.in/", webkit(datetime(2026, 6, 3))))
+    con.execute("INSERT INTO downloads VALUES(?,?,?)", (r"C:\Users\Riya\Downloads\resume_riya.pdf", "https://docs.google.com/", webkit(datetime(2026, 9, 9))))
+    con.commit(); con.close()
+    con = sqlite3.connect(prof / "Network" / "Cookies")
+    con.execute("CREATE TABLE cookies(host_key TEXT, name TEXT, encrypted_value BLOB)")
+    cookie_rows = [(".doubleclick.net", "IDE"), (".google-analytics.com", "_ga"), (".facebook.com", "fr"), (".criteo.com", "uid"),
+                   (".taboola.com", "t_gid"), (".scorecardresearch.com", "UID"), (".adnxs.com", "uuid2"), (".amazon-adsystem.com", "ad-id"),
+                   (".pubmatic.com", "KTPCACOOKIE"), (".clarity.ms", "MUID"), (".linkedin.com", "bcookie"), (".tiktok.com", "ttwid")]
+    replay_sites = [("www.myntra.com", "_hjSessionUser_1"), ("www.zomato.com", "_clck"), ("www.practo.com", "_hjSession_2"),
+                    ("www.naukri.com", "_clsk"), ("www.flipkart.com", "_lr_hb"), ("shop.lenskart.com", "fs_uid")]
+    for h, nme in cookie_rows + replay_sites:
+        con.execute("INSERT INTO cookies VALUES(?,?,?)", (h, nme, b"\x00encrypted"))
+    con.commit(); con.close()
+    con = sqlite3.connect(prof / "Login Data")
+    con.execute("CREATE TABLE logins(origin_url TEXT, username_value TEXT, password_value BLOB)")
+    for s in ["https://accounts.zomato.com/", "https://www.irctc.co.in/", "https://www.instagram.com/", "https://www.naukri.com/",
+              "https://forum.oldgamesite.net/", "https://www.coursera.org/"]:
+        con.execute("INSERT INTO logins VALUES(?,?,?)", (s, "riya.sen", b"\x00encrypted"))
+    con.commit(); con.close()
+    prefs = {"profile": {"content_settings": {"exceptions": {
+        "geolocation": {"https://www.zomato.com:443,*": {"setting": 1}, "https://www.swiggy.com:443,*": {"setting": 1},
+                        "https://maps.google.com:443,*": {"setting": 1}, "https://randomquiz.io:443,*": {"setting": 1}},
+        "media_stream_camera": {"https://meet.google.com:443,*": {"setting": 1}, "https://omegle-clone.xyz:443,*": {"setting": 1}},
+        "media_stream_mic": {"https://meet.google.com:443,*": {"setting": 1}},
+        "notifications": {"https://cricbuzz.com:443,*": {"setting": 1}}}}}}
+    (prof / "Preferences").write_text(json.dumps(prefs), encoding="utf-8")
+    with zipfile.ZipFile(DIR / "persona_chrome.zip", "w", zipfile.ZIP_DEFLATED) as z:
+        for f in prof.rglob("*"):
+            if f.is_file():
+                z.write(f, f.relative_to(Path(d)).as_posix())
+print("wrote chrome persona")
 print("wrote whatsapp, spotify, gmail persona files")

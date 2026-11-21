@@ -131,6 +131,41 @@ def build_findings(records) -> tuple[list[Finding], dict]:
             action={"steps": ["WhatsApp > Settings > Privacy > Groups > My contacts", "Privacy > Profile photo > My contacts",
                               "Exit groups you no longer use"], "link": ""})
 
+    replay = by[("chrome", "account", "session_replay")]
+    if replay:
+        vendors = sorted({r.meta["vendor"] for r in replay})
+        add(layer=1, title=f"{len(replay)} sites recorded your clicks and typing",
+            detail=f"Session-replay tools ({', '.join(vendors)}) record mouse movement, scrolling and what you type, then replay it for the site owner.",
+            priority="high", category="activity", platforms=["chrome"],
+            metric={"value": len(replay), "unit": "sites"}, evidence=[r.id for r in replay],
+            action={"steps": ["Install uBlock Origin and enable the 'EasyPrivacy' filter list",
+                              "Chrome > Settings > Privacy and security > Third-party cookies > Block third-party cookies",
+                              "Delete existing data: Settings > Privacy > Delete browsing data > Cookies"],
+                    "link": "chrome://settings/privacy"})
+
+    trackers = by[("chrome", "account", "tracker")]
+    if trackers:
+        add(layer=1, title=f"{len(trackers)} ad and analytics companies track you across sites",
+            detail="Their cookies let them follow you from site to site and build an advertising profile.",
+            priority="medium", category="activity", platforms=["chrome"],
+            metric={"value": len(trackers), "unit": "trackers"}, evidence=[r.id for r in trackers],
+            action={"steps": ["Chrome > Settings > Privacy and security > Third-party cookies > Block third-party cookies",
+                              "Settings > Privacy > Ad privacy > turn off Ad topics, Site-suggested ads, Ad measurement"],
+                    "link": "chrome://settings/adPrivacy"})
+
+    perms = [r for r in records if r.category == "device" and r.meta.get("permission")]
+    sensors = [r for r in perms if r.meta["permission"] in ("location", "camera", "microphone")]
+    if sensors:
+        kinds = Counter(r.meta["permission"] for r in sensors)
+        sites = {r.meta["domain"] for r in sensors}
+        add(layer=5, title=f"{len(sites)} sites can access your location, camera or microphone",
+            detail=", ".join(f"{v} {k}" for k, v in kinds.items()) + " permissions are allowed in your browser.",
+            priority="high" if kinds.get("location") else "medium", category="device", platforms=sorted({r.platform for r in sensors}),
+            metric={"value": len(sites), "unit": "sites"}, evidence=[r.id for r in sensors],
+            action={"steps": ["Chrome > Settings > Privacy and security > Site settings",
+                              "Open Location, Camera and Microphone; remove every site you don't trust",
+                              "Set the default to 'Don't allow sites to ...'"], "link": "chrome://settings/content"})
+
     people = closeness(records)
     if people:
         top = people[:5]
@@ -146,9 +181,10 @@ def build_findings(records) -> tuple[list[Finding], dict]:
     order = {"high": 0, "medium": 1, "low": 2}
     out.sort(key=lambda f: (order[f.priority], -f.metric["value"]))
     summary = {
-        "servicesFound": len({r.meta.get("domain") for r in records if r.category == "account" and r.meta.get("domain")}),
-        "trackersFound": 0,  # filled by chrome parser
-        "sessionRecorders": 0,  # filled by chrome parser
+        "servicesFound": len({r.meta["domain"] for r in records if r.category == "account" and r.meta.get("domain")
+                              and r.meta.get("source") not in ("tracker", "session_replay")}),
+        "trackersFound": len(trackers),
+        "sessionRecorders": len(replay),
         "topPeople": [{k: p[k] for k in ("name", "score", "signals")} for p in people[:10]],
         "sensitiveHits": sum(len(v) for v in sensitive.values()),
     }
@@ -161,7 +197,8 @@ def build_graph(records, summary) -> dict:
     for r in records:
         if r.category == "account" and r.meta.get("domain"):
             nid = "svc:" + r.meta["domain"]
-            typ = "advertiser" if r.meta.get("source") == "advertiser" else "service"
+            src = r.meta.get("source")
+            typ = "advertiser" if src == "advertiser" else "tracker" if src in ("tracker", "session_replay") else "service"
             nodes.setdefault(nid, {"id": nid, "label": r.meta["domain"], "type": typ, "size": 10})
             edges.append({"source": "user", "target": nid, "weight": 1, "label": r.meta.get("source", ""), "evidence": [r.id]})
     for p in summary["topPeople"]:

@@ -15,7 +15,7 @@ from app.engine.rules import build_findings, build_graph
 import shutil
 import tempfile
 
-from app.parsers import instagram, spotify, whatsapp, mbox
+from app.parsers import instagram, spotify, whatsapp, mbox, chrome
 
 TMP = Path(__file__).resolve().parents[1] / ".cache" / "tmp"  # stays on the project drive
 
@@ -31,6 +31,9 @@ def _wa_text(raw: bytes) -> str:
 def _detect_and_parse(path: Path, wa_offset: int = 0):
     """Pick a parser by content, not filename. Returns (platform, records, coverage)."""
     suffix = path.suffix.lower()
+    if chrome.is_profile(path):
+        recs, cov = chrome.parse(path)
+        return "chrome", recs, cov
     if suffix == ".zip":
         try:
             zf = zipfile.ZipFile(path)
@@ -47,6 +50,14 @@ def _detect_and_parse(path: Path, wa_offset: int = 0):
             if chats:
                 recs, _ = whatsapp.parse_text(_wa_text(zf.read(chats[0])), chats[0], wa_offset)
                 return "whatsapp", recs, _wa_cov()
+            hist = [n for n in zf.namelist() if n.rsplit("/", 1)[-1] == "History"]
+            if hist:  # zipped browser profile: extract to project-drive temp, parse, delete
+                TMP.mkdir(parents=True, exist_ok=True)
+                with tempfile.TemporaryDirectory(dir=TMP) as d:
+                    zf.extractall(d)
+                    prof = Path(d) / hist[0].rsplit("/", 1)[0] if "/" in hist[0] else Path(d)
+                    recs, cov = chrome.parse(prof, path.name)
+                return "chrome", recs, cov
             boxes = [n for n in zf.namelist() if n.lower().endswith(".mbox")]
             if boxes:  # Takeout: mailbox needs a real file, extract to project-drive temp
                 TMP.mkdir(parents=True, exist_ok=True)
