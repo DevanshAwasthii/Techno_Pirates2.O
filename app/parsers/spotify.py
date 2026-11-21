@@ -1,6 +1,8 @@
 """Spotify 'Download your data' parser: Account data zip and Extended streaming history zip."""
 from __future__ import annotations
 
+from app.cancellation import check_cancel
+
 import json
 import re
 import zipfile
@@ -32,22 +34,28 @@ def parse(zf: zipfile.ZipFile, src: str = "spotify.zip"):
 
     names = zf.namelist()
     for f in [x for x in names if x.endswith("Inferences.json")]:
+        check_cancel()
         segs = json.load(zf.open(f)).get("inferences", [])
         for i, s in enumerate(segs):
+            check_cancel()
             add("interest", f"Spotify ad segment: {clean_segment(s)}", None, f, f"index {i}", "inferred", "platform",
                 topic=clean_segment(s), raw=s)
         cov["interest"] = "found" if segs else "not_found"
 
     for f in [x for x in names if re.search(r"StreamingHistory\w*_\d+\.json$", x)]:
+        check_cancel()
         for i, e in enumerate(json.load(zf.open(f))):
+            check_cancel()
             ts = datetime.strptime(e["endTime"], "%Y-%m-%d %H:%M").strftime("%Y-%m-%dT%H:%M:00Z")
             add("activity", f"Played {e.get('trackName')} by {e.get('artistName')}", ts, f, f"index {i}",
                 artist=e.get("artistName"), ms=e.get("msPlayed"))
         cov["activity"] = "found"
 
     for f in [x for x in names if re.search(r"Streaming_History_Audio_.*\.json$", x)]:
+        check_cancel()
         ips_seen = set()
         for i, e in enumerate(json.load(zf.open(f))):
+            check_cancel()
             add("activity", f"Played {e.get('master_metadata_track_name')} on {e.get('platform')}", e.get("ts"), f, f"index {i}",
                 artist=e.get("master_metadata_album_artist_name"), ms=e.get("ms_played"))
             ip = e.get("ip_addr") or e.get("ip_addr_decrypted")

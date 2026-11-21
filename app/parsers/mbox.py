@@ -5,6 +5,8 @@ signup, verification, password reset, receipts, security alerts. Streams message
 """
 from __future__ import annotations
 
+from app.cancellation import Cancelled, check_cancel
+
 import csv
 import mailbox
 import re
@@ -63,6 +65,7 @@ def _body(msg) -> str:
 def classify(subject: str) -> str | None:
     s = subject.lower()
     for kind, rx in KINDS.items():
+        check_cancel()
         if re.search(rx, s):
             return kind
     return None
@@ -76,8 +79,11 @@ def parse(path: str, src: str = "mail.mbox", source_coverage=None):
     recs, n, skipped, unreadable = [], 0, 0, 0
     try:
         for i, key in enumerate(box.iterkeys()):
+            check_cancel()
             try:  # one malformed message (bad charset, broken MIME) must not drop the whole mailbox
                 rec = _record(box[key], i, src)
+            except Cancelled:
+                raise
             except Exception:
                 unreadable += 1
                 continue

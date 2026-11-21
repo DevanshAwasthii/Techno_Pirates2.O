@@ -1,8 +1,10 @@
-﻿"""Sensitive-data detection in message text and closeness scoring."""
+"""Sensitive-data detection in message text and closeness scoring."""
 from __future__ import annotations
 
 import re
+from heapq import merge
 import unicodedata
+from app.cancellation import check_cancel
 from collections import Counter, defaultdict
 
 # Order matters: longest first. Card (16) before Aadhaar (12) before phone (10); taken spans are not re-counted.
@@ -25,11 +27,19 @@ def scan_text(text: str) -> list[str]:
     text = re.sub(r"(?:https?://|www\.)\S+", " ", text)
     hits, taken = [], []
     for label, rx in PATTERNS.items():
-        for m in rx.finditer(text):
-            if any(m.start() < e and s < m.end() for s, e in taken):
+        check_cancel()
+        accepted, cursor = [], 0
+        for match in rx.finditer(text):
+            check_cancel()
+            start, end = match.span()
+            while cursor < len(taken) and taken[cursor][1] <= start:
+                cursor += 1
+            if cursor < len(taken) and taken[cursor][0] < end:
                 continue
-            taken.append(m.span())
+            accepted.append((start, end))
             hits.append(label)
+        # finditer and taken are sorted, and each is internally disjoint.
+        taken = list(merge(taken, accepted))
     return hits
 
 
@@ -53,10 +63,12 @@ def closeness(records) -> list[dict]:
     evidence = defaultdict(list)
     display, platforms = {}, defaultdict(set)
     for r in records:
+        check_cancel()
         for n in [r.meta.get("person")] + list(r.meta.get("thread", [])):
             if n:
                 display.setdefault(person_key(n), n)
     for r in records:
+        check_cancel()
         person = r.meta.get("person")
         if not person:
             continue

@@ -1,6 +1,8 @@
 """iPhone App Privacy Report NDJSON: access events and network domains only."""
 from __future__ import annotations
 
+from app.cancellation import check_cancel
+
 import hashlib
 import json
 from pathlib import Path
@@ -18,6 +20,7 @@ def parse(path):
     namespace = hashlib.sha256(str(path.resolve()).encode()).hexdigest()[:12]
     with path.open(encoding="utf-8-sig", errors="replace") as stream:
         for number, raw in enumerate(stream, 1):
+            check_cancel()
             if not raw.strip():
                 continue
             try:

@@ -4,6 +4,8 @@ Steps reflect app menus as of Nov 2026; the presenter verifies them on real apps
 """
 from __future__ import annotations
 
+from app.cancellation import check_cancel
+
 from collections import Counter, defaultdict
 from datetime import datetime, timedelta, timezone
 
@@ -18,6 +20,7 @@ IG_CENTER = "https://accountscenter.instagram.com/"
 def build_findings(records, now=None) -> tuple[list[Finding], dict]:
     by = defaultdict(list)
     for r in records:
+        check_cancel()
         by[(r.platform, r.category, r.meta.get("source"))].append(r)
     out: list[Finding] = []
 
@@ -69,11 +72,14 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
     sensitive = defaultdict(list)
     sens_platforms = defaultdict(set)
     for r in records:
+        check_cancel()
         if r.category == "message":
             for label in set(scan_text(r.meta.get("text", ""))):  # count messages, not pattern occurrences
+                check_cancel()
                 sensitive[label].append(r.id)
                 sens_platforms[label].add(r.platform)
     for label, ids in sorted(sensitive.items(), key=lambda kv: -len(kv[1])):
+        check_cancel()
         add(layer=3, title=f"{label} pattern appears in imported messages ({len(ids)} message{'s' if len(ids) != 1 else ''})",
             detail="Pattern matches do not establish whose details these are. Recipients and anyone with access to the device or export may see the message contents; an imported message does not establish platform access to encrypted chats.",
             priority="high", category="message", platforms=sorted(sens_platforms[label]),
@@ -85,6 +91,7 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
     if mail:
         services = defaultdict(list)
         for r in mail:
+            check_cancel()
             services[canonical_service_key(r.meta["domain"])].append(r.id)
         forgotten = [d for d, ids in services.items() if len(ids) == 1]
         add(layer=1, title=f"{len(services)} services have your email address",
@@ -182,6 +189,7 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
     # Matching observations support only an account-linkage inference.
     ip_platforms = defaultdict(set); ip_ids = defaultdict(list)
     for r in records:
+        check_cancel()
         if r.category == "location" and r.meta.get("ip"):
             ip_platforms[r.meta["ip"]].add(r.platform); ip_ids[r.meta["ip"]].append(r.id)
     shared = {ip: ps for ip, ps in ip_platforms.items() if len(ps) > 1}
@@ -197,6 +205,7 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
     wa = [r for r in records if r.platform == "whatsapp"]
     groups = defaultdict(set)
     for r in wa:
+        check_cancel()
         if r.meta.get("group"):
             groups[r.meta["chat"]].update(r.meta["senders"])
     if groups:
@@ -284,6 +293,7 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
         now = now.replace(tzinfo=timezone.utc)
     recent_location = []
     for r in records:
+        check_cancel()
         if r.platform not in {"ios", "android"} or r.meta.get("source") != "sensor_access" or r.meta.get("sensor") != "location":
             continue
         try:
@@ -370,6 +380,7 @@ def build_graph(records, summary) -> dict:
     services = {}
     rank = {"tracker": 0, "advertiser": 1, "service": 2}
     for r in records:
+        check_cancel()
         if r.category != "account" or not r.meta.get("domain"):
             continue
         key = canonical_service_key(r.meta["domain"])
@@ -381,10 +392,12 @@ def build_graph(records, summary) -> dict:
         service["evidence"].append(r.id)
     groups = defaultdict(list)
     for key, service in sorted(services.items()):
+        check_cancel()
         groups[service_category(key, service["type"])].append(service)
     nodes = [{"id": "user", "label": "You", "type": "user", "size": 1}]
     edges = []
     for category, members in groups.items():
+        check_cancel()
         nid = "cluster:" + category
         evidence = [rid for member in members for rid in member["evidence"]]
         nodes.append({"id": nid, "label": category, "type": "cluster", "size": len(members), "services": members})

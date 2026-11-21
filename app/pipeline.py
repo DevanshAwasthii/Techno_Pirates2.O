@@ -13,20 +13,15 @@ import os
 import zipfile
 from pathlib import Path
 
+from app.cancellation import Cancelled, cancellation, check_cancel
 from app.engine.records import ParseError, to_dict
 from app.engine.coverage import laptop_sources, coverage_rows
 from app.engine.rules import build_findings, build_graph
-import shutil
 import tempfile
 
 from app.parsers import instagram, instagram_html, spotify, whatsapp, mbox, chrome, ocr, google_access, deviceScan, iosPrivacy
 
 TMP = Path(__file__).resolve().parents[1] / ".cache" / "tmp"  # stays on the project drive
-
-
-class Cancelled(Exception):
-    pass
-
 
 def _wa_text(raw: bytes) -> str:
     return raw.decode("utf-8-sig", errors="replace")
@@ -98,7 +93,9 @@ def _detect_and_parse(path: Path, wa_offset: int = 0, warnings=None, source_cove
                     with tempfile.TemporaryDirectory(dir=TMP) as d:  # one scope: copy, parse and cleanup (CRC errors too)
                         out = Path(d) / f"m{k}.mbox"
                         with zf.open(box) as src, out.open("wb") as dst:
-                            shutil.copyfileobj(src, dst)
+                            while chunk := src.read(1 << 20):
+                                check_cancel()
+                                dst.write(chunk)
                         mrecs, mcov = mbox.parse(str(out), box, source_coverage=source_coverage)
                     for r in mrecs:
                         r.id = f"b{k}-{r.id}"
@@ -136,6 +133,11 @@ def _wa_cov():
 
 
 def run(paths, progress=lambda *a: None, cancel=None) -> dict:
+    with cancellation(cancel):
+        return _run(paths, progress, cancel)
+
+
+def _run(paths, progress, cancel) -> dict:
     records, coverage, errors = [], {}, []
     source_coverage = []
     media = ocr.VIDEO | ocr.IMAGE
@@ -146,6 +148,7 @@ def run(paths, progress=lambda *a: None, cancel=None) -> dict:
         if cancel is not None and cancel.is_set():
             raise Cancelled()
         progress("parse", p.name, int(80 * i / max(len(paths), 1)))
+        check_cancel()
         records_before, errors_before, coverage_before = len(records), len(errors), len(source_coverage)
         fp = _fingerprint(p)
         if fp and fp in seen_content:  # same export downloaded twice: counting it again would inflate every finding
@@ -169,6 +172,8 @@ def run(paths, progress=lambda *a: None, cancel=None) -> dict:
             for name, values in sections.items():
                 prev = coverage.get(name, {})
                 coverage[name] = {k: ("found" if "found" in (v, prev.get(k)) else v) for k, v in values.items()}
+        except Cancelled:
+            raise
         except ParseError as e:
             errors.append(e.to_dict())
         except Exception as e:  # never crash the whole run on one file
@@ -189,8 +194,11 @@ def run(paths, progress=lambda *a: None, cancel=None) -> dict:
     # only chat-export messages carry chat/senders; OCR status records do not
     whatsapp.assign_owner([r for r in records if r.platform == "whatsapp" and "chat" in r.meta])
     progress("rules", "", 90)
+    check_cancel()
     findings, summary = build_findings(records)
+    check_cancel()
     graph = build_graph(records, summary)
+    check_cancel()
     progress("done", "", 100)
     result = {
         "records": [to_dict(r) for r in records],

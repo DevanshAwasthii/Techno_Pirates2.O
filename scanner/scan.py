@@ -33,7 +33,7 @@ def _iso(stamp):
     return datetime.fromtimestamp(stamp, timezone.utc).isoformat()
 
 
-def scan_laptop(max_seconds=WALK_SECONDS):
+def scan_laptop(max_seconds=WALK_SECONDS, check_cancel=lambda: None):
     """Measure first-level app folders, without following symlinks or junctions.
 
     A deadline and inaccessible entries can make sizes lower bounds. The partial
@@ -54,6 +54,7 @@ def scan_laptop(max_seconds=WALK_SECONDS):
              "recent_checked": False, "recent_errors": 0, "links_skipped": 0}
     recent = 0
     for variable in ("APPDATA", "LOCALAPPDATA"):
+        check_cancel()
         raw = os.environ.get(variable)
         if not raw:
             continue
@@ -65,6 +66,7 @@ def scan_laptop(max_seconds=WALK_SECONDS):
         try:
             with os.scandir(root) as entries:
                 for entry in entries:
+                    check_cancel()
                     if time.monotonic() >= walk_deadline:
                         scope["storage_time_limited"] = True
                         break
@@ -85,6 +87,7 @@ def scan_laptop(max_seconds=WALK_SECONDS):
             with os.scandir(Path(raw) / "Microsoft" / "Windows" / "Recent") as entries:
                 scope["recent_checked"] = True
                 for entry in entries:
+                    check_cancel()
                     if time.monotonic() >= walk_deadline:
                         scope["recent_checked"] = False
                         break
@@ -99,6 +102,7 @@ def scan_laptop(max_seconds=WALK_SECONDS):
             scope["recent_errors"] += 1
     folders.sort(key=lambda path: str(path).lower())
     for index, folder in enumerate(folders):
+        check_cancel()
         now = time.monotonic()
         if now >= walk_deadline:
             scope["storage_time_limited"] = True
@@ -108,10 +112,12 @@ def scan_laptop(max_seconds=WALK_SECONDS):
         folder_partial = False
         logs, stack = [], [folder]
         while stack and time.monotonic() < folder_deadline:
+            check_cancel()
             directory = stack.pop()
             try:
                 with os.scandir(directory) as entries:
                     for entry in entries:
+                        check_cancel()
                         if time.monotonic() >= folder_deadline:
                             folder_partial = scope["storage_time_limited"] = True
                             break
@@ -156,7 +162,9 @@ def scan_laptop(max_seconds=WALK_SECONDS):
     scope["logs_skipped_limit"] = max(0, scope["logs_candidates"] - MAX_LOG_FILES)
     logs, attempted = [], 0
     for app in apps:
+        check_cancel()
         for path in candidates[app["path"]][0]:
+            check_cancel()
             if attempted >= MAX_LOG_FILES:
                 break
             if time.monotonic() >= deadline:
@@ -187,6 +195,7 @@ def scan_laptop(max_seconds=WALK_SECONDS):
             "partial": storage_partial or logs_partial or bool(scope["recent_errors"]),
             "storage_partial": storage_partial, "logs_partial": logs_partial, "scope": scope,
             "scan_seconds": round(time.monotonic() - start, 3)}
+
 
 
 def _adb(*args):

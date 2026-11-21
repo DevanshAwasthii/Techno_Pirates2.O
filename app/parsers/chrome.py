@@ -6,6 +6,8 @@ Copies are removed on success or failure; locked sources are reported.
 """
 from __future__ import annotations
 
+from app.cancellation import check_cancel
+
 import json
 import os
 import hashlib
@@ -42,9 +44,11 @@ def default_profiles() -> list[Path]:
         return []
     profiles = []
     for relative in ("Google/Chrome/User Data", "Microsoft/Edge/User Data"):
+        check_cancel()
         try:
             with os.scandir(Path(raw) / relative) as entries:
                 for entry in entries:
+                    check_cancel()
                     name = entry.name
                     if name != "Default" and not (name.startswith("Profile ") and name[8:].isdigit()):
                         continue
@@ -87,6 +91,7 @@ def _query(db: Path, sql: str):
         snapshot = Path(folder) / db.name
         shutil.copy2(db, snapshot)
         for suffix in ("-wal", "-shm", "-journal"):
+            check_cancel()
             side = db.with_name(db.name + suffix)
             if side.exists():
                 shutil.copy2(side, snapshot.with_name(snapshot.name + suffix))
@@ -154,12 +159,15 @@ def parse(profile: Path, src: str | None = None, warnings=None, source_coverage=
         rows = query(hist, "SELECT url, visit_count, last_visit_time FROM urls")
         per = Counter(); last = {}
         for url, cnt, t in rows:
+            check_cancel()
             h = _host(url)
             per[h] += cnt or 0
             last[h] = max(last.get(h, 0), t or 0)
         for h, cnt in per.most_common(50):
+            check_cancel()
             add("activity", f"Visited {h} {cnt} times", _webkit(last[h]), "History", f"urls host={h}", domain=h, visits=cnt)
         for target, url, t in query(hist, "SELECT target_path, tab_url, start_time FROM downloads"):
+            check_cancel()
             add("activity", f"Downloaded {Path(target).name} from {_host(url or '')}", _webkit(t), "History",
                 "downloads", domain=_host(url or ""), action="download")
         cov["activity"] = "found" if rows else "not_assessed" if str(hist) in failed_sources else "not_found"
@@ -169,16 +177,20 @@ def parse(profile: Path, src: str | None = None, warnings=None, source_coverage=
         rows = query(cookies, "SELECT host_key, name FROM cookies")
         trackers, replay = {}, {}
         for host, name in rows:
+            check_cancel()
             base = _base(host)
             if base in TRACKERS:
                 trackers.setdefault(base, set()).add(host)
             for pre, vendor in REPLAY.items():
+                check_cancel()
                 if name.startswith(pre):
                     replay.setdefault(_host(host), vendor)
         for base, hosts in sorted(trackers.items()):
+            check_cancel()
             add("account", f"Tracker cookie from {base}", None, str(cookies.relative_to(profile)) if live else cookies.name, f"cookies host_key in {sorted(hosts)[:3]}",
                 domain=base, source="tracker")
         for site, vendor in sorted(replay.items()):
+            check_cancel()
             item = f"{site} has a cookie associated with {vendor}; may use session-recording tools"
             add("account", item, None, str(cookies.relative_to(profile)) if live else cookies.name, f"cookies host_key={site}",
                 domain=site, source="session_replay", vendor=vendor)
@@ -187,6 +199,7 @@ def parse(profile: Path, src: str | None = None, warnings=None, source_coverage=
     if logins.exists():
         rows = query(logins, "SELECT DISTINCT origin_url FROM logins")  # password_value is never selected
         for (url,) in rows:
+            check_cancel()
             if url:
                 d = _base(_host(url))
                 add("account", f"Saved login for {d}", None, "Login Data", "logins origin_url", domain=d, source="saved_login")
@@ -201,11 +214,13 @@ def parse(profile: Path, src: str | None = None, warnings=None, source_coverage=
                 raise ValueError("Browser permission exceptions are not an object")
             skipped = 0
             for key, label in PERMS.items():
+                check_cancel()
                 values = exc.get(key, {})
                 if not isinstance(values, dict):
                     skipped += 1
                     continue
                 for pattern, value in values.items():
+                    check_cancel()
                     if not isinstance(pattern, str) or not isinstance(value, dict):
                         skipped += 1
                         continue
@@ -230,6 +245,7 @@ def parse(profile: Path, src: str | None = None, warnings=None, source_coverage=
     source_row(prefs, "browser_permissions")
     if source_coverage is not None:
         for row in states.values():
+            check_cancel()
             row["records"] = sum(r.sourceFile == row["source"] if live else Path(r.sourceFile).name == Path(row["source"]).name for r in recs)
             source_coverage.append(row)
 

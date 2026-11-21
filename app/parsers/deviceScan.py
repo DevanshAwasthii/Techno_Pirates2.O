@@ -1,6 +1,8 @@
 """Read local device-scan metadata and counts, never the underlying app files."""
 from __future__ import annotations
 
+from app.cancellation import check_cancel
+
 import hashlib
 import json
 from pathlib import Path
@@ -43,6 +45,7 @@ def parse(path, data=None):
         apps = laptop.get("apps") if isinstance(laptop.get("apps"), list) else []
         apps = sorted(((i, a) for i, a in enumerate(apps) if isinstance(a, dict) and isinstance(a.get("name"), str)), key=lambda pair: -count(pair[1].get("bytes")))[:30]
         for i, app in apps:
+            check_cancel()
             size = count(app.get("bytes"))
             add("device", "device", f"{app['name']} holds {size / 1_000_000_000:.2f} GB of app data", f"laptop.apps[{i}] path={app.get('path', '')}",
                 timestamp=app.get("last_modified") if isinstance(app.get("last_modified"), str) else scanned,
@@ -50,6 +53,7 @@ def parse(path, data=None):
                 files=count(app.get("files")), partial=bool(app.get("partial", laptop.get("storage_partial", laptop.get("partial")))))
         logs = laptop.get("logs") if isinstance(laptop.get("logs"), list) else []
         for i, log in enumerate(logs):
+            check_cancel()
             if not isinstance(log, dict):
                 continue
             counts = {key: count(log.get(key)) for key in ("emails", "ips", "phones")}
@@ -68,6 +72,7 @@ def parse(path, data=None):
         coverage["android"] = empty_coverage("android")
         apps = android.get("apps") if isinstance(android.get("apps"), list) else []
         for i, app in enumerate(apps):
+            check_cancel()
             if not isinstance(app, dict) or not isinstance(app.get("package"), str) or not app["package"]:
                 continue
             package = app["package"]
@@ -80,6 +85,7 @@ def parse(path, data=None):
                 coverage["android"]["contact"] = "found"
             access = app.get("last_access") if isinstance(app.get("last_access"), dict) else {}
             for sensor in ("location", "camera", "microphone", "contacts"):
+                check_cancel()
                 timestamp = access.get(sensor)
                 if isinstance(timestamp, str) and timestamp:
                     add("android", "location" if sensor == "location" else "device", f"{package} accessed {sensor}",

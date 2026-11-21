@@ -212,11 +212,11 @@ def test_extended_mode_passes_120_seconds_to_background_scanner(tmp_path, monkey
             jobs.append(target)
         def start(self):
             pass
-    def collect(*, max_seconds):
+    def collect(*, max_seconds, check_cancel=lambda: None):
         budgets.append(max_seconds)
         return {"apps": [], "logs": [], "recent_files": 0}
     app = SimpleNamespace(loading=False, closing=False, resolve_button=Widget(), open_button=Widget(),
-                          scan_button=Widget(), scan_mode=Widget(), status_label=Widget(), progress=Widget(),
+                          scan_button=Widget(), cancel_button=Widget(), scan_mode=Widget(), status_label=Widget(), progress=Widget(),
                           show_errors=lambda message: None, dispatch=lambda *args: completions.append(args),
                           scan_complete=lambda *args: None, load_failed=lambda *args: None)
     monkeypatch.setattr(ui, "ROOT", tmp_path)

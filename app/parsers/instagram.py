@@ -5,6 +5,8 @@ Never loads the whole zip; reads only the JSON members it needs.
 """
 from __future__ import annotations
 
+from app.cancellation import check_cancel
+
 import json
 import re
 import zipfile
@@ -90,6 +92,7 @@ def parse(zf: zipfile.ZipFile, src: str = "instagram.zip", owner_name: str | Non
 
     # owner name: needed to tell incoming from outgoing DMs
     for f in _find(json_files, r"personal_information\.json$"):
+        check_cancel()
         try:
             d = _load(zf, f)
             prof = (d.get("profile_user") or [{}])[0].get("string_map_data", {})
@@ -100,16 +103,20 @@ def parse(zf: zipfile.ZipFile, src: str = "instagram.zip", owner_name: str | Non
     # contacts: followers / following
     found = False
     for f in _find(json_files, r"followers_\d+\.json$"):
+        check_cancel()
         for i, e in enumerate(_load(zf, f)):
+            check_cancel()
             s = _sld(e)
             who = fix_text(s.get("value") or e.get("title"))
             if who:
                 found = True
                 add("contact", f"Follower: @{who}", iso(s.get("timestamp")), f, f"index {i}", person=who, relation="follower")
     for f in _find(json_files, r"following\.json$"):
+        check_cancel()
         d = _load(zf, f)
         items = d if isinstance(d, list) else d.get("relationships_following", []) if isinstance(d, dict) else []
         for i, e in enumerate(items):
+            check_cancel()
             s = _sld(e)
             who = fix_text(e.get("title") or s.get("value"))
             if who:
@@ -121,15 +128,19 @@ def parse(zf: zipfile.ZipFile, src: str = "instagram.zip", owner_name: str | Non
     # activity: likes and comments
     found = False
     for f in _find(json_files, r"liked_posts\.json$"):
+        check_cancel()
         d = _load(zf, f)
         for i, e in enumerate(d.get("likes_media_likes", [])):
+            check_cancel()
             who = fix_text(e.get("title"))
             found = True
             add("activity", f"Liked a post by @{who}", iso(_sld(e).get("timestamp")), f, f"index {i}", person=who, action="like")
     for f in _find(json_files, r"post_comments(_\d+)?\.json$"):
+        check_cancel()
         d = _load(zf, f)
         items = d if isinstance(d, list) else d.get("comments_media_comments", [])
         for i, e in enumerate(items):
+            check_cancel()
             m = e.get("string_map_data", {})
             who = fix_text((m.get("Media Owner") or {}).get("value"))
             found = True
@@ -140,9 +151,11 @@ def parse(zf: zipfile.ZipFile, src: str = "instagram.zip", owner_name: str | Non
 
     # interests: Instagram's own inferred topics
     for f in _find(json_files, r"your_topics\.json$"):
+        check_cancel()
         d = _load(zf, f)
         topics = d.get("topics_your_topics", [])
         for i, e in enumerate(topics):
+            check_cancel()
             name = fix_text((e.get("string_map_data", {}).get("Name") or {}).get("value"))
             if name:
                 add("interest", f"Instagram thinks you like: {name}", None, f, f"index {i}", "inferred", "platform", topic=name)
@@ -150,15 +163,19 @@ def parse(zf: zipfile.ZipFile, src: str = "instagram.zip", owner_name: str | Non
 
     # accounts: advertisers using your data, off-Meta activity
     for f in _find(json_files, r"advertisers_using_your_activity_or_information\.json$"):
+        check_cancel()
         d = _load(zf, f)
         for i, e in enumerate(d.get("ig_custom_audiences_all_types", [])):
+            check_cancel()
             name = fix_text(e.get("advertiser_name"))
             if name:
                 add("account", f"Advertiser holds your info: {name}", None, f, f"index {i}", domain=name, source="advertiser",
                     uploaded_list=bool(e.get("has_data_file_custom_audience")))
     for f in _find(json_files, r"your_activity_off_meta_technologies\.json$"):
+        check_cancel()
         d = _load(zf, f)
         for i, e in enumerate(d.get("apps_and_websites_off_meta_activity", [])):
+            check_cancel()
             name = fix_text(e.get("name"))
             events = e.get("events", [])
             last = max((ev.get("timestamp", 0) for ev in events), default=None)
@@ -167,9 +184,11 @@ def parse(zf: zipfile.ZipFile, src: str = "instagram.zip", owner_name: str | Non
 
     # location: login IPs
     for f in _find(json_files, r"login_activity\.json$"):
+        check_cancel()
         d = _load(zf, f)
         logins = d.get("account_history_login_history", [])
         for i, e in enumerate(logins):
+            check_cancel()
             m = e.get("string_map_data", {})
             ip = (m.get("IP Address") or {}).get("value")
             ts = (m.get("Time") or {}).get("timestamp")
@@ -180,9 +199,11 @@ def parse(zf: zipfile.ZipFile, src: str = "instagram.zip", owner_name: str | Non
 
     # messages: DMs (end-to-end encrypted chats may be missing from the export)
     for f in _find(json_files, r"inbox/[^/]+/message_\d+\.json$"):
+        check_cancel()
         d = _load(zf, f)
         people = [fix_text(p.get("name")) for p in d.get("participants", [])]
         for i, m in enumerate(d.get("messages", [])):
+            check_cancel()
             sender = fix_text(m.get("sender_name"))
             text = fix_text(m.get("content") or "")
             add("message", f"{sender}: {text[:80]}", iso(m.get("timestamp_ms")), f, f"index {i}",

@@ -6,6 +6,8 @@ record per (date, hour) bucket for the heatmap. Each record keeps its row count 
 """
 from __future__ import annotations
 
+from app.cancellation import check_cancel
+
 import csv
 import io
 import zipfile
@@ -43,8 +45,10 @@ def parse(zf: zipfile.ZipFile, src: str = "takeout.zip"):
         recs.append(Record(f"go-{category[:4]}-{n:05d}", PLATFORM, category, item, ts, "recorded", None, file, ref, meta))
 
     for name in [x for x in zf.namelist() if "Access Log Activity/" in x and x.rsplit("/", 1)[-1].startswith(DEV)]:
+        check_cancel()
         short = name.rsplit("/", 1)[-1][:40]
         for i, r in enumerate(_rows(zf, name)):
+            check_cancel()
             label = " ".join(x for x in (r.get("Brand Name"), r.get("Marketing Name") or r.get("Device Model")) if x) or r.get("Device Type") or "Device"
             add("device", f"{label} ({r.get('OS', '')} {r.get('OS Version', '')}) accessed your Google account".replace("  ", " "),
                 None, short, f"row {i + 2}", device=label, device_type=r.get("Device Type"))
@@ -54,11 +58,13 @@ def parse(zf: zipfile.ZipFile, src: str = "takeout.zip"):
                 cov["location"] = "found"
 
     for name in [x for x in zf.namelist() if "Access Log Activity/" in x and x.rsplit("/", 1)[-1].startswith(ACT)]:
+        check_cancel()
         short = name.rsplit("/", 1)[-1][:40]
         ips = defaultdict(lambda: {"n": 0, "first": None, "last": None, "place": "", "row": 0})
         products, hours = Counter(), Counter()
         total = 0
         for i, r in enumerate(_rows(zf, name)):
+            check_cancel()
             total += 1
             ts = _iso(r.get("Activity Timestamp"))
             ip = (r.get("IP Address") or "").strip()
@@ -74,11 +80,14 @@ def parse(zf: zipfile.ZipFile, src: str = "takeout.zip"):
             if ts:
                 hours[ts[:13]] += 1  # 'YYYY-MM-DDTHH'
         for ip, s in sorted(ips.items(), key=lambda kv: -kv[1]["n"]):
+            check_cancel()
             add("location", f"Google saw you at IP {ip} ({s['place'] or 'unknown place'}) {s['n']} times", s["last"], short,
                 f"first row {s['row']}", ip=ip, place=s["place"], count=s["n"], first=s["first"])
         for prod, c in products.most_common():
+            check_cancel()
             add("activity", f"{c} account activities logged for {prod}", None, short, "Product Name column", product=prod, count=c)
         for hour, c in sorted(hours.items()):
+            check_cancel()
             add("activity", f"{c} Google account activities in this hour", hour + ":00:00Z", short, "hourly summary", count=c)
         if total:
             cov["activity"] = "found"

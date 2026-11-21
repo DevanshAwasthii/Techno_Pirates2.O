@@ -8,6 +8,8 @@ Structure verified on a real Nov 2026 export.
 """
 from __future__ import annotations
 
+from app.cancellation import check_cancel
+
 import re
 import zipfile
 from datetime import datetime
@@ -22,6 +24,7 @@ DATE_RX = re.compile(r"^[A-Z][a-z]{2} \d{1,2}, \d{4},? \d{1,2}:\d{2}(?::\d{2})? 
 def parse_date(text: str) -> str | None:
     t = text.replace(",", "").strip().upper()
     for fmt in ("%b %d %Y %I:%M %p", "%b %d %Y %I:%M:%S %p", "%b %d %Y %I:%M%p"):
+        check_cancel()
         try:
             return datetime.strptime(t, fmt).strftime("%Y-%m-%dT%H:%M:%S")  # export shows local time, no zone
         except ValueError:
@@ -39,6 +42,7 @@ class _Boxes(HTMLParser):
         self.href, self.label, self.td = None, None, None
 
     def handle_starttag(self, tag, attrs):
+        check_cancel()
         cls = dict(attrs).get("class") or ""
         if tag == "div":
             if self.box is None and "_a6-g" in cls:
@@ -75,6 +79,7 @@ class _Boxes(HTMLParser):
             self.td = None
 
     def handle_data(self, data):
+        check_cancel()
         t = data.strip()
         if not t or self.box is None:
             return
@@ -128,6 +133,7 @@ def parse(zf: zipfile.ZipFile, src: str = "instagram.zip"):
 
     def first(fields, *keys):
         for k in keys:
+            check_cancel()
             v = fields.get(k)
             if v:
                 return v[0]
@@ -135,27 +141,35 @@ def parse(zf: zipfile.ZipFile, src: str = "instagram.zip"):
 
     owner = None
     for f in find(r"/personal_information\.html$"):
+        check_cancel()
         for b in read(f):
+            check_cancel()
             owner = owner or first(b["fields"], "Name")
 
     for f in find(r"/followers_\d+\.html$"):
+        check_cancel()
         bs = read(f)
         for i, b in enumerate(bs):
+            check_cancel()
             who = b["links"][0][0] if b["links"] else b["title"]
             if who:
                 add("contact", f"Follower: @{who}", b["date"], f, f"item {i + 1}", person=who, relation="follower")
         mark("contact", bool(bs))
     for f in find(r"/following\.html$"):
+        check_cancel()
         bs = read(f)
         for i, b in enumerate(bs):
+            check_cancel()
             who = b["links"][0][0] if b["links"] else b["title"]
             if who:
                 add("contact", f"You follow @{who}", b["date"], f, f"item {i + 1}", person=who, relation="following")
         mark("contact", bool(bs))
 
     for f in find(r"/liked_posts\.html$"):
+        check_cancel()
         bs = read(f)
         for i, b in enumerate(bs):
+            check_cancel()
             who = first(b["fields"], "Username", "Owner") or b["title"]
             if who:
                 add("activity", f"Liked a post by @{who}", b["date"], f, f"item {i + 1}", person=who, action="like")
@@ -163,7 +177,9 @@ def parse(zf: zipfile.ZipFile, src: str = "instagram.zip"):
                 add("activity", "Liked a post (owner not in export)", b["date"], f, f"item {i + 1}", action="like")
         mark("activity", bool(bs))
     for f in find(r"/post_comments(_\d+)?\.html$"):
+        check_cancel()
         for i, b in enumerate(read(f)):
+            check_cancel()
             who = first(b["fields"], "Media Owner")
             ts = parse_date(first(b["fields"], "Time") or "") or b["date"]
             add("activity", f"Commented on @{who}'s post", ts, f, f"item {i + 1}", person=who, action="comment",
@@ -171,22 +187,30 @@ def parse(zf: zipfile.ZipFile, src: str = "instagram.zip"):
             mark("activity", True)
 
     for f in find(r"/other_categories_used_to_reach_you\.html$"):
+        check_cancel()
         topics = [v for b in read(f) for v in b["fields"].get("Name", [])]
         for i, t in enumerate(topics):
+            check_cancel()
             add("interest", f"Instagram uses this category to reach you: {t}", None, f, f"value {i + 1}",
                 "inferred", "platform", topic=t)
         mark("interest", bool(topics))
 
     for f in find(r"/advertisers_using_your_activity_or_information\.html$"):
+        check_cancel()
         for b in read(f):
+            check_cancel()
             for label, values in b["fields"].items():
+                check_cancel()
                 uploaded = "uploaded an audience list containing" in label
                 for i, name in enumerate(dict.fromkeys(values)):
+                    check_cancel()
                     add("account", f"Advertiser holds your info: {name}", None, f, f"list '{label[:40]}...' entry {i + 1}",
                         domain=name, source="advertiser", uploaded_list=uploaded)
 
     for f in find(r"apps_and_websites/your_activity_off_meta_technologies\.html$"):
+        check_cancel()
         for i, b in enumerate(read(f)):
+            check_cancel()
             name = b["links"][0][0] if b["links"] else b["title"]
             if not name:
                 continue
@@ -198,14 +222,18 @@ def parse(zf: zipfile.ZipFile, src: str = "instagram.zip"):
 
     found_loc = False
     for f in find(r"/login_activity\.html$"):
+        check_cancel()
         for i, b in enumerate(read(f)):
+            check_cancel()
             ip = first(b["fields"], "IP Address")
             if ip:
                 found_loc = True
                 add("location", f"Login from IP {ip}", parse_date(first(b["fields"], "Time") or "") or b["date"], f,
                     f"item {i + 1}", ip=ip, device=first(b["fields"], "User Agent"))
     for f in find(r"/last_known_location\.html$"):
+        check_cancel()
         for b in read(f):
+            check_cancel()
             lat = first(b["fields"], "Precise latitude", "Imprecise latitude")
             lon = first(b["fields"], "Precise longitude", "Imprecise longitude")
             if lat and lon:
@@ -214,8 +242,11 @@ def parse(zf: zipfile.ZipFile, src: str = "instagram.zip"):
                 add("location", f"Instagram stores your {'precise ' if precise else ''}last known location ({lat}, {lon})",
                     b["date"], f, "last known location", lat=lat, lon=lon, precise=precise, source="last_known_location")
     for f in find(r"/locations_of_interest\.html$"):
+        check_cancel()
         for b in read(f):
+            check_cancel()
             for i, place in enumerate(b["fields"].get("Locations of interest", [])):
+                check_cancel()
                 found_loc = True
                 add("location", f"Instagram thinks you're interested in: {place}", None, f, f"value {i + 1}",
                     "inferred", "platform", place=place, source="location_of_interest")
@@ -224,20 +255,26 @@ def parse(zf: zipfile.ZipFile, src: str = "instagram.zip"):
 
     threads = {}
     for f in find(r"/inbox/[^/]+/message_\d+\.html$"):
+        check_cancel()
         threads.setdefault(f.split("/inbox/")[1].split("/")[0], []).append((f, read(f)))
     # The profile 'Name' often differs from the display name on messages (verified on a real export),
     # so the owner is the sender present in most threads when the profile name isn't a sender.
     in_threads = {}
     for parts in threads.values():
+        check_cancel()
         for s in {b["title"] for _, bs in parts for b in bs if b["title"]}:
+            check_cancel()
             in_threads[s] = in_threads.get(s, 0) + 1
     if in_threads and owner not in in_threads and len(threads) > 1:
         top = max(in_threads, key=in_threads.get)
         owner = top if in_threads[top] >= max(2, len(threads) // 2) else owner
     for thread, parts in threads.items():
+        check_cancel()
         senders = sorted({b["title"] for _, bs in parts for b in bs if b["title"]})
         for f, bs in parts:
+            check_cancel()
             for i, b in enumerate(bs):
+                check_cancel()
                 sender = b["title"]
                 body = " ".join(t for t in b["texts"] if t != sender and not DATE_RX.match(t))
                 add("message", f"{sender}: {body[:80]}", b["date"], f, f"item {i + 1}", person=sender,

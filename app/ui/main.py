@@ -23,6 +23,7 @@ from fpdf import FPDF
 
 import webbrowser
 
+from app.cancellation import Cancelled, cancellation, check_cancel
 from app.connect import PLATFORMS, DownloadWatcher, downloads_folder, file_key, recent_exports
 from app.engine.coverage import STATUS_LABELS, coverage_rows, audit_is_partial, tracker_display, storage_display, chat_display
 
@@ -122,6 +123,7 @@ def prepare_charts(result):
         positions[node] = (1.8 * math.cos(angle), math.sin(angle))
     heat = [[0 for _ in range(24)] for _ in range(7)]
     for record in result.get("records") or []:
+        check_cancel()
         stamp = record.get("timestamp")
         if not stamp:
             continue
@@ -238,6 +240,9 @@ class NexDataApp(ctk.CTk):
         self.figures = []
         self.canvases = []
         self.loading = False
+        self.cancel_event = threading.Event()
+        self.view_generation = 0
+        self.pdf_job_id = 0
         self.closing = False
         self.protocol("WM_DELETE_WINDOW", self.close)
         self.grid_columnconfigure(0, weight=1)
@@ -267,6 +272,9 @@ class NexDataApp(ctk.CTk):
         self.progress = ctk.CTkProgressBar(status, mode="indeterminate", width=220, progress_color=CYAN)
         self.progress.grid(row=0, column=1, padx=12)
         self.progress.grid_remove()
+        self.cancel_button = ctk.CTkButton(status, text="Cancel", width=90, command=self.cancel_audit)
+        self.cancel_button.grid(row=0, column=2)
+        self.cancel_button.grid_remove()
         self.resolve_button = ctk.CTkButton(status, text="Close browsers and rescan", command=self.resolve_browser_locks, width=210, fg_color="#8b5b24")
         self.resolve_button.grid(row=3, column=0, sticky="w", pady=(6, 4))
         self.resolve_button.grid_remove()
@@ -385,6 +393,10 @@ class NexDataApp(ctk.CTk):
         if self.loading or self.closing:
             return
         self.loading = True
+        self.cancel_event = threading.Event()
+        self.cancel_button.configure(state="normal")
+        self.cancel_button.grid()
+        event = self.cancel_event
         budget = SCAN_MODES[self.scan_mode.get()]
         self.scan_mode.configure(state="disabled")
         self.resolve_button.configure(state="disabled")
@@ -400,10 +412,14 @@ class NexDataApp(ctk.CTk):
                 from scanner.scan import scan_laptop
                 from app.parsers.chrome import default_profiles
                 profiles = default_profiles()
-                scan = {"scanned_at": datetime.now(timezone.utc).isoformat(), "laptop": scan_laptop(max_seconds=budget), "android": None}
+                with cancellation(event):
+                    laptop = scan_laptop(max_seconds=budget, check_cancel=check_cancel)
+                scan = {"scanned_at": datetime.now(timezone.utc).isoformat(), "laptop": laptop, "android": None}
                 path = ROOT / ".cache" / "device_scan.json"
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.write_text(json.dumps(scan, indent=2) + "\n", encoding="utf-8")
+            except Cancelled:
+                self.dispatch(self.load_cancelled)
             except Exception as exc:
                 self.dispatch(self.load_failed, f"Laptop scan could not finish: {exc}")
             else:
@@ -412,6 +428,9 @@ class NexDataApp(ctk.CTk):
         threading.Thread(target=worker, name="nexdata-device-scan", daemon=True).start()
 
     def scan_complete(self, path, profiles):
+        if self.cancel_event.is_set():
+            self.load_cancelled()
+            return
         paths = pc_scan_paths(path, profiles, self.loaded_paths)
         self.finish_loading()
         self.load_paths(paths, source_mode="pc")
@@ -520,6 +539,10 @@ class NexDataApp(ctk.CTk):
             self.show_errors("The project's samples folder contains fictional test data. Select your own exports from another folder.")
             return
         self.loading = True
+        self.cancel_event = threading.Event()
+        self.cancel_button.configure(state="normal")
+        self.cancel_button.grid()
+        event = self.cancel_event
         self.source_mode = source_mode
         self.source_label.configure(text="REAL PC SCAN | App folders and available browser metadata. Social accounts and phones require your own exports." if source_mode == "pc" else "YOUR SELECTED IMPORTS | Showing only the files you selected; their origin is not independently verified.")
         self.pending_paths = list(paths)
@@ -535,11 +558,14 @@ class NexDataApp(ctk.CTk):
         def worker():
             try:
                 from app import pipeline
-                result = pipeline.run(paths)
+                result = pipeline.run(paths, cancel=event)
                 result["sourceMode"] = source_mode
                 result["inputSources"] = [str(path) for path in paths]
                 # results stay in memory only: never persist message text or other personal values to disk
-                charts = prepare_charts(result)
+                with cancellation(event):
+                    charts = prepare_charts(result)
+            except Cancelled:
+                self.dispatch(self.load_cancelled)
             except Exception as exc:
                 self.dispatch(self.load_failed, f"Audit could not finish: {exc}")
             else:
@@ -547,10 +573,22 @@ class NexDataApp(ctk.CTk):
 
         threading.Thread(target=worker, name="nexdata-audit", daemon=True).start()
 
+    def cancel_audit(self):
+        self.cancel_event.set()
+        self.cancel_button.configure(state="disabled")
+        self.status_label.configure(text="Cancelling audit...")
+
+    def load_cancelled(self):
+        self.restore_browsers()
+        self.finish_loading()
+        self.pending_paths = []
+        self.status_label.configure(text="Audit cancelled. Previous results remain available.")
+
     def finish_loading(self):
         self.loading = False
         self.progress.stop()
         self.progress.grid_remove()
+        self.cancel_button.grid_remove()
         self.open_button.configure(state="normal")
         self.scan_button.configure(state="normal")
         self.resolve_button.configure(state="normal")
@@ -575,6 +613,10 @@ class NexDataApp(ctk.CTk):
         self.show_errors(message)
 
     def load_complete(self, result, charts, count):
+        if self.cancel_event.is_set():
+            self.load_cancelled()
+            return
+        self.view_generation += 1
         try:
             self.result = result
             self.loaded_paths = list(self.pending_paths)
@@ -811,22 +853,43 @@ class NexDataApp(ctk.CTk):
         popup.geometry("900x620")
         popup.transient(self)
         popup.after(100, popup.lift)
+        self.label(popup, finding.get("title", "Evidence"), bold=True, size=18)
+        controls = ctk.CTkFrame(popup)
+        controls.pack(fill="x", padx=14, pady=6)
         body = ctk.CTkScrollableFrame(popup)
         body.pack(fill="both", expand=True, padx=14, pady=14)
-        self.label(body, finding.get("title", "Evidence"), bold=True, size=18)
         ids = finding.get("evidence") or []
-        if not ids:
-            self.label(body, "No source records attached to this finding.", color=MUTED)
-        for record_id in ids[:50]:
-            card = self.card(body)
-            record = self.records_by_id.get(record_id)
-            if record is None:
-                self.label(card, f"{record_id}: record unavailable", color=MUTED)
-                continue
-            self.label(card, record.get("item", ""), bold=True)
-            self.label(card, f"Timestamp: {record.get('timestamp') or 'Not recorded'}\nSource file: {record.get('sourceFile') or '-'}\nRecord reference: {record.get('recordRef') or '-'}\nKind: {record.get('kind') or '-'}", color=MUTED, size=12)
-        if len(ids) > 50:
-            self.label(body, f"+{len(ids) - 50} more", color=CYAN, bold=True)
+        current = [0]
+        total_pages = max(1, (len(ids) + 49) // 50)
+
+        def render(page):
+            current[0] = max(0, min(page, total_pages - 1))
+            for child in body.winfo_children():
+                child.destroy()
+            start = current[0] * 50
+            if not ids:
+                self.label(body, "No source records attached to this finding.", color=MUTED)
+            for record_id in ids[start:start + 50]:
+                card = self.card(body)
+                record = self.records_by_id.get(record_id)
+                if record is None:
+                    self.label(card, f"{record_id}: record unavailable", color=MUTED)
+                    continue
+                self.label(card, record.get("item", ""), bold=True)
+                self.label(card, f"Timestamp: {record.get('timestamp') or 'Not recorded'}\nSource file: {record.get('sourceFile') or '-'}\nRecord reference: {record.get('recordRef') or '-'}\nKind: {record.get('kind') or '-'}", color=MUTED, size=12)
+            page_label.configure(text=f"Page {current[0] + 1} of {total_pages} | {len(ids)} source records")
+            prev.configure(state="normal" if current[0] > 0 else "disabled")
+            nxt.configure(state="normal" if current[0] + 1 < total_pages else "disabled")
+            body._parent_canvas.yview_moveto(0)
+
+        prev = ctk.CTkButton(controls, text="Prev", width=90, command=lambda: render(current[0] - 1))
+        prev.pack(side="left", padx=6)
+        page_label = ctk.CTkLabel(controls, text="")
+        page_label.pack(side="left", expand=True)
+        nxt = ctk.CTkButton(controls, text="Next", width=90, command=lambda: render(current[0] + 1))
+        nxt.pack(side="right", padx=6)
+        render(0)
+        return popup
 
     def render_actions(self):
         page = self.scroll_page("Fix first")
@@ -873,6 +936,9 @@ class NexDataApp(ctk.CTk):
             self.show_errors(f"Could not open link: {exc}")
 
     def export_pdf(self):
+        self.pdf_job_id += 1
+        job_id, view = self.pdf_job_id, self.view_generation
+        widgets = (self.export_button, self.export_label)
         self.export_button.configure(state="disabled")
         self.export_label.configure(text="Writing PDF locally...")
         snapshot = self.result
@@ -881,15 +947,23 @@ class NexDataApp(ctk.CTk):
             try:
                 REPORT_PATH.write_bytes(report_bytes(snapshot))
             except Exception as exc:
-                self.dispatch(self.export_complete, f"PDF export failed: {exc}")
+                self.dispatch(self.export_complete, f"PDF export failed: {exc}", job_id, view, widgets)
             else:
-                self.dispatch(self.export_complete, f"Saved: {REPORT_PATH}")
+                self.dispatch(self.export_complete, f"Saved: {REPORT_PATH}", job_id, view, widgets)
 
         threading.Thread(target=worker, name="nexdata-pdf", daemon=True).start()
 
-    def export_complete(self, message):
-        self.export_button.configure(state="normal")
-        self.export_label.configure(text=message)
+    def export_complete(self, message, job_id, view, widgets):
+        if self.closing or job_id != self.pdf_job_id or view != self.view_generation:
+            return
+        button, label = widgets
+        try:
+            if button.winfo_exists() and label.winfo_exists():
+                button.configure(state="normal")
+                label.configure(text=message)
+        except TclError:
+            pass  # view closed between the liveness check and callback
+
 
     def clear_figures(self):
         for canvas in self.canvases:
@@ -901,6 +975,7 @@ class NexDataApp(ctk.CTk):
         self.figures.clear()
 
     def close(self):
+        self.cancel_event.set()
         self.closing = True
         self.restore_browsers()
         self.clear_figures()

@@ -8,6 +8,8 @@ Names are snapped to known people from the other exports (rapidfuzz), fixing OCR
 """
 from __future__ import annotations
 
+from app.cancellation import check_cancel
+
 import hashlib
 import re
 import unicodedata
@@ -66,6 +68,7 @@ def frames(path: Path):
     last, sec = None, 0
     try:
         while sec <= total:
+            check_cancel()
             cap.set(cv2.CAP_PROP_POS_MSEC, sec * 1000)
             ok, f = cap.read()
             if not ok:
@@ -126,6 +129,7 @@ def parse(path: Path, known_people: list[str] | None = None):
                            path.name, f"frame at {sec}s", meta))
 
     for sec, f in frames(path):
+        check_cancel()
         lines = read_lines(f)
         all_text += lines
         text = " ".join(lines).lower()
@@ -133,6 +137,7 @@ def parse(path: Path, known_people: list[str] | None = None):
         if is_status:
             mine = "viewed by" in text
             for i, line in enumerate(lines):
+                check_cancel()
                 if line.lower() in NOISE or TIME_LINE.match(line) or VIEWED_BY.search(line):
                     continue
                 nxt = lines[i + 1] if i + 1 < len(lines) else ""
@@ -143,10 +148,12 @@ def parse(path: Path, known_people: list[str] | None = None):
                     else:
                         add("whatsapp", f"{who} posted a status ({nxt})", sec, person=who, action="status_post", capture="ocr")
             for m in VIEWED_BY.finditer(text):
+                check_cancel()
                 add("whatsapp", f"Your status was viewed by {m.group(1)} people", sec, action="status_views_total",
                     views=int(m.group(1)), capture="ocr")
             continue
         for line in lines:
+            check_cancel()
             m = LIKED_BY.search(line)
             if m:
                 who = snap(m.group(1), known)

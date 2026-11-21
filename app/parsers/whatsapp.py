@@ -6,6 +6,8 @@ Owner (the exporting user) is not named in the file; the pipeline infers it acro
 """
 from __future__ import annotations
 
+from app.cancellation import check_cancel
+
 import re
 from datetime import datetime
 
@@ -26,6 +28,7 @@ def looks_like_whatsapp(text: str) -> bool:
 
 def _day_first(matches) -> bool:
     for d, m in matches:
+        check_cancel()
         if int(d) > 12:
             return True
         if int(m) > 12:
@@ -60,6 +63,7 @@ def parse_text(text: str, src: str, start_id: int = 0):
         raise ParseError("wrong_format", "Not a WhatsApp chat export", src)
     raw = []
     for line in text.splitlines():
+        check_cancel()
         m = LINE.match(line)
         if m:
             raw.append([m.groupdict(), m.group("rest")])
@@ -69,6 +73,7 @@ def parse_text(text: str, src: str, start_id: int = 0):
     name = chat_name(src)
     msgs = []
     for g, rest in raw:
+        check_cancel()
         if ": " not in rest:
             continue  # system line without a sender
         sender, body = rest.split(": ", 1)
@@ -80,6 +85,7 @@ def parse_text(text: str, src: str, start_id: int = 0):
     is_group = len(senders) > 2
     recs = []
     for i, (sender, body, ts) in enumerate(msgs):
+        check_cancel()
         recs.append(Record(f"wa-mess-{start_id + i + 1:05d}", PLATFORM, "message", f"{sender} in {name}: {body[:80]}", ts,
                            sourceFile=src, recordRef=f"message {i + 1}",
                            meta={"person": sender, "chat": name, "group": is_group, "senders": senders, "text": body}))
@@ -90,15 +96,19 @@ def assign_owner(records):
     """Owner = the sender present in the most chats. Sets direction and thread on every WhatsApp record."""
     chats = {}
     for r in records:
+        check_cancel()
         chats.setdefault(r.meta["chat"], set(r.meta["senders"]))
     if not chats:
         return None
     counts = {}
     for s in chats.values():
+        check_cancel()
         for p in s:
+            check_cancel()
             counts[p] = counts.get(p, 0) + 1
     owner = max(counts, key=counts.get) if len(chats) > 1 else None
     for r in records:
+        check_cancel()
         others = [p for p in r.meta["senders"] if p != owner]
         r.meta["thread"] = others
         r.meta["direction"] = "out" if owner and r.meta["person"] == owner else "in"
