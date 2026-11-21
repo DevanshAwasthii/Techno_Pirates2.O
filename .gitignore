@@ -4,3 +4,8 @@ __pycache__/
 .pytest_cache/
 *.pdf
 real-data/
+device_scan.json
+real_findings.json
+*.log
+.env
+.env.*

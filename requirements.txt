@@ -1,0 +1,9 @@
+customtkinter
+matplotlib
+networkx
+fpdf2
+numpy
+opencv-python
+rapidocr-onnxruntime
+RapidFuzz
+pytest

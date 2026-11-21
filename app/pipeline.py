@@ -29,11 +29,11 @@ def _wa_text(raw: bytes) -> str:
     return raw.decode("utf-8-sig", errors="replace")
 
 
-def _detect_and_parse(path: Path, wa_offset: int = 0):
+def _detect_and_parse(path: Path, wa_offset: int = 0, warnings=None):
     """Pick a parser by content, not filename. Returns (platform, records, coverage)."""
     suffix = path.suffix.lower()
     if chrome.is_profile(path):
-        recs, cov = chrome.parse(path)
+        recs, cov = chrome.parse(path, warnings=warnings)
         return "chrome", recs, cov
     if suffix == ".ndjson":
         recs, cov, _ = iosPrivacy.parse(path)
@@ -115,7 +115,7 @@ def run(paths, progress=lambda *a: None, cancel=None) -> dict:
                 prev = coverage.get(platform, {})
                 coverage[platform] = {k: ("found" if "found" in (v, prev.get(k)) else prev.get(k, v)) for k, v in cov.items()}
                 continue
-            platform, recs, cov = _detect_and_parse(p, sum(r.platform == "whatsapp" for r in records))
+            platform, recs, cov = _detect_and_parse(p, sum(r.platform == "whatsapp" for r in records), warnings=errors)
             records += recs
             sections = cov if platform is None else {platform: cov}
             for name, values in sections.items():

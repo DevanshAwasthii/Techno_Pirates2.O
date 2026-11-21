@@ -160,23 +160,29 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
                               "Exit groups you no longer use"], "link": ""})
 
     replay = by[("chrome", "account", "session_replay")]
+    replay_count = len({r.meta["domain"] for r in replay})
     if replay:
         vendors = sorted({r.meta["vendor"] for r in replay})
-        add(layer=1, title=f"{len(replay)} sites recorded your clicks and typing",
-            detail=f"Session-replay tools ({', '.join(vendors)}) record mouse movement, scrolling and what you type, then replay it for the site owner.",
+        live = any(r.meta.get("live_profile") for r in replay)
+        add(layer=1, title=f"{replay_count} sites have session-replay cookie indicators" if live else f"{len(replay)} sites recorded your clicks and typing",
+            detail=(f"Cookie names associated with {', '.join(vendors)} were found locally. This indicates a tool may be present; it does not prove your clicks, typing or screen contents were recorded."
+                    if live else f"Session-replay tools ({', '.join(vendors)}) record mouse movement, scrolling and what you type, then replay it for the site owner."),
             priority="high", category="activity", platforms=["chrome"],
-            metric={"value": len(replay), "unit": "sites"}, evidence=[r.id for r in replay],
+            metric={"value": replay_count, "unit": "sites"}, evidence=[r.id for r in replay],
             action={"steps": ["Install uBlock Origin and enable the 'EasyPrivacy' filter list",
                               "Chrome > Settings > Privacy and security > Third-party cookies > Block third-party cookies",
                               "Delete existing data: Settings > Privacy > Delete browsing data > Cookies"],
                     "link": "chrome://settings/privacy"})
 
     trackers = by[("chrome", "account", "tracker")]
+    tracker_count = len({r.meta["domain"] for r in trackers})
     if trackers:
-        add(layer=1, title=f"{len(trackers)} ad and analytics companies track you across sites",
-            detail="Their cookies let them follow you from site to site and build an advertising profile.",
+        live = any(r.meta.get("live_profile") for r in trackers)
+        add(layer=1, title=f"{tracker_count} known tracker domains appear in browser cookies" if live else f"{len(trackers)} ad and analytics companies track you across sites",
+            detail=("Cookie names and domains were observed locally. Their presence alone does not establish what data was sent or whether cross-site tracking occurred."
+                    if live else "Their cookies let them follow you from site to site and build an advertising profile."),
             priority="medium", category="activity", platforms=["chrome"],
-            metric={"value": len(trackers), "unit": "trackers"}, evidence=[r.id for r in trackers],
+            metric={"value": tracker_count, "unit": "trackers"}, evidence=[r.id for r in trackers],
             action={"steps": ["Chrome > Settings > Privacy and security > Third-party cookies > Block third-party cookies",
                               "Settings > Privacy > Ad privacy > turn off Ad topics, Site-suggested ads, Ad measurement"],
                     "link": "chrome://settings/adPrivacy"})
@@ -298,8 +304,8 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
     summary = {
         "servicesFound": len({r.meta["domain"] for r in records if r.category == "account" and r.meta.get("domain")
                               and r.meta.get("source") not in ("tracker", "session_replay")}),
-        "trackersFound": len(trackers),
-        "sessionRecorders": len(replay),
+        "trackersFound": tracker_count,
+        "sessionRecorders": replay_count,
         "topPeople": [{k: p[k] for k in ("name", "score", "signals")} for p in people[:10]],
         "sensitiveHits": sum(len(v) for v in sensitive.values()),
         "recentLocationApps": len(location_apps),

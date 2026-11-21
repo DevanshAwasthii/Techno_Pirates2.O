@@ -1,15 +1,14 @@
 """Chrome / Edge profile parser: History, Cookies, Login Data, Preferences.
 
 Reads only domains, names and counts. Never reads cookie values or password values.
-Chrome locks these files while running, so they are copied to the project temp folder first.
+Databases are opened read-only. Locked sources are reported; secret-bearing databases are never copied.
 """
 from __future__ import annotations
 
 import json
 import os
-import shutil
+import hashlib
 import sqlite3
-import tempfile
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -34,10 +33,26 @@ PERMS = {"geolocation": "location", "media_stream_camera": "camera", "media_stre
 
 
 def default_profiles() -> list[Path]:
-    """Chrome and Edge default profile folders on this Windows machine."""
-    local = Path(os.environ.get("LOCALAPPDATA", ""))
-    cands = [local / "Google/Chrome/User Data/Default", local / "Microsoft/Edge/User Data/Default"]
-    return [p for p in cands if (p / "History").exists()]
+    """Find existing Chrome/Edge Default and numbered profiles on this PC."""
+    raw = os.environ.get("LOCALAPPDATA")
+    if not raw:
+        return []
+    profiles = []
+    for relative in ("Google/Chrome/User Data", "Microsoft/Edge/User Data"):
+        try:
+            with os.scandir(Path(raw) / relative) as entries:
+                for entry in entries:
+                    name = entry.name
+                    if name != "Default" and not (name.startswith("Profile ") and name[8:].isdigit()):
+                        continue
+                    try:
+                        if entry.is_dir(follow_symlinks=False) and (Path(entry.path) / "History").is_file():
+                            profiles.append(Path(entry.path))
+                    except OSError:
+                        continue
+        except OSError:
+            continue
+    return sorted(profiles, key=lambda p: str(p).lower())
 
 
 def is_profile(path: Path) -> bool:
@@ -63,37 +78,47 @@ def _base(host: str) -> str:
 
 
 def _query(db: Path, sql: str):
-    """Copy the (possibly locked) SQLite file, then read the copy."""
-    TMP.mkdir(parents=True, exist_ok=True)
-    fd, tmp = tempfile.mkstemp(dir=TMP, suffix=".db"); os.close(fd)
+    """Select metadata from the original database without copying secret columns."""
+    con = sqlite3.connect(db.resolve().as_uri() + "?mode=ro", uri=True, timeout=2)
     try:
-        try:
-            shutil.copyfile(db, tmp)
-        except PermissionError:
-            raise ParseError("unknown", f"{db.name} is locked. Close Chrome/Edge fully and try again.", str(db))
-        con = sqlite3.connect(f"file:{tmp}?mode=ro", uri=True)
-        try:
-            return con.execute(sql).fetchall()
-        finally:
-            con.close()
+        return con.execute(sql).fetchall()
     finally:
-        Path(tmp).unlink(missing_ok=True)
+        con.close()
 
 
-def parse(profile: Path, src: str | None = None):
+def parse(profile: Path, src: str | None = None, warnings=None):
     profile = Path(profile)
+    live = src is None
+    namespace = "ch-" + hashlib.sha256(str(profile.resolve()).encode()).hexdigest()[:12] if live else "ch"
     src = src or profile.name
     recs, n = [], 0
+    failed_sources = set()
     cov = {"location": "not_assessed", "interest": "not_assessed", "contact": "not_assessed", "activity": "not_assessed"}
 
     def add(category, item, ts, file, ref, **meta):
         nonlocal n
         n += 1
-        recs.append(Record(f"ch-{category[:4]}-{n:05d}", PLATFORM, category, item, ts, "recorded", None, file, ref, meta))
+        source = str(profile / file) if live else file
+        if live:
+            meta["live_profile"] = True
+        recs.append(Record(f"{namespace}-{category[:4]}-{n:05d}", PLATFORM, category, item, ts, "recorded", None, source, ref, meta))
+
+    def query(db, sql):
+        try:
+            return _query(db, sql)
+        except (OSError, sqlite3.Error) as exc:
+            failed_sources.add(str(db))
+            if warnings is None:
+                raise ParseError("unknown", f"Cannot read browser metadata: {exc}", str(db)) from None
+            from scanner.browser_access import describe_failure
+            warning = {"code": "unknown", "file": str(db), **describe_failure(db, exc)}
+            if warning not in warnings:
+                warnings.append(warning)
+            return []
 
     hist = profile / "History"
     if hist.exists():
-        rows = _query(hist, "SELECT url, visit_count, last_visit_time FROM urls")
+        rows = query(hist, "SELECT url, visit_count, last_visit_time FROM urls")
         per = Counter(); last = {}
         for url, cnt, t in rows:
             h = _host(url)
@@ -101,14 +126,14 @@ def parse(profile: Path, src: str | None = None):
             last[h] = max(last.get(h, 0), t or 0)
         for h, cnt in per.most_common(50):
             add("activity", f"Visited {h} {cnt} times", _webkit(last[h]), "History", f"urls host={h}", domain=h, visits=cnt)
-        for target, url, t in _query(hist, "SELECT target_path, tab_url, start_time FROM downloads"):
+        for target, url, t in query(hist, "SELECT target_path, tab_url, start_time FROM downloads"):
             add("activity", f"Downloaded {Path(target).name} from {_host(url or '')}", _webkit(t), "History",
                 "downloads", domain=_host(url or ""), action="download")
-        cov["activity"] = "found" if rows else "not_found"
+        cov["activity"] = "found" if rows else "not_assessed" if str(hist) in failed_sources else "not_found"
 
     cookies = next((p for p in (profile / "Network" / "Cookies", profile / "Cookies") if p.exists()), None)
     if cookies:
-        rows = _query(cookies, "SELECT host_key, name FROM cookies")
+        rows = query(cookies, "SELECT host_key, name FROM cookies")
         trackers, replay = {}, {}
         for host, name in rows:
             base = _base(host)
@@ -118,15 +143,15 @@ def parse(profile: Path, src: str | None = None):
                 if name.startswith(pre):
                     replay.setdefault(_host(host), vendor)
         for base, hosts in sorted(trackers.items()):
-            add("account", f"Tracker cookie from {base}", None, cookies.name, f"cookies host_key in {sorted(hosts)[:3]}",
+            add("account", f"Tracker cookie from {base}", None, str(cookies.relative_to(profile)) if live else cookies.name, f"cookies host_key in {sorted(hosts)[:3]}",
                 domain=base, source="tracker")
         for site, vendor in sorted(replay.items()):
-            add("account", f"{site} records your session with {vendor}", None, cookies.name, f"cookies host_key={site}",
+            add("account", f"{site} records your session with {vendor}", None, str(cookies.relative_to(profile)) if live else cookies.name, f"cookies host_key={site}",
                 domain=site, source="session_replay", vendor=vendor)
 
     logins = profile / "Login Data"
     if logins.exists():
-        rows = _query(logins, "SELECT DISTINCT origin_url FROM logins")  # password_value is never selected
+        rows = query(logins, "SELECT DISTINCT origin_url FROM logins")  # password_value is never selected
         for (url,) in rows:
             if url:
                 d = _base(_host(url))
@@ -144,6 +169,6 @@ def parse(profile: Path, src: str | None = None):
         if any(r.meta.get("permission") == "location" for r in recs):
             cov["location"] = "found"
 
-    if not recs:
+    if not recs and warnings is None:
         raise ParseError("wrong_format", "No browser data found in this folder", src)
     return recs, cov

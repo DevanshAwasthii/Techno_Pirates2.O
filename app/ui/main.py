@@ -6,7 +6,7 @@ from pathlib import Path
 import threading
 import json
 import webbrowser
-from tkinter import TclError, filedialog
+from tkinter import TclError, filedialog, messagebox
 
 import customtkinter as ctk
 import networkx as nx
@@ -27,6 +27,16 @@ NODE_COLORS = {"user": "#ffffff", "advertiser": "#f26873", "service": "#ffa75c",
 TAB_NAMES = ("Footprint", "What they know", "Inner circle", "Findings", "Fix first")
 
 
+def is_demo_path(path):
+    return Path(path).resolve().is_relative_to((ROOT / "samples").resolve())
+
+
+def pc_scan_paths(scan_path, profiles, loaded_paths):
+    """Never carry the old demo into a live scan, and replace prior scan inputs."""
+    paths = [scan_path, *profiles, *(p for p in loaded_paths if not is_demo_path(p))]
+    return list(dict.fromkeys(str(Path(path).resolve()) for path in paths))
+
+
 def ordered_findings(result):
     return sorted(result.get("findings") or [], key=lambda f: {"high": 0, "medium": 1, "low": 2}.get(f.get("priority"), 3))
 
@@ -37,7 +47,8 @@ def error_text(errors):
     if not isinstance(errors, (list, tuple)):
         errors = [errors]
     return "\n".join(
-        ": ".join(str(e[k]) for k in ("file", "code", "message") if e.get(k))
+        (f"{Path(e.get('file', '')).name}: {e.get('message', '')}" if e.get("reason") else
+         ": ".join(str(e[k]) for k in ("file", "code", "message") if e.get(k)))
         if isinstance(e, dict) else str(e) for e in errors
     )
 
@@ -78,6 +89,8 @@ def report_bytes(result):
 
     line("NexData - Personal Data Footprint Auditor", 18, True)
     line("Offline report - nothing leaves this device")
+    line("Source: this PC and any user-selected imports" if result.get("sourceMode") == "pc" else "Source: user-selected imports")
+    line("Social interests and relationships require actual account exports; they are not guessed from this PC.")
     line(datetime.now().strftime("Generated %Y-%m-%d %H:%M"))
     summary = result.get("summary") or {}
     line(f"Services holding your data: {summary.get('servicesFound', 0)}")
@@ -112,11 +125,12 @@ class NexDataApp(ctk.CTk):
     def __init__(self):
         ctk.set_appearance_mode("dark")
         super().__init__()
-        self.title("NexData - Personal Data Footprint Auditor")
+        self.title("NexData - Personal Data Footprint Auditor | Real PC scan")
         self.geometry("1280x800")
         self.minsize(1000, 680)
         self.configure(fg_color=BG)
         self.result = {}
+        self.source_mode = "pc"
         self.loaded_paths = []
         self.pending_paths = []
         self.records_by_id = {}
@@ -133,31 +147,34 @@ class NexDataApp(ctk.CTk):
         top.grid_columnconfigure(2, weight=1)
         ctk.CTkLabel(top, text="NexData", font=("Segoe UI", 27, "bold"), text_color=TEXT).grid(row=0, column=0, padx=(22, 18), pady=18)
         ctk.CTkLabel(top, text="Offline - nothing leaves this device", fg_color="#173e32", text_color="#87e3b1", corner_radius=8, padx=12).grid(row=0, column=1)
-        self.demo_button = ctk.CTkButton(top, text="Load demo persona", command=self.load_demo, width=160, fg_color="#217989", hover_color="#2b92a5")
-        self.demo_button.grid(row=0, column=3, padx=10)
-        self.open_button = ctk.CTkButton(top, text="Open files...", command=self.open_files, width=125)
-        self.open_button.grid(row=0, column=4, padx=(0, 10))
-        self.scan_button = ctk.CTkButton(top, text="Scan this laptop", command=self.scan_laptop, width=145, fg_color="#217989")
-        self.scan_button.grid(row=0, column=5, padx=(0, 22))
+        self.open_button = ctk.CTkButton(top, text="Open my exports...", command=self.open_files, width=150)
+        self.open_button.grid(row=0, column=3, padx=(10, 10))
+        self.scan_button = ctk.CTkButton(top, text="Scan this PC", command=self.scan_laptop, width=145, fg_color="#217989")
+        self.scan_button.grid(row=0, column=4, padx=(0, 22))
 
         status = ctk.CTkFrame(self, fg_color="transparent")
         status.grid(row=1, column=0, sticky="ew", padx=22, pady=(10, 0))
         status.grid_columnconfigure(0, weight=1)
-        self.status_label = ctk.CTkLabel(status, text="Ready to audit your data locally", text_color=MUTED, anchor="w")
+        self.status_label = ctk.CTkLabel(status, text="Starting a real scan of this PC...", text_color=MUTED, anchor="w")
         self.status_label.grid(row=0, column=0, sticky="ew")
         self.progress = ctk.CTkProgressBar(status, mode="indeterminate", width=220, progress_color=CYAN)
         self.progress.grid(row=0, column=1, padx=12)
         self.progress.grid_remove()
+        self.resolve_button = ctk.CTkButton(status, text="Close browsers and rescan", command=self.resolve_browser_locks, width=210, fg_color="#8b5b24")
+        self.resolve_button.grid(row=3, column=0, sticky="w", pady=(6, 4))
+        self.resolve_button.grid_remove()
         self.error_label = ctk.CTkLabel(status, text="", text_color="#ff9b9b", justify="left", anchor="w", wraplength=1180)
         self.error_label.grid(row=1, column=0, columnspan=2, sticky="ew")
         self.error_label.grid_remove()
+        self.source_label = ctk.CTkLabel(status, text="REAL PC SCAN | App folders and available browser metadata. Social accounts and phones require your own exports.", text_color=CYAN, anchor="w", justify="left", wraplength=1180)
+        self.source_label.grid(row=2, column=0, columnspan=2, sticky="ew")
         self.tabs = ctk.CTkTabview(self, fg_color=PANEL, segmented_button_selected_color="#237e8e", segmented_button_selected_hover_color="#2c92a3")
         self.tabs.grid(row=2, column=0, sticky="nsew", padx=18, pady=(4, 18))
         for name in TAB_NAMES:
             page = self.tabs.add(name)
             page.grid_columnconfigure(0, weight=1)
             page.grid_rowconfigure(0, weight=1)
-        self.after(150, self.load_demo)
+        self.after(150, self.scan_laptop)
 
     def show_errors(self, message):
         self.error_label.configure(text=message)
@@ -166,20 +183,8 @@ class NexDataApp(ctk.CTk):
         else:
             self.error_label.grid_remove()
 
-    def load_demo(self):
-        try:
-            paths = sorted(str(p.resolve()) for p in (ROOT / "samples").iterdir()
-                           if p.is_file() and p.name.startswith("persona_") and p.suffix.lower() in {".zip", ".txt", ".mbox", ".mp4", ".ndjson", ".json"})
-        except OSError as exc:
-            self.show_errors(str(exc))
-            return
-        if not paths:
-            self.show_errors("No supported persona_* files found in D:\\NEXDATA\\samples.")
-            return
-        self.load_paths(paths)
-
     def open_files(self):
-        paths = filedialog.askopenfilenames(parent=self, title="Open personal data exports", initialdir=str(ROOT / "samples"), filetypes=[("Data exports", "*.zip *.txt *.mbox *.mp4 *.mov *.mkv *.avi *.png *.jpg *.jpeg *.ndjson *.json"), ("All files", "*.*")])
+        paths = filedialog.askopenfilenames(parent=self, title="Open personal data exports", initialdir=str(Path.home() / "Downloads"), filetypes=[("Data exports", "*.zip *.txt *.mbox *.mp4 *.mov *.mkv *.avi *.png *.jpg *.jpeg *.ndjson *.json"), ("All files", "*.*")])
         if paths:
             self.load_paths(paths)
 
@@ -187,16 +192,19 @@ class NexDataApp(ctk.CTk):
         if self.loading or self.closing:
             return
         self.loading = True
-        for button in (self.demo_button, self.open_button, self.scan_button):
+        self.resolve_button.configure(state="disabled")
+        for button in (self.open_button, self.scan_button):
             button.configure(state="disabled")
         self.show_errors("")
-        self.status_label.configure(text="Scanning app folders and counting log patterns locally...")
+        self.status_label.configure(text="Scanning this PC: app folders, log pattern counts and browser metadata...")
         self.progress.grid()
         self.progress.start()
 
         def worker():
             try:
                 from scanner.scan import scan_laptop
+                from app.parsers.chrome import default_profiles
+                profiles = default_profiles()
                 scan = {"scanned_at": datetime.now(timezone.utc).isoformat(), "laptop": scan_laptop(), "android": None}
                 path = ROOT / ".cache" / "device_scan.json"
                 path.parent.mkdir(parents=True, exist_ok=True)
@@ -204,14 +212,48 @@ class NexDataApp(ctk.CTk):
             except Exception as exc:
                 self.dispatch(self.load_failed, f"Laptop scan could not finish: {exc}")
             else:
-                self.dispatch(self.scan_complete, path)
+                self.dispatch(self.scan_complete, path, profiles)
 
         threading.Thread(target=worker, name="nexdata-device-scan", daemon=True).start()
 
-    def scan_complete(self, path):
-        paths = [p for p in self.loaded_paths if Path(p).resolve() != path.resolve()]
+    def scan_complete(self, path, profiles):
+        paths = pc_scan_paths(path, profiles, self.loaded_paths)
         self.finish_loading()
-        self.load_paths(paths + [str(path)])
+        self.load_paths(paths, source_mode="pc")
+
+    def resolve_browser_locks(self):
+        if self.loading or self.closing:
+            return
+        processes = {p["pid"]: p for error in self.result.get("errors") or [] for p in error.get("blocked_by", [])}
+        if not processes:
+            self.scan_laptop()
+            return
+        if not messagebox.askyesno("Close browser background processes?",
+                                  "NexData identified Chrome/Edge processes holding browser data files.\n\n"
+                                  "Close visible browser windows first. NexData will try a normal exit. If Windows refuses, it may stop only the verified background browser processes.\n\n"
+                                  "This can interrupt browser background apps or downloads. Allow this and scan again?", parent=self):
+            return
+        self.loading = True
+        for button in (self.open_button, self.scan_button, self.resolve_button):
+            button.configure(state="disabled")
+        self.status_label.configure(text="Requesting a normal exit from the browsers holding these files...")
+        self.progress.grid()
+        self.progress.start()
+
+        def worker():
+            try:
+                from scanner.browser_access import close_browsers
+                close_browsers(list(processes.values()), allow_background_stop=True)
+            except (OSError, RuntimeError) as exc:
+                self.dispatch(self.load_failed, str(exc))
+            else:
+                self.dispatch(self.browser_locks_resolved)
+
+        threading.Thread(target=worker, name="nexdata-browser-unlock", daemon=True).start()
+
+    def browser_locks_resolved(self):
+        self.finish_loading()
+        self.scan_laptop()
 
     def dispatch(self, callback, *args):
         if not self.closing:
@@ -220,13 +262,18 @@ class NexDataApp(ctk.CTk):
             except (RuntimeError, TclError):
                 pass  # The window may have closed while the worker was finishing.
 
-    def load_paths(self, paths):
+    def load_paths(self, paths, source_mode="imports"):
         if self.loading or self.closing:
             return
+        if any(is_demo_path(path) for path in paths):
+            self.show_errors("The project's samples folder contains fictional test data. Select your own exports from another folder.")
+            return
         self.loading = True
+        self.source_mode = source_mode
+        self.source_label.configure(text="REAL PC SCAN | App folders and available browser metadata. Social accounts and phones require your own exports." if source_mode == "pc" else "YOUR SELECTED IMPORTS | Showing only the files you selected; their origin is not independently verified.")
         self.pending_paths = list(paths)
+        self.resolve_button.configure(state="disabled")
         self.scan_button.configure(state="disabled")
-        self.demo_button.configure(state="disabled")
         self.open_button.configure(state="disabled")
         self.show_errors("")
         self.status_label.configure(text=f"Auditing {len(paths)} file(s) locally...")
@@ -237,6 +284,10 @@ class NexDataApp(ctk.CTk):
             try:
                 from app import pipeline
                 result = pipeline.run(paths)
+                result["sourceMode"] = source_mode
+                result["inputSources"] = [str(path) for path in paths]
+                if source_mode == "pc":
+                    (ROOT / ".cache" / "real_findings.json").write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
                 charts = prepare_charts(result)
             except Exception as exc:
                 self.dispatch(self.load_failed, f"Audit could not finish: {exc}")
@@ -249,9 +300,9 @@ class NexDataApp(ctk.CTk):
         self.loading = False
         self.progress.stop()
         self.progress.grid_remove()
-        self.demo_button.configure(state="normal")
         self.open_button.configure(state="normal")
         self.scan_button.configure(state="normal")
+        self.resolve_button.configure(state="normal")
 
     def load_failed(self, message):
         self.finish_loading()
@@ -274,6 +325,12 @@ class NexDataApp(ctk.CTk):
             self.render_actions()
             self.status_label.configure(text=f"Audit complete | {count} file(s) | {len(result.get('records') or [])} records | {len(result.get('findings') or [])} findings")
             self.show_errors(error_text(result.get("errors")))
+            if any(error.get("blocked_by") for error in result.get("errors") or []):
+                self.resolve_button.grid()
+            else:
+                self.resolve_button.grid_remove()
+            mode = "Real PC scan complete" if self.source_mode == "pc" else "User imports"
+            self.title("NexData - Personal Data Footprint Auditor | " + mode + (" (partial)" if result.get("errors") else ""))
         except Exception as exc:
             self.status_label.configure(text="Some audit views could not be displayed.")
             self.show_errors(error_text(result.get("errors")) + f"\nDisplay error: {exc}")
@@ -322,7 +379,15 @@ class NexDataApp(ctk.CTk):
         stats = ctk.CTkFrame(page, fg_color="transparent")
         stats.grid(row=0, column=0, sticky="ew", pady=8)
         summary = self.result.get("summary") or {}
-        values = [("Services holding your data", summary.get("servicesFound", 0)), ("Sensitive items in chats", summary.get("sensitiveHits", 0)), ("People ranked", len(summary.get("topPeople") or []))]
+        if self.source_mode == "pc":
+            values = [("App folders measured", summary.get("laptopDataApps", 0)),
+                      ("App data measured (GB)", f"{summary.get('laptopDataBytes', 0) / 1_000_000_000:.2f}"),
+                      ("Browser tracker domains", summary.get("trackersFound", 0) if "chrome" in self.result.get("coverage", {}) else "Unavailable")]
+        else:
+            messages = any(r.get("category") == "message" for r in self.result.get("records") or [])
+            values = [("Services found in imports", summary.get("servicesFound", 0)),
+                      ("Sensitive items in chats", summary.get("sensitiveHits", 0) if messages else "Not imported"),
+                      ("People ranked", len(summary.get("topPeople") or []) if summary.get("topPeople") else "Not available")]
         for col, (title, value) in enumerate(values):
             stats.grid_columnconfigure(col, weight=1, uniform="stats")
             card = ctk.CTkFrame(stats, fg_color="#222e3f")
@@ -348,7 +413,7 @@ class NexDataApp(ctk.CTk):
 
     def render_knowledge(self):
         page = self.scroll_page("What they know")
-        self.label(page, "What each platform knows", bold=True, size=20)
+        self.label(page, "What the scanned sources contain", bold=True, size=20)
         self.label(page, "Found = present in this export. Not found = checked but absent. Not assessed = unknown.", color=MUTED, size=12)
         grid = ctk.CTkFrame(page, fg_color="transparent")
         grid.pack(fill="x", padx=8, pady=12)
@@ -366,7 +431,7 @@ class NexDataApp(ctk.CTk):
         self.label(page, "Interests and inferences", bold=True, size=18)
         interests = [r for r in self.result.get("records") or [] if r.get("category") == "interest"]
         if not interests:
-            self.label(page, "No interest records found.", color=MUTED)
+            self.label(page, "No interest exports loaded. This PC scan does not determine your interests.", color=MUTED)
         for record in interests:
             card = self.card(page)
             origin = record.get("inferenceOrigin")
@@ -376,8 +441,8 @@ class NexDataApp(ctk.CTk):
 
     def render_circle(self, charts):
         page = self.scroll_page("Inner circle")
-        self.label(page, "Your inner circle", bold=True, size=20)
-        self.label(page, "Ranked by interaction score from the imported records", color=MUTED, size=12)
+        self.label(page, "People found in your imports", bold=True, size=20)
+        self.label(page, "People require your own social/chat exports; this PC scan does not guess who your friends are.", color=MUTED, size=12)
         people = sorted((self.result.get("summary") or {}).get("topPeople") or [], key=lambda p: float(p.get("score") or 0), reverse=True)[:10]
         fig, ax = self.new_figure(2.7)
         if people:
@@ -385,12 +450,12 @@ class NexDataApp(ctk.CTk):
             ax.set_xlabel("Interaction score", color=MUTED)
             ax.grid(axis="x", alpha=0.12)
         else:
-            ax.text(0.5, 0.5, "No people ranked yet", ha="center", color=MUTED)
+            ax.text(0.5, 0.5, "No people data imported", ha="center", color=MUTED)
             ax.set_axis_off()
         fig.tight_layout()
         self.mount_chart(page, fig)
-        self.label(page, "When your activity happens", bold=True, size=18)
-        self.label(page, "Record counts by weekday and hour, using each timestamp's supplied timezone", color=MUTED, size=12)
+        self.label(page, "Timestamps found in the scanned sources", bold=True, size=18)
+        self.label(page, "File modification and browser record timestamps; these do not measure how long you used an app.", color=MUTED, size=12)
         fig, ax = self.new_figure(2.3)
         heat = ax.imshow(charts[2], aspect="auto", cmap="YlGnBu", interpolation="nearest")
         ax.set_yticks(range(7), ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"])
