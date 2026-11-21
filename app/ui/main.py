@@ -845,8 +845,25 @@ class NexDataApp(ctk.CTk):
                 self.label(card, f"{step_index}. {step}", color=MUTED)
             link = str(action.get("link") or "").strip()
             if link:
-                button = ctk.CTkButton(card, text=link, anchor="w", fg_color="transparent", text_color=CYAN, hover_color="#30465c", command=lambda url=link: self.open_link(url))
-                button.pack(fill="x", padx=10, pady=(4, 12))
+                self.action_link(card, link)
+
+    def action_link(self, card, link):
+        if link.lower().startswith("chrome://settings"):
+            self.label(card, link + " (Edge: paste edge://settings with the same path)", color=MUTED, size=12)
+            button = ctk.CTkButton(card, text="Copy link", command=lambda: self.copy_link(link, button))
+        else:
+            button = ctk.CTkButton(card, text=link, anchor="w", fg_color="transparent", text_color=CYAN,
+                                   hover_color="#30465c", command=lambda: self.open_link(link))
+        button.pack(fill="x", padx=10, pady=(4, 12))
+        return button
+
+    def copy_link(self, url, button):
+        try:
+            self.clipboard_clear()
+            self.clipboard_append(url)
+            button.configure(text="Copied link - paste in Chrome (Edge: use edge://settings)")
+        except TclError as exc:
+            self.show_errors(f"Could not copy link: {exc}")
 
     def open_link(self, url):
         try:
