@@ -22,13 +22,14 @@ PLATFORMS = {
             "Click 'Create files'. When Meta emails you, download the zip - NexData imports it automatically.",
         ],
     },
-    "Google (Gmail, Chrome, YouTube)": {
+    "Google (Mail, Access Log Activity)": {
         "url": "https://takeout.google.com/",
         "patterns": ["takeout-*.zip"],
         "steps": [
-            "Click 'Deselect all', then tick only: Mail, Chrome, YouTube and YouTube Music, My Activity.",
+            "Click 'Deselect all', then tick only: Mail and Access Log Activity.",
             "Next step: Export once, .zip, 2 GB. Click 'Create export'.",
             "Download the zip from Google's email - NexData imports it automatically.",
+            "Not analysed: Chrome Takeout, YouTube and YouTube Music, My Activity, and other Takeout products. Only supported Mail and Access Log Activity contents are analysed.",
         ],
     },
     "Spotify": {

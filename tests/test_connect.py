@@ -6,7 +6,7 @@ from app.connect import DownloadWatcher, matches, PLATFORMS
 
 def test_matches_export_names():
     assert matches("instagram-riya-2026-11-22-abc.zip") == "Instagram"
-    assert matches("Takeout-20261122T010101Z-001.zip") == "Google (Gmail, Chrome, YouTube)"
+    assert matches("Takeout-20261122T010101Z-001.zip") == "Google (Mail, Access Log Activity)"
     assert matches("my_spotify_data.zip") == "Spotify"
     assert matches("WhatsApp Chat with Arjun.txt") == "WhatsApp"
     assert matches("instagram-riya.zip.crdownload") is None  # still downloading
@@ -44,3 +44,11 @@ def test_ignores_old_files_partials_and_empty(tmp_path):
 
 def test_missing_folder_is_harmless(tmp_path):
     assert DownloadWatcher(tmp_path / "nope").poll() == []
+
+
+def test_google_requests_only_supported_products_and_labels_exclusions():
+    google = PLATFORMS["Google (Mail, Access Log Activity)"]
+    assert google["steps"][0] == "Click 'Deselect all', then tick only: Mail and Access Log Activity."
+    excluded = next(s for s in google["steps"] if s.startswith("Not analysed:"))
+    assert all(product in excluded for product in ("Chrome Takeout", "YouTube", "My Activity", "other Takeout products"))
+    assert "Facebook" not in PLATFORMS
