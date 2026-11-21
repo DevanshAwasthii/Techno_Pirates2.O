@@ -29,7 +29,7 @@ REPLAY = {"_hj": "Hotjar", "_clck": "Microsoft Clarity", "_clsk": "Microsoft Cla
 TRACKERS = ("doubleclick.net", "google-analytics.com", "googletagmanager.com", "googlesyndication.com", "facebook.com",
             "facebook.net", "criteo.com", "criteo.net", "taboola.com", "outbrain.com", "scorecardresearch.com",
             "adnxs.com", "rubiconproject.com", "pubmatic.com", "amazon-adsystem.com", "bing.com", "clarity.ms",
-            "hotjar.com", "quantserve.com", "moatads.com", "adsrvr.org", "linkedin.com", "twitter.com", "tiktok.com",
+            "hotjar.com", "quantserve.com", "moatads.com", "adsrvr.org", "linkedin.com", "twitter.com", "x.com", "tiktok.com",
             "branch.io", "appsflyer.com", "mixpanel.com", "segment.io", "inmobi.com", "openx.net")
 PERMS = {"geolocation": "location", "media_stream_camera": "camera", "media_stream_mic": "microphone",
          "notifications": "notifications"}
@@ -112,6 +112,7 @@ def parse(profile: Path, src: str | None = None, warnings=None, source_coverage=
         nonlocal n
         n += 1
         source = str(profile / file) if live else file
+        meta["profile_id"] = namespace if live else f"{src}/{profile.name}"
         if live:
             meta["live_profile"] = True
         recs.append(Record(f"{namespace}-{category[:4]}-{n:05d}", PLATFORM, category, item, ts, "recorded", None, source, ref, meta))

@@ -152,3 +152,27 @@ def test_snapshot_copies_journal_and_cleans_up_on_copy_failure(tmp_path, monkeyp
         chrome._query(db, "SELECT domain FROM metadata")
     assert all(not p.parent.exists() for p in copied)
     assert journal.exists()
+
+
+def test_first_party_browser_relationship_stays_with_its_profile(tmp_path):
+    profiles = []
+    for name, with_login in (("one", True), ("two", False)):
+        profile = tmp_path / name
+        profile.mkdir()
+        profiles.append(profile)
+        with sqlite3.connect(profile / "History") as db:
+            db.execute("CREATE TABLE urls (url, visit_count, last_visit_time)")
+            db.execute("CREATE TABLE downloads (target_path, tab_url, start_time)")
+        with sqlite3.connect(profile / "Cookies") as db:
+            db.execute("CREATE TABLE cookies (host_key, name)")
+            db.execute("INSERT INTO cookies VALUES ('.facebook.com', 'cookie_name')")
+        if with_login:
+            with sqlite3.connect(profile / "Login Data") as db:
+                db.execute("CREATE TABLE logins (origin_url)")
+                db.execute("INSERT INTO logins VALUES ('https://www.facebook.com/login')")
+    assert pipeline.run(profiles[:1])["summary"]["trackersFound"] == 0
+    both = pipeline.run(profiles)
+    assert both["errors"] == []
+    assert both["summary"]["trackersFound"] == 1
+    # Both cookie records remain available as evidence.
+    assert len([r for r in both["records"] if r["meta"].get("source") == "tracker"]) == 2

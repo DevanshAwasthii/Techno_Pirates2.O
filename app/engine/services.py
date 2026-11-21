@@ -22,3 +22,20 @@ def canonical_service_key(value: str) -> str:
         value = ALIASES.get('.'.join(parts[-2:]), parts[index])
     key = re.sub(r'[^\w]', '', value)
     return ALIASES.get(key, key)
+
+
+def first_party_tracker_ids(records):
+    """Account mail applies across imports; saved logins apply to their own profile."""
+    accounts, saved = set(), set()
+    for record in records:
+        if record.category != "account" or not record.meta.get("domain"):
+            continue
+        key = canonical_service_key(record.meta["domain"])
+        source = record.meta.get("source")
+        if source in {"email", "google_signin"}:
+            accounts.add(key)
+        elif source == "saved_login":
+            saved.add((record.meta.get("profile_id", record.sourceFile), key))
+    return {record.id for record in records if record.meta.get("source") == "tracker"
+            and (canonical_service_key(record.meta["domain"]) in accounts
+                 or (record.meta.get("profile_id", record.sourceFile), canonical_service_key(record.meta["domain"])) in saved)}

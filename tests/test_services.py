@@ -37,3 +37,30 @@ def test_aliases_country_suffixes_and_distinct_companies():
     findings, summary = build_findings(records)
     assert summary['servicesFound'] == 3
     assert next(f for f in findings if 'services have your email' in f.title).metric['value'] == 3
+
+
+import pytest
+
+
+@pytest.mark.parametrize("domain,login", [("facebook.com", "facebook.com"), ("facebook.net", "facebook.com"),
+                                         ("linkedin.com", "linkedin.com"), ("x.com", "twitter.com"),
+                                         ("twitter.com", "x.com"), ("bing.com", "bing.com"), ("tiktok.com", "tiktok.com")])
+def test_first_party_tracker_excluded_only_with_account_relationship(domain, login):
+    tracker = account('t', domain, 'tracker', 'chrome')
+    tracker.meta['profile_id'] = 'one'
+    assert build_findings([tracker])[1]['trackersFound'] == 1
+    saved = account('login', login, 'saved_login', 'chrome')
+    saved.meta['profile_id'] = 'one'
+    findings, summary = build_findings([tracker, saved])
+    assert summary['trackersFound'] == 0
+    assert all(f.metric['unit'] != 'trackers' for f in findings)
+    graph = build_graph([tracker, saved], summary)
+    assert next(n for n in graph['nodes'] if n['id'].startswith('svc:'))['type'] == 'service'
+    saved.meta['profile_id'] = 'two'
+    assert build_findings([tracker, saved])[1]['trackersFound'] == 1
+    email = account('email', login)
+    assert build_findings([tracker, email])[1]['trackersFound'] == 0
+    # An advertiser listing alone is not proof of a user account.
+    advertiser = account('adv', login, 'advertiser', 'instagram')
+    assert build_findings([tracker, advertiser])[1]['trackersFound'] == 1
+    assert tracker.meta['source'] == 'tracker'

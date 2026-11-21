@@ -8,7 +8,7 @@ from collections import Counter, defaultdict
 from datetime import datetime, timedelta, timezone
 
 from app.engine.records import Finding
-from app.engine.services import canonical_service_key
+from app.engine.services import canonical_service_key, first_party_tracker_ids
 from app.engine.messages import scan_text, closeness
 from app.parsers.chrome import TRACKERS
 
@@ -175,7 +175,8 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
                               "Delete existing data: Settings > Privacy > Delete browsing data > Cookies"],
                     "link": "chrome://settings/privacy"})
 
-    trackers = by[("chrome", "account", "tracker")]
+    first_party = first_party_tracker_ids(records)
+    trackers = [r for r in by[("chrome", "account", "tracker")] if r.id not in first_party]
     tracker_count = len({r.meta["domain"] for r in trackers})
     if trackers:
         live = any(r.meta.get("live_profile") for r in trackers)
@@ -319,13 +320,14 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
 
 
 def build_graph(records, summary) -> dict:
+    first_party = first_party_tracker_ids(records)
     nodes = {"user": {"id": "user", "label": "You", "type": "user", "size": 40}}
     edges = []
     for r in records:
         if r.category == "account" and r.meta.get("domain"):
             key = canonical_service_key(r.meta["domain"])
             nid = "svc:" + key
-            src = r.meta.get("source")
+            src = "first_party_cookie" if r.id in first_party else r.meta.get("source")
             typ = "advertiser" if src == "advertiser" else "tracker" if src in ("tracker", "session_replay") else "service"
             nodes.setdefault(nid, {"id": nid, "label": key, "type": typ, "size": 10})
             edges.append({"source": "user", "target": nid, "weight": 1, "label": r.meta.get("source", ""), "evidence": [r.id]})
