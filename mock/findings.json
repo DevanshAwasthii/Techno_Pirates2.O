@@ -12251,6 +12251,280 @@
     ],
     "direction": "in"
    }
+  },
+  {
+   "id": "oc-in-00001",
+   "platform": "instagram",
+   "category": "activity",
+   "item": "Feed showed: liked by arjun.das and 214 others",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_instagram_feed.mp4",
+   "recordRef": "frame at 0s",
+   "meta": {
+    "person": "arjun.das",
+    "action": "friend_like",
+    "others": 214,
+    "capture": "ocr"
+   }
+  },
+  {
+   "id": "oc-in-00002",
+   "platform": "instagram",
+   "category": "activity",
+   "item": "Feed showed: meera_k liked a post",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_instagram_feed.mp4",
+   "recordRef": "frame at 2s",
+   "meta": {
+    "person": "meera_k",
+    "action": "friend_like",
+    "capture": "ocr"
+   }
+  },
+  {
+   "id": "oc-in-00003",
+   "platform": "instagram",
+   "category": "activity",
+   "item": "Feed showed: rahul.k reacted to a post",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_instagram_feed.mp4",
+   "recordRef": "frame at 4s",
+   "meta": {
+    "person": "rahul.k",
+    "action": "friend_like",
+    "capture": "ocr"
+   }
+  },
+  {
+   "id": "oc-in-00004",
+   "platform": "instagram",
+   "category": "activity",
+   "item": "Feed showed: liked by arjun.das and 87 others",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_instagram_feed.mp4",
+   "recordRef": "frame at 6s",
+   "meta": {
+    "person": "arjun.das",
+    "action": "friend_like",
+    "others": 87,
+    "capture": "ocr"
+   }
+  },
+  {
+   "id": "oc-wh-00001",
+   "platform": "whatsapp",
+   "category": "activity",
+   "item": "Arjun Das posted a status (Today. 9:12 pm)",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_whatsapp_status.mp4",
+   "recordRef": "frame at 0s",
+   "meta": {
+    "person": "Arjun Das",
+    "action": "status_post",
+    "capture": "ocr"
+   }
+  },
+  {
+   "id": "oc-wh-00002",
+   "platform": "whatsapp",
+   "category": "activity",
+   "item": "Meera K posted a status (Today. 9:13 pm)",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_whatsapp_status.mp4",
+   "recordRef": "frame at 0s",
+   "meta": {
+    "person": "Meera K",
+    "action": "status_post",
+    "capture": "ocr"
+   }
+  },
+  {
+   "id": "oc-wh-00003",
+   "platform": "whatsapp",
+   "category": "activity",
+   "item": "Kabir Roy posted a status (Today. 9:14 pm)",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_whatsapp_status.mp4",
+   "recordRef": "frame at 0s",
+   "meta": {
+    "person": "Kabir Roy",
+    "action": "status_post",
+    "capture": "ocr"
+   }
+  },
+  {
+   "id": "oc-wh-00004",
+   "platform": "whatsapp",
+   "category": "activity",
+   "item": "Tanvi M posted a status (Today, 9:15 pm)",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_whatsapp_status.mp4",
+   "recordRef": "frame at 0s",
+   "meta": {
+    "person": "Tanvi M",
+    "action": "status_post",
+    "capture": "ocr"
+   }
+  },
+  {
+   "id": "oc-wh-00005",
+   "platform": "whatsapp",
+   "category": "activity",
+   "item": "Ishaan G posted a status (Today, 9:16 pm)",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_whatsapp_status.mp4",
+   "recordRef": "frame at 0s",
+   "meta": {
+    "person": "Ishaan G",
+    "action": "status_post",
+    "capture": "ocr"
+   }
+  },
+  {
+   "id": "oc-wh-00006",
+   "platform": "whatsapp",
+   "category": "activity",
+   "item": "Pooja S posted a status (Today, 9:17 pm)",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_whatsapp_status.mp4",
+   "recordRef": "frame at 0s",
+   "meta": {
+    "person": "Pooja S",
+    "action": "status_post",
+    "capture": "ocr"
+   }
+  },
+  {
+   "id": "oc-wh-00007",
+   "platform": "whatsapp",
+   "category": "activity",
+   "item": "Arjun Das viewed your status (Today. 9:12 pm)",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_whatsapp_status.mp4",
+   "recordRef": "frame at 5s",
+   "meta": {
+    "person": "Arjun Das",
+    "action": "status_view",
+    "capture": "ocr"
+   }
+  },
+  {
+   "id": "oc-wh-00008",
+   "platform": "whatsapp",
+   "category": "activity",
+   "item": "Meera K viewed your status (Today. 9:13 pm)",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_whatsapp_status.mp4",
+   "recordRef": "frame at 5s",
+   "meta": {
+    "person": "Meera K",
+    "action": "status_view",
+    "capture": "ocr"
+   }
+  },
+  {
+   "id": "oc-wh-00009",
+   "platform": "whatsapp",
+   "category": "activity",
+   "item": "Kabir Roy viewed your status (Today, 9:14 pm)",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_whatsapp_status.mp4",
+   "recordRef": "frame at 5s",
+   "meta": {
+    "person": "Kabir Roy",
+    "action": "status_view",
+    "capture": "ocr"
+   }
+  },
+  {
+   "id": "oc-wh-00010",
+   "platform": "whatsapp",
+   "category": "activity",
+   "item": "Tanvi M viewed your status (Today. 9:15 pm)",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_whatsapp_status.mp4",
+   "recordRef": "frame at 5s",
+   "meta": {
+    "person": "Tanvi M",
+    "action": "status_view",
+    "capture": "ocr"
+   }
+  },
+  {
+   "id": "oc-wh-00011",
+   "platform": "whatsapp",
+   "category": "activity",
+   "item": "Ishaan G viewed your status (Today, 9:16 pm)",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_whatsapp_status.mp4",
+   "recordRef": "frame at 5s",
+   "meta": {
+    "person": "Ishaan G",
+    "action": "status_view",
+    "capture": "ocr"
+   }
+  },
+  {
+   "id": "oc-wh-00012",
+   "platform": "whatsapp",
+   "category": "activity",
+   "item": "Pooja S viewed your status (Today, 9:17 pm)",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_whatsapp_status.mp4",
+   "recordRef": "frame at 5s",
+   "meta": {
+    "person": "Pooja S",
+    "action": "status_view",
+    "capture": "ocr"
+   }
+  },
+  {
+   "id": "oc-wh-00013",
+   "platform": "whatsapp",
+   "category": "activity",
+   "item": "Your status was viewed by 6 people",
+   "timestamp": null,
+   "kind": "recorded",
+   "inferenceOrigin": null,
+   "sourceFile": "persona_whatsapp_status.mp4",
+   "recordRef": "frame at 5s",
+   "meta": {
+    "action": "status_views_total",
+    "views": 6,
+    "capture": "ocr"
+   }
   }
  ],
  "findings": [
@@ -12863,7 +13137,38 @@
    }
   },
   {
-   "id": "F-019",
+   "id": "F-020",
+   "layer": 3,
+   "title": "6 people watch your WhatsApp status",
+   "detail": "Status viewers form your inner circle; each one sees where you are and what you do.",
+   "priority": "medium",
+   "category": "contact",
+   "platforms": [
+    "whatsapp"
+   ],
+   "metric": {
+    "value": 6,
+    "unit": "people"
+   },
+   "evidence": [
+    "oc-wh-00007",
+    "oc-wh-00008",
+    "oc-wh-00009",
+    "oc-wh-00010",
+    "oc-wh-00011",
+    "oc-wh-00012"
+   ],
+   "action": {
+    "steps": [
+     "WhatsApp > Settings > Privacy > Status",
+     "Choose 'My contacts except...' or 'Only share with...'",
+     "Never post live location or travel plans in status"
+    ],
+    "link": ""
+   }
+  },
+  {
+   "id": "F-021",
    "layer": 3,
    "title": "Your top 5 people are visible from your activity alone",
    "detail": "Likes, comments and messages rank who you are closest to: meera_k, arjun.das, rahul.k, tanvi.m, ishaan_g.",
@@ -13034,6 +13339,34 @@
     ],
     "link": "https://accountscenter.instagram.com/"
    }
+  },
+  {
+   "id": "F-019",
+   "layer": 3,
+   "title": "Instagram showed you what 3 friends liked",
+   "detail": "Your feed exposes friends' likes to you - and yours to them. Every like is visible to your followers.",
+   "priority": "medium",
+   "category": "activity",
+   "platforms": [
+    "instagram"
+   ],
+   "metric": {
+    "value": 3,
+    "unit": "friends"
+   },
+   "evidence": [
+    "oc-in-00001",
+    "oc-in-00002",
+    "oc-in-00003",
+    "oc-in-00004"
+   ],
+   "action": {
+    "steps": [
+     "Instagram > Settings > Activity in Friends tab > turn off",
+     "Settings > Likes and shares > Hide like counts"
+    ],
+    "link": "https://accountscenter.instagram.com/"
+   }
   }
  ],
  "coverage": {
@@ -13075,58 +13408,73 @@
   "topPeople": [
    {
     "name": "meera_k",
-    "score": 118,
+    "score": 122,
     "signals": {
      "like": 58,
-     "message": 20
+     "message": 20,
+     "friend_like": 1,
+     "status_post": 1,
+     "status_view": 1
     }
    },
    {
     "name": "arjun.das",
-    "score": 113,
+    "score": 118,
     "signals": {
      "like": 35,
-     "message": 26
+     "message": 26,
+     "friend_like": 2,
+     "status_post": 1,
+     "status_view": 1
     }
    },
    {
     "name": "rahul.k",
-    "score": 73,
+    "score": 74,
     "signals": {
      "like": 34,
-     "message": 13
+     "message": 13,
+     "friend_like": 1
     }
    },
    {
     "name": "tanvi.m",
-    "score": 50,
+    "score": 53,
     "signals": {
      "like": 23,
-     "message": 9
+     "message": 9,
+     "status_post": 1,
+     "status_view": 1
     }
    },
    {
     "name": "ishaan_g",
-    "score": 43,
+    "score": 46,
     "signals": {
      "like": 13,
-     "message": 10
+     "message": 10,
+     "status_post": 1,
+     "status_view": 1
     }
    },
    {
     "name": "kabir.roy",
-    "score": 42,
+    "score": 45,
     "signals": {
      "like": 15,
-     "message": 9
+     "message": 9,
+     "status_post": 1,
+     "status_view": 1
     }
    },
    {
     "name": "pooja.s",
-    "score": 29,
+    "score": 32,
     "signals": {
      "like": 5,
-     "message": 8
+     "message": 8,
+     "status_post": 1,
+     "status_view": 1
     }
    },
    {
@@ -13640,7 +13988,7 @@
     "id": "person:pooja.s",
     "label": "pooja.s",
     "type": "person",
-    "size": 39
+    "size": 40
    },
    {
     "id": "person:sneha.b",
@@ -14592,49 +14940,49 @@
    {
     "source": "user",
     "target": "person:meera_k",
-    "weight": 118,
+    "weight": 122,
     "label": "closeness",
     "evidence": []
    },
    {
     "source": "user",
     "target": "person:arjun.das",
-    "weight": 113,
+    "weight": 118,
     "label": "closeness",
     "evidence": []
    },
    {
     "source": "user",
     "target": "person:rahul.k",
-    "weight": 73,
+    "weight": 74,
     "label": "closeness",
     "evidence": []
    },
    {
     "source": "user",
     "target": "person:tanvi.m",
-    "weight": 50,
+    "weight": 53,
     "label": "closeness",
     "evidence": []
    },
    {
     "source": "user",
     "target": "person:ishaan_g",
-    "weight": 43,
+    "weight": 46,
     "label": "closeness",
     "evidence": []
    },
    {
     "source": "user",
     "target": "person:kabir.roy",
-    "weight": 42,
+    "weight": 45,
     "label": "closeness",
     "evidence": []
    },
    {
     "source": "user",
     "target": "person:pooja.s",
-    "weight": 29,
+    "weight": 32,
     "label": "closeness",
     "evidence": []
    },

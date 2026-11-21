@@ -31,7 +31,7 @@ def scan_text(text: str) -> list[str]:
 
 
 # ponytail: hand-picked weights, tune with real data; a DM signals more closeness than a like
-WEIGHTS = {"message": 3, "comment": 2, "like": 1, "tag": 3, "status_view": 2}
+WEIGHTS = {"message": 3, "comment": 2, "like": 1, "tag": 3, "status_view": 2, "friend_like": 1, "status_post": 1}
 
 
 def person_key(name: str) -> str:

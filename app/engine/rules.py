@@ -166,6 +166,26 @@ def build_findings(records) -> tuple[list[Finding], dict]:
                               "Open Location, Camera and Microphone; remove every site you don't trust",
                               "Set the default to 'Don't allow sites to ...'"], "link": "chrome://settings/content"})
 
+    feed = [r for r in records if r.meta.get("capture") == "ocr" and r.meta.get("action") == "friend_like"]
+    if feed:
+        friends = {r.meta["person"] for r in feed}
+        add(layer=3, title=f"Instagram showed you what {len(friends)} friends liked",
+            detail="Your feed exposes friends' likes to you - and yours to them. Every like is visible to your followers.",
+            priority="medium", category="activity", platforms=["instagram"],
+            metric={"value": len(friends), "unit": "friends"}, evidence=[r.id for r in feed],
+            action={"steps": ["Instagram > Settings > Activity in Friends tab > turn off",
+                              "Settings > Likes and shares > Hide like counts"], "link": IG_CENTER})
+
+    viewers = [r for r in records if r.meta.get("action") == "status_view"]
+    if viewers:
+        who = {r.meta["person"] for r in viewers}
+        add(layer=3, title=f"{len(who)} people watch your WhatsApp status",
+            detail="Status viewers form your inner circle; each one sees where you are and what you do.",
+            priority="medium", category="contact", platforms=["whatsapp"],
+            metric={"value": len(who), "unit": "people"}, evidence=[r.id for r in viewers],
+            action={"steps": ["WhatsApp > Settings > Privacy > Status", "Choose 'My contacts except...' or 'Only share with...'",
+                              "Never post live location or travel plans in status"], "link": ""})
+
     people = closeness(records)
     if people:
         top = people[:5]

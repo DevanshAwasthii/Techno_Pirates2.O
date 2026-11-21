@@ -15,7 +15,7 @@ from app.engine.rules import build_findings, build_graph
 import shutil
 import tempfile
 
-from app.parsers import instagram, spotify, whatsapp, mbox, chrome
+from app.parsers import instagram, spotify, whatsapp, mbox, chrome, ocr
 
 TMP = Path(__file__).resolve().parents[1] / ".cache" / "tmp"  # stays on the project drive
 
@@ -83,12 +83,22 @@ def _wa_cov():
 
 def run(paths, progress=lambda *a: None, cancel=None) -> dict:
     records, coverage, errors = [], {}, []
-    paths = [Path(p) for p in paths]
+    media = ocr.VIDEO | ocr.IMAGE
+    # recordings last: OCR snaps names to people already found in the exports
+    paths = sorted((Path(p) for p in paths), key=lambda p: p.suffix.lower() in media)
     for i, p in enumerate(paths):
         if cancel is not None and cancel.is_set():
             raise Cancelled()
         progress("parse", p.name, int(80 * i / max(len(paths), 1)))
         try:
+            if p.suffix.lower() in media:
+                known = sorted({n for r in records for n in [r.meta.get("person")] if n})
+                recs, cov = ocr.parse(p, known)
+                platform = recs[0].platform
+                records += recs
+                prev = coverage.get(platform, {})
+                coverage[platform] = {k: ("found" if "found" in (v, prev.get(k)) else prev.get(k, v)) for k, v in cov.items()}
+                continue
             platform, recs, cov = _detect_and_parse(p, sum(r.platform == "whatsapp" for r in records))
             records += recs
             prev = coverage.get(platform, {})
@@ -97,7 +107,8 @@ def run(paths, progress=lambda *a: None, cancel=None) -> dict:
             errors.append(e.to_dict())
         except Exception as e:  # never crash the whole run on one file
             errors.append({"code": "unknown", "message": str(e), "file": p.name})
-    whatsapp.assign_owner([r for r in records if r.platform == "whatsapp"])
+    # only chat-export messages carry chat/senders; OCR status records do not
+    whatsapp.assign_owner([r for r in records if r.platform == "whatsapp" and "chat" in r.meta])
     progress("rules", "", 90)
     findings, summary = build_findings(records)
     graph = build_graph(records, summary)

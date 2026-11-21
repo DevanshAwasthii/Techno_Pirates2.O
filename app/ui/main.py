@@ -164,7 +164,7 @@ class NexDataApp(ctk.CTk):
     def load_demo(self):
         try:
             paths = sorted(str(p.resolve()) for p in (ROOT / "samples").iterdir()
-                           if p.is_file() and p.name.startswith("persona_") and p.suffix.lower() in {".zip", ".txt", ".mbox"})
+                           if p.is_file() and p.name.startswith("persona_") and p.suffix.lower() in {".zip", ".txt", ".mbox", ".mp4"})
         except OSError as exc:
             self.show_errors(str(exc))
             return
