@@ -37,7 +37,15 @@ def iso(ts) -> str | None:
 
 def is_instagram_zip(zf: zipfile.ZipFile) -> bool:
     names = zf.namelist()
-    return any(re.search(r"(followers_\d+|liked_posts|login_activity|your_topics|message_\d+)\.(json|html)$", n) for n in names)
+    return any(re.search(r"(followers_\d+|following|liked_posts|post_comments(_\d+)?|login_activity|your_topics|message_\d+"
+                         r"|personal_information|advertisers_using_your_activity_or_information"
+                         r"|your_activity_off_meta_technologies|other_categories_used_to_reach_you)\.(json|html)$", n)
+               for n in names)
+
+
+INSTAGRAM_JSON = re.compile(r"(followers_\d+|following|liked_posts|post_comments(_\d+)?|login_activity|your_topics|message_\d+"
+                            r"|personal_information|advertisers_using_your_activity_or_information"
+                            r"|your_activity_off_meta_technologies)\.json$")
 
 
 def _load(zf, name):
@@ -100,7 +108,8 @@ def parse(zf: zipfile.ZipFile, src: str = "instagram.zip", owner_name: str | Non
                 add("contact", f"Follower: @{who}", iso(s.get("timestamp")), f, f"index {i}", person=who, relation="follower")
     for f in _find(json_files, r"following\.json$"):
         d = _load(zf, f)
-        for i, e in enumerate(d.get("relationships_following", d if isinstance(d, list) else [])):
+        items = d if isinstance(d, list) else d.get("relationships_following", []) if isinstance(d, dict) else []
+        for i, e in enumerate(items):
             s = _sld(e)
             who = fix_text(e.get("title") or s.get("value"))
             if who:

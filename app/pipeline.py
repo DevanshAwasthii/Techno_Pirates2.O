@@ -7,8 +7,10 @@ One bad file never stops the others: its error goes into "errors".
 """
 from __future__ import annotations
 
-import zipfile
+import hashlib
 import json
+import os
+import zipfile
 from pathlib import Path
 
 from app.engine.records import ParseError, to_dict
@@ -78,9 +80,12 @@ def _detect_and_parse(path: Path, wa_offset: int = 0, warnings=None, source_cove
             if hist:  # zipped browser profile: extract to project-drive temp, parse, delete
                 TMP.mkdir(parents=True, exist_ok=True)
                 with tempfile.TemporaryDirectory(dir=TMP) as d:
-                    zf.extractall(d)
-                    prof = Path(d) / hist[0].rsplit("/", 1)[0] if "/" in hist[0] else Path(d)
-                    recs, cov = chrome.parse(prof, path.name)
+                    folder = hist[0].rsplit("/", 1)[0] + "/" if "/" in hist[0] else ""
+                    # extract only the profile folder's top-level files, not unrelated members
+                    zf.extractall(d, [n for n in zf.namelist() if n.startswith(folder) and "/" not in n[len(folder):].rstrip("/")
+                                      or n.startswith(folder + "Network/")])
+                    prof = Path(d) / folder if folder else Path(d)
+                    recs, cov = chrome.parse(prof, path.name, warnings=warnings, source_coverage=source_coverage)
                 return "chrome", recs, cov
             boxes = [n for n in zf.namelist() if n.lower().endswith(".mbox")]
             access = google_access.has_access_logs(zf)
@@ -88,16 +93,17 @@ def _detect_and_parse(path: Path, wa_offset: int = 0, warnings=None, source_cove
                 recs, cov = [], {}
                 if access:
                     recs, cov = google_access.parse(zf, path.name)
-                if boxes:  # mailbox needs a real file, extract to project-drive temp
+                for k, box in enumerate(boxes):  # every mailbox member, not just the first
                     TMP.mkdir(parents=True, exist_ok=True)
-                    with tempfile.NamedTemporaryFile(dir=TMP, suffix=".mbox", delete=False) as out:
-                        shutil.copyfileobj(zf.open(boxes[0]), out)
-                    try:
-                        mrecs, mcov = mbox.parse(out.name, boxes[0], source_coverage=source_coverage)
-                    finally:
-                        Path(out.name).unlink(missing_ok=True)
+                    with tempfile.TemporaryDirectory(dir=TMP) as d:  # one scope: copy, parse and cleanup (CRC errors too)
+                        out = Path(d) / f"m{k}.mbox"
+                        with zf.open(box) as src, out.open("wb") as dst:
+                            shutil.copyfileobj(src, dst)
+                        mrecs, mcov = mbox.parse(str(out), box, source_coverage=source_coverage)
+                    for r in mrecs:
+                        r.id = f"b{k}-{r.id}"
                     recs += mrecs
-                    cov = {k: "found" if "found" in (v, cov.get(k)) else cov.get(k, v) for k, v in mcov.items()} if cov else mcov
+                    cov = {k2: "found" if "found" in (v, cov.get(k2)) else cov.get(k2, v) for k2, v in mcov.items()} if cov else mcov
                 return ("google" if access else "gmail"), recs, cov
     elif suffix == ".txt":
         recs, _ = whatsapp.parse_text(_wa_text(path.read_bytes()), path.name, wa_offset)
@@ -106,6 +112,23 @@ def _detect_and_parse(path: Path, wa_offset: int = 0, warnings=None, source_cove
         recs, cov = mbox.parse(str(path), path.name, source_coverage=source_coverage)
         return "gmail", recs, cov
     raise ParseError("wrong_format", "We don't recognise this file.", path.name)
+
+
+def _fingerprint(p: Path):
+    """Cheap content identity: size + hash of first and last MB. None for folders or unreadable files."""
+    try:
+        if not p.is_file():
+            return None
+        size = p.stat().st_size
+        h = hashlib.sha1(str(size).encode())
+        with p.open("rb") as f:
+            h.update(f.read(1 << 20))
+            if size > 2 << 20:
+                f.seek(-(1 << 20), os.SEEK_END)
+                h.update(f.read(1 << 20))
+        return h.hexdigest()
+    except OSError:
+        return None
 
 
 def _wa_cov():
@@ -118,11 +141,19 @@ def run(paths, progress=lambda *a: None, cancel=None) -> dict:
     media = ocr.VIDEO | ocr.IMAGE
     # recordings last: OCR snaps names to people already found in the exports
     paths = sorted((Path(p) for p in paths), key=lambda p: p.suffix.lower() in media)
+    seen_content = {}
     for i, p in enumerate(paths):
         if cancel is not None and cancel.is_set():
             raise Cancelled()
         progress("parse", p.name, int(80 * i / max(len(paths), 1)))
         records_before, errors_before, coverage_before = len(records), len(errors), len(source_coverage)
+        fp = _fingerprint(p)
+        if fp and fp in seen_content:  # same export downloaded twice: counting it again would inflate every finding
+            errors.append({"code": "duplicate", "file": p.name,
+                           "message": f"Same content as {seen_content[fp]}; skipped so nothing is counted twice."})
+            continue
+        if fp:
+            seen_content[fp] = p.name
         try:
             if p.suffix.lower() in media:
                 known = sorted({n for r in records for n in [r.meta.get("person")] if n})
@@ -143,6 +174,10 @@ def run(paths, progress=lambda *a: None, cancel=None) -> dict:
         except Exception as e:  # never crash the whole run on one file
             errors.append({"code": "unknown", "message": str(e), "file": p.name})
         finally:
+            # parsers number records per file; prefix a per-source tag so ids stay unique across files
+            tag = hashlib.sha1(str(p.resolve()).lower().encode("utf-8")).hexdigest()[:6]
+            for r in records[records_before:]:
+                r.id = f"{tag}-{r.id}"
             if len(source_coverage) == coverage_before:
                 added = records[records_before:]
                 issues = errors[errors_before:]

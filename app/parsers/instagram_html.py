@@ -100,8 +100,10 @@ def boxes(html: str) -> list[dict]:
 
 
 def is_html_export(zf: zipfile.ZipFile) -> bool:
+    """HTML when no recognised Instagram JSON data file exists; unrelated .json files don't count."""
+    from app.parsers.instagram import INSTAGRAM_JSON
     names = zf.namelist()
-    return not any(n.endswith(".json") for n in names) and any(n.endswith(".html") for n in names)
+    return not any(INSTAGRAM_JSON.search(n) for n in names) and any(n.endswith(".html") for n in names)
 
 
 def parse(zf: zipfile.ZipFile, src: str = "instagram.zip"):

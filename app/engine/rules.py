@@ -70,7 +70,7 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
     sens_platforms = defaultdict(set)
     for r in records:
         if r.category == "message":
-            for label in scan_text(r.meta.get("text", "")):
+            for label in set(scan_text(r.meta.get("text", ""))):  # count messages, not pattern occurrences
                 sensitive[label].append(r.id)
                 sens_platforms[label].add(r.platform)
     for label, ids in sorted(sensitive.items(), key=lambda kv: -len(kv[1])):

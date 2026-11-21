@@ -54,7 +54,10 @@ def _body(msg) -> str:
     if part is None:
         return ""
     raw = part.get_payload(decode=True) or b""
-    return raw[:BODY_BYTES].decode(part.get_content_charset() or "utf-8", errors="replace")
+    try:
+        return raw[:BODY_BYTES].decode(part.get_content_charset() or "utf-8", errors="replace")
+    except LookupError:  # unknown charset name in the header
+        return raw[:BODY_BYTES].decode("utf-8", errors="replace")
 
 
 def classify(subject: str) -> str | None:
@@ -70,20 +73,47 @@ def parse(path: str, src: str = "mail.mbox", source_coverage=None):
         box = mailbox.mbox(path, create=False)
     except Exception as e:
         raise ParseError("wrong_format", f"Cannot open mailbox: {e}", src)
-    recs, n, skipped = [], 0, 0
-    for i, msg in enumerate(box):
+    recs, n, skipped, unreadable = [], 0, 0, 0
+    try:
+        for i, key in enumerate(box.iterkeys()):
+            try:  # one malformed message (bad charset, broken MIME) must not drop the whole mailbox
+                rec = _record(box[key], i, src)
+            except Exception:
+                unreadable += 1
+                continue
+            if rec == "skipped":
+                skipped += 1
+            elif rec is not None:
+                n += 1
+                rec.id = f"gm-acco-{n:05d}"
+                recs.append(rec)
+    finally:
+        box.close()
+    if not recs and not skipped:
+        raise ParseError("wrong_format", "No account emails found in this mailbox", src)
+    if source_coverage is not None:
+        source_coverage.append({"name": src, "source": src, "platform": "gmail", "kind": "gmail_mail",
+                                "status": "partial" if unreadable else "scanned", "records": len(recs), "skipped_spam_trash": skipped,
+                                "detail": f"{len(recs)} account/newsletter records extracted; {skipped} spam/trash emails ignored"
+                                          + (f"; {unreadable} unreadable emails skipped" if unreadable else "") + ". Other mail was not assessed."})
+    cov = {"location": "not_assessed", "interest": "not_assessed", "contact": "not_assessed", "activity": "found" if recs else "not_found"}
+    return recs, cov
+
+
+def _record(msg, i, src):
+    """One message -> account Record, 'skipped' for spam/trash, or None when it is not proof of an account."""
+    if True:
         labels = {label.strip().casefold() for header in msg.get_all("X-Gmail-Labels", [])
                   for row in csv.reader([_h(header)]) for label in row}
         if labels & {"spam", "trash"}:
-            skipped += 1
-            continue
+            return "skipped"
         subject = _h(msg.get("Subject"))
         name, addr = parseaddr(_h(msg.get("From")))
         if "@" not in addr:
-            continue
+            return None
         dom = base_domain(addr)
         if dom in PERSONAL:
-            continue
+            return None
         grant = GOOGLE_GRANT.search(subject) if dom == "google.com" else None
         kind = classify(subject)
         if not kind and not grant:
@@ -96,21 +126,11 @@ def parse(path: str, src: str = "mail.mbox", source_coverage=None):
         elif msg.get("List-Unsubscribe"):
             source, kind, dom_out = "newsletter", "subscription", dom  # on a mailing list: they hold your email
         else:
-            continue  # personal mail is not proof of an account
+            return None  # personal mail is not proof of an account
         try:
             ts = parsedate_to_datetime(msg.get("Date")).strftime("%Y-%m-%dT%H:%M:%S%z")
         except Exception:
             ts = None
-        n += 1
-        recs.append(Record(f"gm-acco-{n:05d}", PLATFORM, "account", f"{dom_out}: {subject[:90]}", ts,
-                           sourceFile=src, recordRef=f"message {i + 1}",
-                           meta={"domain": dom_out, "source": source, "email_kind": kind, "sender": name or addr}))
-    box.close()
-    if not recs and not skipped:
-        raise ParseError("wrong_format", "No account emails found in this mailbox", src)
-    if source_coverage is not None:
-        source_coverage.append({"name": src, "source": src, "platform": "gmail", "kind": "gmail_mail",
-                                "status": "scanned", "records": len(recs), "skipped_spam_trash": skipped,
-                                "detail": f"{len(recs)} account/newsletter records extracted; {skipped} spam/trash emails ignored. Other mail was not assessed."})
-    cov = {"location": "not_assessed", "interest": "not_assessed", "contact": "not_assessed", "activity": "found" if recs else "not_found"}
-    return recs, cov
+        return Record("gm-acco-pending", PLATFORM, "account", f"{dom_out}: {subject[:90]}", ts,
+                      sourceFile=src, recordRef=f"message {i + 1}",
+                      meta={"domain": dom_out, "source": source, "email_kind": kind, "sender": name or addr})

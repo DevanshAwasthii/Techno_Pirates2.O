@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from pathlib import Path
+import os
 import threading
 import time
 import math
@@ -32,16 +33,28 @@ SETTINGS = ROOT / ".cache" / "settings.json"  # local, gitignored; preferences o
 
 
 def load_settings() -> dict:
+    """Read preferences; anything of the wrong shape is dropped instead of crashing startup."""
     try:
-        return json.loads(SETTINGS.read_text(encoding="utf-8"))
+        data = json.loads(SETTINGS.read_text(encoding="utf-8-sig"))
     except (OSError, ValueError):
         return {}
+    if not isinstance(data, dict):
+        return {}
+    clean = {}
+    if isinstance(data.get("auto_close_browsers"), bool):
+        clean["auto_close_browsers"] = data["auto_close_browsers"]
+    for key in ("imported", "library"):
+        if isinstance(data.get(key), list):
+            clean[key] = [x for x in data[key] if isinstance(x, str) and x]
+    return clean
 
 
 def save_settings(data: dict):
     try:
         SETTINGS.parent.mkdir(parents=True, exist_ok=True)
-        SETTINGS.write_text(json.dumps(data), encoding="utf-8")
+        tmp = SETTINGS.with_suffix(".tmp")
+        tmp.write_text(json.dumps(data), encoding="utf-8")
+        os.replace(tmp, SETTINGS)  # atomic: a crash mid-write never leaves a half-written file
     except OSError:
         pass  # a preference that can't be saved just means the user is asked again
 
@@ -262,6 +275,9 @@ class NexDataApp(ctk.CTk):
 
     def import_exports(self, paths):
         """Add exports to what is loaded, remember them so the startup offer never repeats them."""
+        if self.loading:  # never drop an import: the poll loop retries once the current run finishes
+            self.auto_queue.extend(p for p in paths if p not in self.auto_queue)
+            return
         settings = load_settings()
         done = set(settings.get("imported", []))
         for p in paths:
@@ -440,18 +456,12 @@ class NexDataApp(ctk.CTk):
             try:
                 from scanner.browser_access import close_browser_windows, close_browsers
                 # Windows first: while any window is open the browser restarts the lock-holding process.
-                self.reopen_paths = close_browser_windows()
+                # Paths are recorded BEFORE any close request, so a partial failure still reopens them.
+                close_browser_windows(on_paths=lambda p: setattr(self, "reopen_paths", list(p)))
                 time.sleep(1.5)  # let the browser finish its normal shutdown
                 close_browsers(list(processes.values()), allow_background_stop=True)  # leftovers; exited PIDs are skipped
             except (OSError, RuntimeError) as exc:
-                if self.reopen_paths:  # never leave the user's browser closed after a failed attempt
-                    from scanner.browser_access import reopen_browsers
-                    paths, self.reopen_paths = self.reopen_paths, []
-                    try:
-                        reopen_browsers(paths)
-                    except OSError:
-                        pass
-                self.dispatch(self.load_failed, str(exc))
+                self.dispatch(self.load_failed, str(exc))  # load_failed reopens anything we closed
             else:
                 self.dispatch(self.browser_locks_resolved)
 
@@ -493,8 +503,7 @@ class NexDataApp(ctk.CTk):
                 result = pipeline.run(paths)
                 result["sourceMode"] = source_mode
                 result["inputSources"] = [str(path) for path in paths]
-                if source_mode == "pc":
-                    (ROOT / ".cache" / "real_findings.json").write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+                # results stay in memory only: never persist message text or other personal values to disk
                 charts = prepare_charts(result)
             except Exception as exc:
                 self.dispatch(self.load_failed, f"Audit could not finish: {exc}")
@@ -512,7 +521,20 @@ class NexDataApp(ctk.CTk):
         self.resolve_button.configure(state="normal")
         self.scan_mode.configure(state="normal")
 
+    def restore_browsers(self):
+        """One-shot: reopen browsers NexData closed, on success, failure or exit alike."""
+        paths, self.reopen_paths = self.reopen_paths, []
+        if not paths:
+            return
+        try:
+            from scanner.browser_access import reopen_browsers
+            reopen_browsers(paths)
+        except OSError as exc:
+            if not self.closing:
+                self.show_errors(f"Could not reopen your browser automatically: {exc}")
+
     def load_failed(self, message):
+        self.restore_browsers()
         self.finish_loading()
         self.status_label.configure(text="Audit failed. You can select files and try again.")
         self.show_errors(message)
@@ -542,19 +564,13 @@ class NexDataApp(ctk.CTk):
                 self.after(300, self.maybe_auto_close)  # PC data is part of every run, imports included
             else:
                 self.resolve_button.grid_remove()
-            if self.reopen_paths:  # browsers we closed for this scan come back with their tabs
-                paths, self.reopen_paths = self.reopen_paths, []
-                try:
-                    from scanner.browser_access import reopen_browsers
-                    reopen_browsers(paths)
-                except OSError as exc:
-                    self.show_errors(f"Could not reopen your browser automatically: {exc}")
             mode = "Real PC scan finished" if self.source_mode == "pc" else "User imports"
             self.title("NexData - Personal Data Footprint Auditor | " + mode + (" (partial coverage)" if partial else " (supported checks)"))
         except Exception as exc:
             self.status_label.configure(text="Some audit views could not be displayed.")
             self.show_errors(error_text(result.get("errors")) + f"\nDisplay error: {exc}")
         finally:
+            self.restore_browsers()  # browsers we closed for this scan come back, even if rendering failed
             self.finish_loading()
 
     def scroll_page(self, name):
@@ -834,6 +850,7 @@ class NexDataApp(ctk.CTk):
 
     def close(self):
         self.closing = True
+        self.restore_browsers()
         self.clear_figures()
         self.destroy()
 

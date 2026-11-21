@@ -244,7 +244,7 @@ def close_browsers(processes, *, allow_background_stop=False):
     raise RuntimeError("A browser is still running. It was not force-closed; exit it fully and rescan.")
 
 
-def close_browser_windows(timeout=20.0):
+def close_browser_windows(timeout=20.0, on_paths=None):
     """Ask every visible Chrome/Edge window to close, exactly like clicking its X (WM_CLOSE).
 
     Needed because the Cookies lock belongs to a background network process that the browser
@@ -283,6 +283,8 @@ def close_browser_windows(timeout=20.0):
 
     windows = browser_windows()
     paths = sorted({p for _, p in windows})
+    if on_paths:
+        on_paths(paths)  # caller records what to reopen before anything is closed
     for hwnd, _ in windows:
         user.PostMessageW(hwnd, 0x0010, 0, 0)  # WM_CLOSE: normal close, the browser saves its session
     deadline = time.monotonic() + timeout
