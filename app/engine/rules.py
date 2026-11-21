@@ -8,6 +8,7 @@ from collections import Counter, defaultdict
 from datetime import datetime, timedelta, timezone
 
 from app.engine.records import Finding
+from app.engine.services import canonical_service_key
 from app.engine.messages import scan_text, closeness
 from app.parsers.chrome import TRACKERS
 
@@ -84,7 +85,7 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
     if mail:
         services = defaultdict(list)
         for r in mail:
-            services[r.meta["domain"]].append(r.id)
+            services[canonical_service_key(r.meta["domain"])].append(r.id)
         forgotten = [d for d, ids in services.items() if len(ids) == 1]
         add(layer=1, title=f"{len(services)} services have your email address",
             detail=f"Found from signup, password-reset, receipt and security emails. {len(forgotten)} appear only once - likely forgotten accounts.",
@@ -302,7 +303,7 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
     order = {"high": 0, "medium": 1, "low": 2}
     out.sort(key=lambda f: (order[f.priority], -f.metric["value"]))
     summary = {
-        "servicesFound": len({r.meta["domain"] for r in records if r.category == "account" and r.meta.get("domain")
+        "servicesFound": len({canonical_service_key(r.meta["domain"]) for r in records if r.category == "account" and r.meta.get("domain")
                               and r.meta.get("source") not in ("tracker", "session_replay")}),
         "trackersFound": tracker_count,
         "sessionRecorders": replay_count,
@@ -322,10 +323,11 @@ def build_graph(records, summary) -> dict:
     edges = []
     for r in records:
         if r.category == "account" and r.meta.get("domain"):
-            nid = "svc:" + r.meta["domain"]
+            key = canonical_service_key(r.meta["domain"])
+            nid = "svc:" + key
             src = r.meta.get("source")
             typ = "advertiser" if src == "advertiser" else "tracker" if src in ("tracker", "session_replay") else "service"
-            nodes.setdefault(nid, {"id": nid, "label": r.meta["domain"], "type": typ, "size": 10})
+            nodes.setdefault(nid, {"id": nid, "label": key, "type": typ, "size": 10})
             edges.append({"source": "user", "target": nid, "weight": 1, "label": r.meta.get("source", ""), "evidence": [r.id]})
     for p in summary["topPeople"]:
         nid = "person:" + p["name"]
