@@ -43,6 +43,8 @@ def load_settings() -> dict:
     clean = {}
     if isinstance(data.get("auto_close_browsers"), bool):
         clean["auto_close_browsers"] = data["auto_close_browsers"]
+    if type(data.get("browser_close_consent_version")) is int and data["browser_close_consent_version"] == 1:
+        clean["browser_close_consent_version"] = 1
     for key in ("imported", "library"):
         if isinstance(data.get(key), list):
             clean[key] = [x for x in data[key] if isinstance(x, str) and x]
@@ -390,12 +392,13 @@ class NexDataApp(ctk.CTk):
         """First-time consent for closing browsers during scans. Returns True to close now."""
         win = ctk.CTkToplevel(self)
         win.title("Close Chrome/Edge to finish the scan?")
-        win.geometry("560x260")
+        win.geometry("600x340")
         win.transient(self)
         win.grab_set()
         ctk.CTkLabel(win, text="Chrome/Edge lock the cookies file, so trackers and session-recording tools can't be checked.\n\n"
-                               "NexData can close them normally (tabs are restored when you reopen them). "
-                               "Save any unfinished work in the browser first.",
+                               "NexData first tries a normal close. If normal close fails, NexData may stop verified background browser processes. "
+                               "This can interrupt downloads or background apps. Tabs are restored when reopened, but unfinished work may be lost. "
+                               "Save your work first. This permission also applies to future scans if you remember it.",
                      wraplength=520, justify="left", text_color=TEXT).pack(padx=20, pady=(18, 10), anchor="w")
         remember = ctk.BooleanVar(value=True)
         ctk.CTkCheckBox(win, text="Remember my choice for future scans", variable=remember).pack(padx=20, anchor="w")
@@ -404,7 +407,7 @@ class NexDataApp(ctk.CTk):
         def done(close):
             choice["close"] = close
             if remember.get():
-                save_settings({**load_settings(), "auto_close_browsers": close})
+                save_settings({**load_settings(), "auto_close_browsers": close, "browser_close_consent_version": 1})
                 self.auto_close_var.set(close)
             win.destroy()
 
@@ -416,7 +419,10 @@ class NexDataApp(ctk.CTk):
         return choice["close"]
 
     def toggle_auto_close(self):
-        save_settings({**load_settings(), "auto_close_browsers": bool(self.auto_close_var.get())})
+        if self.auto_close_var.get():
+            self.auto_close_var.set(self.ask_auto_close())
+        else:
+            save_settings({**load_settings(), "auto_close_browsers": False})
 
     def manual_scan(self):
         self.auto_close_tried = False
@@ -427,8 +433,9 @@ class NexDataApp(ctk.CTk):
         if self.auto_close_tried or self.loading or self.closing:
             return
         self.auto_close_tried = True
-        pref = load_settings().get("auto_close_browsers")
-        if pref is None:
+        settings = load_settings()
+        pref = settings.get("auto_close_browsers")
+        if pref is None or (pref and settings.get("browser_close_consent_version") != 1):
             pref = self.ask_auto_close()
         if pref:
             self.resolve_browser_locks(confirmed=True)

@@ -38,7 +38,7 @@ def test_settings_roundtrip_and_corrupt_file(tmp_path, monkeypatch):
 
 
 def test_remembered_yes_closes_once_per_scan(app):
-    ui.save_settings({"auto_close_browsers": True})
+    ui.save_settings({"auto_close_browsers": True, "browser_close_consent_version": 1})
     app.maybe_auto_close()
     app.maybe_auto_close()  # same scan: must not loop
     assert app.calls == [True]
