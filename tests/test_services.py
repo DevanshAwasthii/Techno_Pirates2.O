@@ -18,7 +18,7 @@ def test_company_names_domains_and_email_subdomains_merge():
     assert mail.metric['value'] == 2
     assert set(mail.evidence) == {'3', '6'}
     graph = build_graph(records, summary)
-    assert len([n for n in graph['nodes'] if n['id'].startswith('svc:')]) == 2
+    assert sum(len(n.get('services', [])) for n in graph['nodes']) == 2
     assert {e for edge in graph['edges'] for e in edge['evidence']} == {r.id for r in records}
     assert records[2].meta['domain'] == 'e.myntra.com'
 
@@ -55,7 +55,7 @@ def test_first_party_tracker_excluded_only_with_account_relationship(domain, log
     assert summary['trackersFound'] == 0
     assert all(f.metric['unit'] != 'trackers' for f in findings)
     graph = build_graph([tracker, saved], summary)
-    assert next(n for n in graph['nodes'] if n['id'].startswith('svc:'))['type'] == 'service'
+    assert next(s for n in graph['nodes'] for s in n.get('services', []))['type'] == 'service'
     saved.meta['profile_id'] = 'two'
     assert build_findings([tracker, saved])[1]['trackersFound'] == 1
     email = account('email', login)

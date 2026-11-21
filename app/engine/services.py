@@ -39,3 +39,22 @@ def first_party_tracker_ids(records):
     return {record.id for record in records if record.meta.get("source") == "tracker"
             and (canonical_service_key(record.meta["domain"]) in accounts
                  or (record.meta.get("profile_id", record.sourceFile), canonical_service_key(record.meta["domain"])) in saved)}
+
+
+CATEGORY_KEYWORDS = {
+    "Shopping": ("myntra", "amazon", "flipkart", "meesho", "ajio", "nykaa", "jiomart", "ebay", "etsy", "decathlon"),
+    "Food & delivery": ("swiggy", "zomato", "zepto", "blinkit", "bigbasket", "dominos", "instamart"),
+    "Finance & payments": ("paytm", "phonepe", "googlepay", "razorpay", "paypal", "bank", "icici", "sbi", "cred", "groww", "zerodha", "payu"),
+    "Travel": ("irctc", "makemytrip", "goibibo", "booking", "airbnb", "uber", "ola", "rapido", "redbus", "cleartrip", "yatra"),
+    "Social & messaging": ("instagram", "facebook", "linkedin", "twitter", "tiktok", "whatsapp", "telegram", "snapchat", "discord", "reddit", "truecaller", "pinterest"),
+    "Education & jobs": ("coursera", "udemy", "naukri", "unacademy", "byju", "geeksforgeeks", "leetcode", "internshala", "quizmaster", "duolingo", "indeed", "glassdoor"),
+}
+
+
+def service_category(key, kind):
+    if kind == "tracker":
+        return "Trackers & ads"
+    for category, keywords in CATEGORY_KEYWORDS.items():
+        if any(word in key for word in keywords):
+            return category
+    return "Trackers & ads" if kind == "advertiser" else "Other"

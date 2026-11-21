@@ -8,7 +8,7 @@ from collections import Counter, defaultdict
 from datetime import datetime, timedelta, timezone
 
 from app.engine.records import Finding
-from app.engine.services import canonical_service_key, first_party_tracker_ids
+from app.engine.services import canonical_service_key, first_party_tracker_ids, service_category
 from app.engine.messages import scan_text, closeness
 from app.parsers.chrome import TRACKERS
 
@@ -320,19 +320,28 @@ def build_findings(records, now=None) -> tuple[list[Finding], dict]:
 
 
 def build_graph(records, summary) -> dict:
+    """Bound the overview to eight groups; retain all service records for drill-down."""
     first_party = first_party_tracker_ids(records)
-    nodes = {"user": {"id": "user", "label": "You", "type": "user", "size": 40}}
-    edges = []
+    services = {}
+    rank = {"tracker": 0, "advertiser": 1, "service": 2}
     for r in records:
-        if r.category == "account" and r.meta.get("domain"):
-            key = canonical_service_key(r.meta["domain"])
-            nid = "svc:" + key
-            src = "first_party_cookie" if r.id in first_party else r.meta.get("source")
-            typ = "advertiser" if src == "advertiser" else "tracker" if src in ("tracker", "session_replay") else "service"
-            nodes.setdefault(nid, {"id": nid, "label": key, "type": typ, "size": 10})
-            edges.append({"source": "user", "target": nid, "weight": 1, "label": r.meta.get("source", ""), "evidence": [r.id]})
-    for p in summary["topPeople"]:
-        nid = "person:" + p["name"]
-        nodes[nid] = {"id": nid, "label": p["name"], "type": "person", "size": 10 + min(p["score"], 30)}
-        edges.append({"source": "user", "target": nid, "weight": p["score"], "label": "closeness", "evidence": []})
-    return {"nodes": list(nodes.values()), "edges": edges}
+        if r.category != "account" or not r.meta.get("domain"):
+            continue
+        key = canonical_service_key(r.meta["domain"])
+        src = "first_party_cookie" if r.id in first_party else r.meta.get("source")
+        kind = "advertiser" if src == "advertiser" else "tracker" if src in ("tracker", "session_replay") else "service"
+        service = services.setdefault(key, {"id": "svc:" + key, "label": key, "type": kind, "evidence": []})
+        if rank[kind] > rank[service["type"]]:
+            service["type"] = kind
+        service["evidence"].append(r.id)
+    groups = defaultdict(list)
+    for key, service in sorted(services.items()):
+        groups[service_category(key, service["type"])].append(service)
+    nodes = [{"id": "user", "label": "You", "type": "user", "size": 1}]
+    edges = []
+    for category, members in groups.items():
+        nid = "cluster:" + category
+        evidence = [rid for member in members for rid in member["evidence"]]
+        nodes.append({"id": nid, "label": category, "type": "cluster", "size": len(members), "services": members})
+        edges.append({"source": "user", "target": nid, "weight": len(members), "label": category, "evidence": evidence})
+    return {"nodes": nodes, "edges": edges}

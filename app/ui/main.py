@@ -4,6 +4,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from pathlib import Path
 import threading
+import math
 import json
 import webbrowser
 from tkinter import TclError, filedialog, messagebox
@@ -25,6 +26,9 @@ TEXT = "#ecf2fa"
 MUTED = "#a4b2c5"
 CYAN = "#56d9ed"
 PRIORITIES = {"high": "#c84959", "medium": "#a97522", "low": "#536174"}
+CLUSTER_COLORS = {"Shopping": "#ffa75c", "Food & delivery": "#8edc99", "Finance & payments": "#f3ce69",
+                  "Travel": "#78bfff", "Social & messaging": "#56d9ed", "Education & jobs": "#f29dc6",
+                  "Trackers & ads": "#cba6f7", "Other": "#a4b2c5"}
 NODE_COLORS = {"user": "#ffffff", "advertiser": "#f26873", "service": "#ffa75c", "person": CYAN, "tracker": "#cba6f7"}
 TAB_NAMES = ("Footprint", "Scan coverage", "What they know", "Inner circle", "Findings", "Fix first")
 SCAN_MODES = {"Quick (20s)": 20, "Extended (120s)": 120}
@@ -65,7 +69,11 @@ def prepare_charts(result):
     for edge in (result.get("graph") or {}).get("edges", []):
         if edge.get("source") in graph and edge.get("target") in graph:
             graph.add_edge(edge["source"], edge["target"], weight=max(0.01, float(edge.get("weight") or 1)))
-    positions = nx.spring_layout(graph, seed=1) if graph else {}
+    clusters = [n for n in graph if graph.nodes[n].get("type") == "cluster"]
+    positions = {"user": (0, 0)} if graph else {}
+    for i, node in enumerate(clusters):
+        angle = math.pi / 2 - 2 * math.pi * i / max(len(clusters), 1)
+        positions[node] = (1.8 * math.cos(angle), math.sin(angle))
     heat = [[0 for _ in range(24)] for _ in range(7)]
     for record in result.get("records") or []:
         stamp = record.get("timestamp")
@@ -77,6 +85,11 @@ def prepare_charts(result):
             continue
         heat[date.weekday()][date.hour] += 1
     return graph, positions, heat
+
+
+def service_findings(result, service):
+    ids = set(service.get("evidence") or [])
+    return [f for f in result.get("findings") or [] if ids.intersection(f.get("evidence") or [])]
 
 
 def report_bytes(result):
@@ -420,20 +433,54 @@ class NexDataApp(ctk.CTk):
             self.label(card, title, color=MUTED, size=13)
         plot = ctk.CTkFrame(page, fg_color=PANEL)
         plot.grid(row=1, column=0, sticky="nsew")
-        self.label(plot, "Connections in stored browser metadata", bold=True, size=17)
-        self.label(plot, "White: you     Red: advertiser     Orange: service     Cyan: person     Purple: tracker indicator. Not live network traffic.", color=MUTED, size=12)
+        self.label(plot, "Your footprint by service group", bold=True, size=19)
+        self.label(plot, "Larger circles contain more services. Click a group to see its services, findings and source evidence.", color=MUTED, size=14)
         graph, positions, _ = charts
         fig, ax = self.new_figure(4.0)
-        if graph:
-            nx.draw_networkx_edges(graph, positions, ax=ax, edge_color="#6b7a91", alpha=0.38, width=0.9)
-            nx.draw_networkx_nodes(graph, positions, ax=ax, node_color=[NODE_COLORS.get(graph.nodes[n].get("type"), "#9aa7ba") for n in graph], node_size=[max(90, min(1800, float(graph.nodes[n].get("size") or 10) * 14)) for n in graph], linewidths=1, edgecolors=PANEL)
-            nx.draw_networkx_labels(graph, positions, ax=ax, labels={n: graph.nodes[n].get("label", str(n)) for n in graph}, font_color=TEXT, font_size=8)
-            ax.margins(0.16)
+        node_ids = list(graph)
+        if len(graph) > 1:
+            largest = max(float(graph.nodes[n].get("size", 1)) for n in graph)
+            nx.draw_networkx_edges(graph, positions, ax=ax, edge_color="#6b7a91", alpha=0.5, width=1.5)
+            dots = nx.draw_networkx_nodes(graph, positions, ax=ax,
+                node_color=[CLUSTER_COLORS.get(graph.nodes[n].get("label"), "#ffffff") for n in graph],
+                node_size=[900 if n == "user" else 300 + 2400 * graph.nodes[n]["size"] / largest for n in graph],
+                linewidths=1.5, edgecolors=PANEL)
+            dots.set_picker(True)
+            labels = {n: (graph.nodes[n]["label"].replace(" & ", " &\n") + f"\n{graph.nodes[n]['size']} services")
+                      if n != "user" else "You" for n in graph}
+            label_positions = {n: (x, y - 0.24) if n != "user" else (x, y) for n, (x, y) in positions.items()}
+            nx.draw_networkx_labels(graph, label_positions, ax=ax, labels=labels, font_color=TEXT,
+                                    font_size=14, font_weight="bold", bbox={"facecolor": PANEL, "edgecolor": "none", "alpha": 0.92, "pad": 2})
+            ax.set_xlim(-2.6, 2.6)
+            ax.set_ylim(-1.65, 1.35)
+            def picked(event):
+                if event.artist is dots and len(event.ind):
+                    node = graph.nodes[node_ids[event.ind[0]]]
+                    if node.get("type") == "cluster":
+                        self.show_cluster(node)
+            fig.canvas.mpl_connect("pick_event", picked)
         else:
-            ax.text(0.5, 0.5, "No connections found in these files", ha="center", color=MUTED)
+            ax.text(0.5, 0.5, "No service records found in these files", ha="center", color=MUTED)
         ax.set_axis_off()
         fig.tight_layout(pad=0.5)
         self.mount_chart(plot, fig)
+
+    def show_cluster(self, cluster):
+        popup = ctk.CTkToplevel(self)
+        popup.title("Services - " + cluster["label"])
+        popup.geometry("900x620")
+        popup.transient(self)
+        popup.after(100, popup.lift)
+        body = ctk.CTkScrollableFrame(popup)
+        body.pack(fill="both", expand=True, padx=14, pady=14)
+        self.label(body, f"{cluster['label']} | {cluster['size']} services", bold=True, size=20)
+        for service in cluster.get("services", []):
+            card = self.card(body)
+            self.label(card, service["label"], bold=True, color=CYAN, size=18)
+            findings = service_findings(self.result, service)
+            self.label(card, "\n".join(f["title"] for f in findings) or "No rule finding for this service.", size=14)
+            ctk.CTkButton(card, text=f"View {len(service['evidence'])} source records", width=200,
+                          command=lambda s=service: self.show_evidence({"title": s["label"], "evidence": s["evidence"]})).pack(anchor="w", padx=16, pady=(6, 12))
 
     def render_coverage(self):
         page = self.scroll_page("Scan coverage")
