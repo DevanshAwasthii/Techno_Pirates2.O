@@ -1,0 +1,101 @@
+"""Single entry point the GUI calls. Runs in a background thread.
+
+    result = run(paths, progress=lambda stage, file, pct: ..., cancel=threading.Event())
+
+Returns {"records", "findings", "coverage", "summary", "graph", "errors"} as plain dicts.
+One bad file never stops the others: its error goes into "errors".
+"""
+from __future__ import annotations
+
+import zipfile
+from pathlib import Path
+
+from app.engine.records import ParseError, to_dict
+from app.engine.rules import build_findings, build_graph
+import shutil
+import tempfile
+
+from app.parsers import instagram, spotify, whatsapp, mbox
+
+TMP = Path(__file__).resolve().parents[1] / ".cache" / "tmp"  # stays on the project drive
+
+
+class Cancelled(Exception):
+    pass
+
+
+def _wa_text(raw: bytes) -> str:
+    return raw.decode("utf-8-sig", errors="replace")
+
+
+def _detect_and_parse(path: Path, wa_offset: int = 0):
+    """Pick a parser by content, not filename. Returns (platform, records, coverage)."""
+    suffix = path.suffix.lower()
+    if suffix == ".zip":
+        try:
+            zf = zipfile.ZipFile(path)
+        except zipfile.BadZipFile:
+            raise ParseError("corrupt_zip", "This zip is damaged. Download it again.", path.name)
+        with zf:
+            if instagram.is_instagram_zip(zf):
+                recs, cov, _ = instagram.parse(zf, path.name)
+                return "instagram", recs, cov
+            if spotify.is_spotify_zip(zf):
+                recs, cov = spotify.parse(zf, path.name)
+                return "spotify", recs, cov
+            chats = [n for n in zf.namelist() if n.endswith(".txt") and ("_chat" in n or "WhatsApp Chat" in n)]
+            if chats:
+                recs, _ = whatsapp.parse_text(_wa_text(zf.read(chats[0])), chats[0], wa_offset)
+                return "whatsapp", recs, _wa_cov()
+            boxes = [n for n in zf.namelist() if n.lower().endswith(".mbox")]
+            if boxes:  # Takeout: mailbox needs a real file, extract to project-drive temp
+                TMP.mkdir(parents=True, exist_ok=True)
+                with tempfile.NamedTemporaryFile(dir=TMP, suffix=".mbox", delete=False) as out:
+                    shutil.copyfileobj(zf.open(boxes[0]), out)
+                try:
+                    recs, cov = mbox.parse(out.name, boxes[0])
+                finally:
+                    Path(out.name).unlink(missing_ok=True)
+                return "gmail", recs, cov
+    elif suffix == ".txt":
+        recs, _ = whatsapp.parse_text(_wa_text(path.read_bytes()), path.name, wa_offset)
+        return "whatsapp", recs, _wa_cov()
+    elif suffix == ".mbox":
+        recs, cov = mbox.parse(str(path), path.name)
+        return "gmail", recs, cov
+    raise ParseError("wrong_format", "We don't recognise this file.", path.name)
+
+
+def _wa_cov():
+    return {"location": "not_found", "interest": "not_assessed", "contact": "found", "activity": "found"}
+
+
+def run(paths, progress=lambda *a: None, cancel=None) -> dict:
+    records, coverage, errors = [], {}, []
+    paths = [Path(p) for p in paths]
+    for i, p in enumerate(paths):
+        if cancel is not None and cancel.is_set():
+            raise Cancelled()
+        progress("parse", p.name, int(80 * i / max(len(paths), 1)))
+        try:
+            platform, recs, cov = _detect_and_parse(p, sum(r.platform == "whatsapp" for r in records))
+            records += recs
+            prev = coverage.get(platform, {})
+            coverage[platform] = {k: ("found" if "found" in (v, prev.get(k)) else v) for k, v in cov.items()}
+        except ParseError as e:
+            errors.append(e.to_dict())
+        except Exception as e:  # never crash the whole run on one file
+            errors.append({"code": "unknown", "message": str(e), "file": p.name})
+    whatsapp.assign_owner([r for r in records if r.platform == "whatsapp"])
+    progress("rules", "", 90)
+    findings, summary = build_findings(records)
+    graph = build_graph(records, summary)
+    progress("done", "", 100)
+    return {
+        "records": [to_dict(r) for r in records],
+        "findings": [to_dict(f) for f in findings],
+        "coverage": coverage,
+        "summary": summary,
+        "graph": graph,
+        "errors": errors,
+    }
