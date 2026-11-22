@@ -3,6 +3,7 @@ matplotlib
 networkx
 fpdf2
 numpy
+Pillow
 opencv-python
 rapidocr-onnxruntime
 RapidFuzz
