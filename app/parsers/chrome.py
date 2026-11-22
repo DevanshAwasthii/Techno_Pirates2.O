@@ -22,7 +22,9 @@ from urllib.parse import urlparse
 from app.engine.records import Record, ParseError
 
 PLATFORM = "chrome"
-TMP = Path(__file__).resolve().parents[2] / ".cache" / "tmp"
+from app.paths import ROOT
+
+TMP = ROOT / ".cache" / "tmp"
 
 # cookie-name prefix -> session replay vendor (records clicks, scrolls, typing)
 REPLAY = {"_hj": "Hotjar", "_clck": "Microsoft Clarity", "_clsk": "Microsoft Clarity", "fs_uid": "FullStory",

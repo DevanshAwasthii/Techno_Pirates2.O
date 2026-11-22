@@ -25,7 +25,9 @@ import tempfile
 
 from app.parsers import instagram, instagram_html, instagram_activity, spotify, whatsapp, mbox, chrome, ocr, google_access, deviceScan, iosPrivacy
 
-TMP = Path(__file__).resolve().parents[1] / ".cache" / "tmp"  # stays on the project drive
+from app.paths import ROOT
+
+TMP = ROOT / ".cache" / "tmp"  # follows the runtime root override
 
 def _wa_text(raw: bytes) -> str:
     return raw.decode("utf-8-sig", errors="replace")

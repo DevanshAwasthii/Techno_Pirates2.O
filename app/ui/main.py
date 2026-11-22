@@ -28,7 +28,7 @@ from app.connect import PLATFORMS, DownloadWatcher, downloads_folder, file_key, 
 from app.engine.coverage import STATUS_LABELS, coverage_rows, audit_is_partial, tracker_display, storage_display, chat_display
 from app.ui.profile_views import render_profile, render_connections, render_extras, report_sections, evidence_details
 
-ROOT = Path(__file__).resolve().parents[2]
+from app.paths import ROOT
 
 
 SETTINGS = ROOT / ".cache" / "settings.json"  # local, gitignored; preferences only, never personal data
