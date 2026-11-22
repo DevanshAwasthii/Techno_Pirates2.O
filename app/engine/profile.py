@@ -7,9 +7,7 @@ import re
 
 from app.cancellation import check_cancel
 
-from app.behavioral_intelligence.taxonomy import PATTERNS, SENSITIVE
-
-POSITIVE = {'story_view', 'story_like', 'like', 'comment', 'save', 'repost', 'post_view', 'video_view', 'see_more'}
+from app.behavioral_intelligence.taxonomy import PATTERNS, SENSITIVE, POSITIVE
 LOCAL_ZONE = timezone(timedelta(hours=5, minutes=30))
 
 

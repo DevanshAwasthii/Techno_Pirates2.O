@@ -35,6 +35,42 @@ Instagram HTML imports additionally support viewed stories/posts/videos, story l
 
 Findings and Fix first include the oldest exported date per platform (a lower bound on tracking history) and a 137-service deletion directory. Only 38 familiar official routes are bundled; other routes are explicitly unknown. These are offline references, not live-verified instructions, and opening them is a user action. The ad-targeting preview is illustrative, excludes sensitive affinities, and does not claim current advertiser availability or actual targeting. PDF reports include these sections and the offline place map; long lists show bounded previews with totals and direct readers to the desktop's complete paged views.
 
+## Interests, optional models, and photos
+
+**Interests (AI optional)** uses the same offline taxonomy as Profile, with a
+hierarchy of topics and inspectable scores from unique record counts, platform
+diversity and recency. Evidence links preserve the imported record IDs. Missing
+dates and sparse evidence remain explicit limitations.
+
+Model interpretation is disabled by default. Save its settings locally in
+`.cache/behavioral-ai.json`, then use **Check connection** or **Generate local AI
+analysis**. The connector accepts loopback endpoints by default. A separate
+**Allow a model on a private LAN device** setting permits only literal RFC1918
+IPv4 addresses; its warning explains that the compact summary leaves this
+computer for another device on the network. Only allowlisted taxonomy aggregates
+and temporary evidence aliases are sent, never raw records, messages, cookies,
+names or paths. Proxies, redirects and public endpoints are blocked. There is no
+online research. See [the future Online check design](docs/online-check.md).
+
+**Photos** retains only images explicitly selected with **Add images**, under
+`.cache/image-exposure`. It checks SHA-256 duplicates, perceptual similarity,
+EXIF/GPS/camera metadata, and local OCR pattern flags. Recognized OCR text is not
+retained. **Clear images** deletes the retained copies and removes their findings;
+originals remain unchanged. Findings and Fix first include photo evidence, and
+PDF/JSON exports include the checks. No public-image search or upload occurs.
+Limits: 200 retained photos, 25 MB and 20 megapixels per image. OCR failures remain
+visible as unavailable rather than a clean check.
+
+Saved PDF and JSON reports mask email addresses, phone patterns, IP addresses and
+structured person names by default. Raw record text and local file references are
+omitted in masked exports. **Include full values** is an explicit choice for each
+export and is never remembered. Masking is pattern-based; review a report before
+sharing it, especially free-form narrative supplied by an export.
+
+Set `NEXDATA_ROOT` to relocate runtime settings and cache storage. With no override,
+paths continue to follow the installed package location. Bundled offline reference
+datasets remain alongside their modules.
+
 ## Browser locks
 
 Closing a browser window may leave background processes holding its databases. NexData identifies verified Chrome/Edge file owners and offers **Close browsers and rescan**. This requires confirmation. It tries normal shutdown first; with explicit consent, it can stop verified background processes if normal shutdown fails. Visible browser windows must be closed first. This can interrupt browser background apps or downloads.

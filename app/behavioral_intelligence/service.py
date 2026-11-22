@@ -7,9 +7,7 @@ from datetime import datetime, timezone
 
 from app.cancellation import check_cancel
 from app.engine.records import Record
-from .taxonomy import classify
-
-POSITIVE = {'story_view', 'story_like', 'like', 'comment', 'save', 'repost', 'post_view', 'video_view', 'see_more'}
+from .taxonomy import classify, POSITIVE
 
 
 def _date(value):
@@ -18,6 +16,18 @@ def _date(value):
         return date.astimezone(timezone.utc) if date.tzinfo else None
     except (AttributeError, TypeError, ValueError, OverflowError):
         return None
+
+
+def _recency_weight(age):
+    if age is None:
+        return .75
+    if age <= 30:
+        return 1.2
+    if age <= 90:
+        return 1.0
+    if age <= 365:
+        return .7
+    return .5
 
 
 def extract_signals(records):
@@ -67,7 +77,7 @@ def analyze_behavior(records, *, now=None):
         for row in unique.values():
             date = _date(row['timestamp'])
             age = max(0, (now - date).days) if date else None
-            weights.append(.75 if age is None else 1.2 if age <= 30 else 1.0 if age <= 90 else .7 if age <= 365 else .5)
+            weights.append(_recency_weight(age))
             if date:
                 months[date.strftime('%Y-%m')] += 1
         evidence = sorted(unique)

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import json
-from urllib.error import HTTPError, URLError
+from urllib.error import URLError
 from urllib.request import Request, ProxyHandler, HTTPRedirectHandler, build_opener
 
 from app.cancellation import check_cancel

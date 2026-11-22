@@ -70,11 +70,15 @@ TOPICS += (
 )
 
 SENSITIVE = {"Health", "Religion", "Politics", "Finance"}
+POSITIVE = {'story_view', 'story_like', 'like', 'comment', 'save', 'repost', 'post_view', 'video_view', 'see_more'}
 
 PATTERNS = {}
 for topic in TOPICS:
     words = [word for t in TOPICS if t.secondary == topic.secondary for word in t.keywords]
     PATTERNS[topic.secondary] = re.compile(r'(?<!\w)(?:' + '|'.join(re.escape(w.strip()) for w in words) + r')(?!\w)', re.I)
+
+KEYWORD_PATTERNS = tuple((topic, tuple((word, re.compile(r'(?<!\w)' + re.escape(word.strip()) + r'(?!\w)', re.I))
+                                     for word in topic.keywords)) for topic in TOPICS)
 
 
 def classify(text: str, domain: str = "") -> list[tuple[Topic, str, float]]:
@@ -82,8 +86,8 @@ def classify(text: str, domain: str = "") -> list[tuple[Topic, str, float]]:
     text = (text or '').casefold()
     domain = domain.casefold().strip('.')
     results = []
-    for topic in TOPICS:
-        keyword = next((word for word in topic.keywords if re.search(r'(?<!\w)' + re.escape(word.strip()) + r'(?!\w)', text)), None)
+    for topic, patterns in KEYWORD_PATTERNS:
+        keyword = next((word for word, pattern in patterns if pattern.search(text)), None)
         domain_hit = next((d for d in topic.domains if domain == d or domain.endswith('.' + d)), None)
         if keyword:
             results.append((topic, f"content keyword '{keyword}'", .60))

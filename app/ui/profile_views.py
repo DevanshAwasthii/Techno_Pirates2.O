@@ -22,6 +22,12 @@ def evidence_details(record):
         details.append(f"Recorded coordinates: {meta['lat']}, {meta['lon']}")
     if meta.get('fields'):
         details.append('Information fields: ' + ', '.join(str(k) for k in meta['fields']))
+    if meta.get('source') == 'local_photo':
+        for key, value in (meta.get('metadata') or {}).items():
+            details.append(f'Photo {key}: {str(value)[:500]}')
+        details.append('SHA-256: ' + str(meta.get('sha256', '')))
+        details.append('Perceptual hash: ' + str(meta.get('phash', '')))
+        details.append('OCR pattern flags: ' + (', '.join(meta.get('sensitive_text') or []) or 'none detected / OCR unavailable'))
     return details
 
 

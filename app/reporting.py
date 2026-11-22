@@ -57,7 +57,11 @@ def export_result(result, *, include_full_values=False):
             output = {}
             for key, item in value.items():
                 clean_key = mask(key)
-                if key in PATH_FIELDS and isinstance(item, str):
+                if key == 'records' and isinstance(item, list):
+                    output[clean_key] = walk(item, record=True)
+                elif key == 'inputSources' and isinstance(item, list):
+                    output[clean_key] = ['[local reference]' for _ in item]
+                elif key in PATH_FIELDS and isinstance(item, str):
                     output[clean_key] = '[local reference]'
                 elif (record and key == 'item' or meta and key in RAW_FIELDS) and isinstance(item, str):
                     output[clean_key] = '[record text omitted]'
@@ -72,11 +76,7 @@ def export_result(result, *, include_full_values=False):
             return [walk(item, record=record, meta=meta) for item in value]
         return mask(value) if isinstance(value, str) else value
 
-    masked = walk(result)
-    # Record bodies require a stronger boundary than narrative aggregate sections.
-    if isinstance(result.get('records'), list):
-        masked['records'] = walk(result['records'], record=True)
-    return masked
+    return walk(result)
 
 
 def json_report_bytes(result, *, include_full_values=False):

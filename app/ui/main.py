@@ -28,6 +28,7 @@ from app.connect import PLATFORMS, DownloadWatcher, downloads_folder, file_key, 
 from app.engine.coverage import STATUS_LABELS, coverage_rows, audit_is_partial, tracker_display, storage_display, chat_display
 from app.ui.profile_views import render_profile, render_connections, render_extras, report_sections, evidence_details
 from app.reporting import export_result, json_report_bytes
+from app.ui.local_views import LocalAnalysis
 
 from app.paths import ROOT
 
@@ -79,7 +80,7 @@ PRIORITIES = {"high": "#c84959", "medium": "#a97522", "low": "#536174"}
 CLUSTER_COLORS = {"Shopping": "#ffa75c", "Food & delivery": "#8edc99", "Finance & payments": "#f3ce69",
                   "Travel": "#78bfff", "Social & messaging": "#56d9ed", "Education & jobs": "#f29dc6",
                   "Trackers & ads": "#cba6f7", "Other": "#a4b2c5"}
-TAB_NAMES = ("Footprint", "Scan coverage", "What they know", "Inner circle", "Profile", "Connections & places", "Findings", "Fix first")
+TAB_NAMES = ("Footprint", "Scan coverage", "What they know", "Inner circle", "Profile", "Connections & places", "Interests (AI optional)", "Photos", "Findings", "Fix first")
 SCAN_MODES = {"Quick (20s)": 20, "Extended (120s)": 120}
 
 
@@ -223,6 +224,15 @@ def report_bytes(result, *, include_full_values=False):
             line(action["link"])
     if result.get('profile') is not None:
         report_sections(result, line, pdf)
+    if result.get('behavioral'):
+        line('Interests: deterministic taxonomy scores', 14, True)
+        for row in result['behavioral'].get('interests', [])[:50]:
+            line(f"{row['category']}: score {row['score']} | {row['evidenceCount']} records | {row['sourceDiversity']} platforms | recency weight {row['recencyWeight']}")
+    if result.get('photos'):
+        line('Photos: local checks', 14, True)
+        line(result['photos']['limitations'])
+        for key, value in result['photos']['summary'].items():
+            line(f'{key}: {value}')
     if result.get("errors"):
         line("Import errors", 14, True)
         line(error_text(result["errors"]))
@@ -238,6 +248,7 @@ class NexDataApp(ctk.CTk):
         self.minsize(1000, 680)
         self.configure(fg_color=BG)
         self.result = {}
+        self.local_analysis = LocalAnalysis(self, ROOT)
         self.source_mode = "pc"
         # exports imported in earlier sessions stay part of the analysis while the files still exist
         self.loaded_paths = [p for p in load_settings().get("library", []) if Path(p).is_file()]
@@ -249,6 +260,7 @@ class NexDataApp(ctk.CTk):
         self.cancel_event = threading.Event()
         self.view_generation = 0
         self.pdf_job_id = 0
+        self.json_job_id = 0
         self.closing = False
         self.protocol("WM_DELETE_WINDOW", self.close)
         self.grid_columnconfigure(0, weight=1)
@@ -258,7 +270,7 @@ class NexDataApp(ctk.CTk):
         top.grid(row=0, column=0, sticky="ew")
         top.grid_columnconfigure(2, weight=1)
         ctk.CTkLabel(top, text="NexData", font=("Segoe UI", 27, "bold"), text_color=TEXT).grid(row=0, column=0, padx=(22, 18), pady=18)
-        ctk.CTkLabel(top, text="Offline - nothing leaves this device", fg_color="#173e32", text_color="#87e3b1", corner_radius=8, padx=12).grid(row=0, column=1)
+        ctk.CTkLabel(top, text="Local audit | AI optional", fg_color="#173e32", text_color="#87e3b1", corner_radius=8, padx=12).grid(row=0, column=1)
         self.open_button = ctk.CTkButton(top, text="Open my exports...", command=self.open_files, width=150)
         self.scan_mode = ctk.CTkOptionMenu(top, values=list(SCAN_MODES), width=145)
         self.scan_mode.set("Quick (20s)")
@@ -297,6 +309,8 @@ class NexDataApp(ctk.CTk):
             page = self.tabs.add(name)
             page.grid_columnconfigure(0, weight=1)
             page.grid_rowconfigure(0, weight=1)
+        # The menu keeps every view reachable when ten tab labels exceed a small window.
+        ctk.CTkOptionMenu(status, values=list(TAB_NAMES), command=self.tabs.set, width=220).grid(row=0, column=3, padx=(12, 0))
         self.after(150, self.scan_laptop)
         self.watcher = DownloadWatcher(downloads_folder())
         self.auto_queue = []
@@ -606,11 +620,11 @@ class NexDataApp(ctk.CTk):
         def worker():
             try:
                 from app import pipeline
-                result = pipeline.run(paths, cancel=event)
-                result["sourceMode"] = source_mode
-                result["inputSources"] = [str(path) for path in paths]
-                # results stay in memory only: never persist message text or other personal values to disk
                 with cancellation(event):
+                    result = pipeline.run(paths, cancel=event, image_store=self.local_analysis.images, photo_ocr=True)
+                    result["sourceMode"] = source_mode
+                    result["inputSources"] = [str(path) for path in paths]
+                    # results stay in memory only: never persist message text or other personal values to disk
                     charts = prepare_charts(result)
             except Cancelled:
                 self.dispatch(self.load_cancelled)
@@ -679,6 +693,8 @@ class NexDataApp(ctk.CTk):
             self.render_circle(charts)
             render_profile(self)
             render_connections(self)
+            self.local_analysis.render_interests()
+            self.local_analysis.render_photos()
             self.render_findings()
             self.render_actions()
             partial = audit_is_partial(result)
@@ -949,7 +965,8 @@ class NexDataApp(ctk.CTk):
         self.label(page, "Your next steps, in priority order", bold=True, size=20)
         self.export_button = ctk.CTkButton(page, text="Export PDF", width=145, command=self.export_pdf, fg_color="#217989")
         self.export_button.pack(anchor="w", padx=16, pady=8)
-        ctk.CTkButton(page, text="Export JSON", width=145, command=self.export_json, fg_color="#217989").pack(anchor="w", padx=16, pady=4)
+        self.json_export_button = ctk.CTkButton(page, text="Export JSON", width=145, command=self.export_json, fg_color="#217989")
+        self.json_export_button.pack(anchor="w", padx=16, pady=4)
         self.export_label = self.label(page, "Save a local report with findings and actions.", color=MUTED, size=12)
         findings = ordered_findings(self.result)
         if not findings:
@@ -1019,14 +1036,25 @@ class NexDataApp(ctk.CTk):
         full_values = messagebox.askyesno('Report privacy',
             'Include full values in this JSON export?\n\nNo (default): mask identifiers, names and local references.\nYes: include full values for this export only.',
             parent=self, default='no')
-        try:
-            Path(path).write_bytes(json_report_bytes(self.result, include_full_values=full_values))
-            self.export_label.configure(text=f'Saved: {path}')
-        except (OSError, ValueError) as exc:
-            self.show_errors(f'JSON export failed: {exc}')
+        self.json_job_id += 1
+        job_id, view = self.json_job_id, self.view_generation
+        widgets = (self.json_export_button, self.export_label)
+        self.json_export_button.configure(state='disabled')
+        self.export_label.configure(text='Writing JSON locally...')
+        snapshot = self.result
 
-    def export_complete(self, message, job_id, view, widgets):
-        if self.closing or job_id != self.pdf_job_id or view != self.view_generation:
+        def worker():
+            try:
+                Path(path).write_bytes(json_report_bytes(snapshot, include_full_values=full_values))
+                message = f'Saved: {path}'
+            except Exception as exc:
+                message = f'JSON export failed: {exc}'
+            self.dispatch(self.export_complete, message, job_id, view, widgets, 'json')
+
+        threading.Thread(target=worker, name='nexdata-json', daemon=True).start()
+
+    def export_complete(self, message, job_id, view, widgets, kind='pdf'):
+        if self.closing or job_id != getattr(self, f'{kind}_job_id') or view != self.view_generation:
             return
         button, label = widgets
         try:

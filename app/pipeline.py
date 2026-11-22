@@ -21,6 +21,8 @@ from app.engine.places import build_places
 from app.engine.connections import build_connections
 from app.engine.profile import build_profile
 from app.engine.extras import build_extras
+from app.behavioral_intelligence.service import analyze_behavior
+from app.image_exposure.service import scan_exposure, merge_photo_result
 import tempfile
 
 from app.parsers import instagram, instagram_html, instagram_activity, spotify, whatsapp, mbox, chrome, ocr, google_access, deviceScan, iosPrivacy
@@ -148,12 +150,12 @@ def _wa_cov():
     return {"location": "not_found", "interest": "not_assessed", "contact": "found", "activity": "found"}
 
 
-def run(paths, progress=lambda *a: None, cancel=None) -> dict:
+def run(paths, progress=lambda *a: None, cancel=None, *, image_store=None, photo_ocr=False) -> dict:
     with cancellation(cancel):
-        return _run(paths, progress, cancel)
+        return _run(paths, progress, cancel, image_store, photo_ocr)
 
 
-def _run(paths, progress, cancel) -> dict:
+def _run(paths, progress, cancel, image_store, photo_ocr) -> dict:
     records, coverage, errors = [], {}, []
     source_coverage = []
     media = ocr.VIDEO | ocr.IMAGE
@@ -234,6 +236,9 @@ def _run(paths, progress, cancel) -> dict:
         "connections": connections,
         "places": places,
         "extras": extras,
+        "behavioral": analyze_behavior(records),
     }
     result["sourceCoverage"] = coverage_rows(result)
+    if image_store is not None:
+        result = merge_photo_result(result, scan_exposure(image_store, use_ocr=photo_ocr))
     return result

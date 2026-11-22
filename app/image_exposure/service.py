@@ -160,3 +160,17 @@ def scan_exposure(store, *, use_ocr=False):
             'summary': {'imagesAnalyzed': len(images), 'locationMetadata': len(gps), 'cameraMetadata': len(camera),
                         'potentialIdentifiers': len(text), 'exactDuplicates': len(exact), 'similarPairs': len(similar)},
             'limitations': 'Only user-selected retained photos were checked locally. No upload, public search or account search occurred.'}
+
+
+def merge_photo_result(result, photos):
+    """Replace the photo slice, preserving audit snapshots and unrelated evidence."""
+    merged = dict(result)
+    merged['records'] = [r for r in result.get('records', []) if (r.get('meta') or {}).get('source') != 'local_photo'] + photos['records']
+    merged['findings'] = [f for f in result.get('findings', []) if not f.get('id', '').startswith('photo-f-')] + photos['findings']
+    merged['errors'] = [e for e in result.get('errors', []) if e.get('code') != 'photo_unavailable'] + photos['errors']
+    merged['sourceCoverage'] = [r for r in result.get('sourceCoverage', []) if r.get('kind') != 'local_photos'] + [{
+        'name': 'User-selected photos', 'platform': 'device', 'kind': 'local_photos', 'source': '',
+        'status': 'partial' if photos['errors'] else 'scanned' if photos['records'] else 'not_provided',
+        'records': len(photos['records']), 'detail': photos['limitations']}]
+    merged['photos'] = photos
+    return merged
