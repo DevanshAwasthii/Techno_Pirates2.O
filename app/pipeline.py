@@ -17,9 +17,13 @@ from app.cancellation import Cancelled, cancellation, check_cancel
 from app.engine.records import ParseError, to_dict
 from app.engine.coverage import laptop_sources, coverage_rows
 from app.engine.rules import build_findings, build_graph
+from app.engine.places import build_places
+from app.engine.connections import build_connections
+from app.engine.profile import build_profile
+from app.engine.extras import build_extras
 import tempfile
 
-from app.parsers import instagram, instagram_html, spotify, whatsapp, mbox, chrome, ocr, google_access, deviceScan, iosPrivacy
+from app.parsers import instagram, instagram_html, instagram_activity, spotify, whatsapp, mbox, chrome, ocr, google_access, deviceScan, iosPrivacy
 
 TMP = Path(__file__).resolve().parents[1] / ".cache" / "tmp"  # stays on the project drive
 
@@ -60,9 +64,19 @@ def _detect_and_parse(path: Path, wa_offset: int = 0, warnings=None, source_cove
         except zipfile.BadZipFile:
             raise ParseError("corrupt_zip", "This zip is damaged. Download it again.", path.name)
         with zf:
-            if instagram.is_instagram_zip(zf):
+            if instagram.is_instagram_zip(zf) or instagram_activity.supports(zf):
                 parser = instagram_html if instagram_html.is_html_export(zf) else instagram
-                recs, cov, _ = parser.parse(zf, path.name)
+                try:
+                    recs, cov, owner = parser.parse(zf, path.name)
+                except ParseError as exc:
+                    if exc.code != 'wrong_format' or not instagram_activity.supports(zf):
+                        raise
+                    recs, cov, owner = [], {}, None
+                activity, activity_cov, _ = instagram_activity.parse(zf, path.name, owner=owner, warnings=warnings)
+                recs += activity
+                for key, value in activity_cov.items():
+                    if value == 'found' or key not in cov or cov[key] == 'not_assessed':
+                        cov[key] = value
                 return "instagram", recs, cov
             if spotify.is_spotify_zip(zf):
                 recs, cov = spotify.parse(zf, path.name)
@@ -199,6 +213,12 @@ def _run(paths, progress, cancel) -> dict:
     check_cancel()
     graph = build_graph(records, summary)
     check_cancel()
+    progress('profile', '', 94)
+    places = build_places(records)
+    connections = build_connections(records, places)
+    profile = build_profile(records, connections, places)
+    extras = build_extras(records, profile)
+    check_cancel()
     progress("done", "", 100)
     result = {
         "records": [to_dict(r) for r in records],
@@ -208,6 +228,10 @@ def _run(paths, progress, cancel) -> dict:
         "graph": graph,
         "errors": errors,
         "sourceCoverage": source_coverage,
+        "profile": profile,
+        "connections": connections,
+        "places": places,
+        "extras": extras,
     }
     result["sourceCoverage"] = coverage_rows(result)
     return result

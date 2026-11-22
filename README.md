@@ -27,6 +27,14 @@ After the first setup, run only the last command from your checkout root.
 
 The GUI includes Footprint, Scan coverage, What they know, Inner circle, Findings, Fix first, evidence windows and local PDF export. The footprint map groups canonical services into up to eight categories; click a group for its services, findings and source records. Company names and common domain variants count once. Gmail Spam/Trash messages are ignored with a count in Scan coverage. Browser cookies for a service with account evidence are excluded from tracker totals; saved logins establish this relationship only within their browser profile.
 
+The **Profile** tab adds an offline approximation of exported content affinities, creators/content types, explicit negative feedback, shopping signals and timestamped-record patterns. Its 36-category keyword taxonomy labels every result with a heuristic confidence, inference source and evidence IDs. Health, religion, politics and finance affinities appear separately; life-stage and sleep-window hints are explicitly guesses. Sparse timestamps do not establish a sleep schedule, and hourly summaries count as records rather than individual activity events. Aware activity timestamps are converted to Asia/Kolkata; naive export timestamps retain their displayed local time.
+
+**Connections & places** ranks exported story views/likes, post likes, comments, saves, reposts and direct messages. Mutual means observed follows in both directions plus chat. Group messages are excluded from direct-message scoring, and identities are not guessed across platforms. Place captions/hashtags and recorded coordinates use a bundled, hand-authored gazetteer of 583 approximate city/state/country/landmark references. Ambiguous common-word names require an explicit hashtag. The offline scatter map needs no map tiles or network. A content mention does not establish a visit; shared mentions within 60 days do not prove co-location. Both views have paged evidence drill-down.
+
+Instagram HTML imports additionally support viewed stories/posts/videos, story likes, saved posts, reposts, your posts/stories with coordinates/device metadata, interest feedback, ad-topic preferences, submitted advertiser information and audience insights. Audience insights are retained as audience information and are not treated as your demographics. Unsupported sections remain outside coverage.
+
+Findings and Fix first include the oldest exported date per platform (a lower bound on tracking history) and a 137-service deletion directory. Only 38 familiar official routes are bundled; other routes are explicitly unknown. These are offline references, not live-verified instructions, and opening them is a user action. The ad-targeting preview is illustrative, excludes sensitive affinities, and does not claim current advertiser availability or actual targeting. PDF reports include these sections and the offline place map; long lists show bounded previews with totals and direct readers to the desktop's complete paged views.
+
 ## Browser locks
 
 Closing a browser window may leave background processes holding its databases. NexData identifies verified Chrome/Edge file owners and offers **Close browsers and rescan**. This requires confirmation. It tries normal shutdown first; with explicit consent, it can stop verified background processes if normal shutdown fails. Visible browser windows must be closed first. This can interrupt browser background apps or downloads.
@@ -61,7 +69,7 @@ Add `--seconds 120` for an extended laptop scan. Add `--android` for a connected
 & .\.venv\Scripts\python.exe -m pytest -q tests
 ```
 
-Latest verified suite: **107 tests passed in 32.82 seconds**. Tests include real OCR on synthetic recordings, parser/rule checks, scanner limits, read-only browser queries and browser-lock shutdown safeguards. Real PC verification also confirmed that the previously blocked Chrome databases became readable after approved background-process shutdown.
+Latest verified suite: **214 tests passed in 55.45 seconds**. Tests include real OCR on synthetic recordings, parser/rule checks, scanner limits, read-only browser queries and browser-lock shutdown safeguards. Profile checks use synthetic exports, exercise the actual scatter evidence callback, extract PDF text, and cover partial imports and JSON list variants. Real PC verification also confirmed that the previously blocked Chrome databases became readable after approved background-process shutdown.
 
 Fixture generators:
 
@@ -69,6 +77,7 @@ Fixture generators:
 & .\.venv\Scripts\python.exe -m samples.make_persona
 & .\.venv\Scripts\python.exe -m samples.make_recordings
 & .\.venv\Scripts\python.exe -m samples.make_device
+& .\.venv\Scripts\python.exe -m samples.make_activity
 ```
 
 Real Android hardware and an actual iPhone privacy export have not been verified in this workspace.

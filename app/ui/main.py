@@ -26,6 +26,7 @@ import webbrowser
 from app.cancellation import Cancelled, cancellation, check_cancel
 from app.connect import PLATFORMS, DownloadWatcher, downloads_folder, file_key, recent_exports
 from app.engine.coverage import STATUS_LABELS, coverage_rows, audit_is_partial, tracker_display, storage_display, chat_display
+from app.ui.profile_views import render_profile, render_connections, render_extras, report_sections, evidence_details
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -77,7 +78,7 @@ PRIORITIES = {"high": "#c84959", "medium": "#a97522", "low": "#536174"}
 CLUSTER_COLORS = {"Shopping": "#ffa75c", "Food & delivery": "#8edc99", "Finance & payments": "#f3ce69",
                   "Travel": "#78bfff", "Social & messaging": "#56d9ed", "Education & jobs": "#f29dc6",
                   "Trackers & ads": "#cba6f7", "Other": "#a4b2c5"}
-TAB_NAMES = ("Footprint", "Scan coverage", "What they know", "Inner circle", "Findings", "Fix first")
+TAB_NAMES = ("Footprint", "Scan coverage", "What they know", "Inner circle", "Profile", "Connections & places", "Findings", "Fix first")
 SCAN_MODES = {"Quick (20s)": 20, "Extended (120s)": 120}
 
 
@@ -217,6 +218,8 @@ def report_bytes(result):
             line(f"  {step_index}. {step}")
         if action.get("link"):
             line(action["link"])
+    if result.get('profile') is not None:
+        report_sections(result, line, pdf)
     if result.get("errors"):
         line("Import errors", 14, True)
         line(error_text(result["errors"]))
@@ -671,6 +674,8 @@ class NexDataApp(ctk.CTk):
             self.render_coverage()
             self.render_knowledge()
             self.render_circle(charts)
+            render_profile(self)
+            render_connections(self)
             self.render_findings()
             self.render_actions()
             partial = audit_is_partial(result)
@@ -888,6 +893,7 @@ class NexDataApp(ctk.CTk):
             if metric:
                 self.label(card, f"{metric.get('value', '')} {metric.get('unit', '')}", bold=True, color=CYAN)
             ctk.CTkButton(card, text="Show me the evidence", width=185, command=lambda f=finding: self.show_evidence(f)).pack(anchor="w", padx=16, pady=(6, 14))
+        render_extras(self, page)
 
     def show_evidence(self, finding):
         popup = ctk.CTkToplevel(self)
@@ -919,6 +925,8 @@ class NexDataApp(ctk.CTk):
                     continue
                 self.label(card, record.get("item", ""), bold=True)
                 self.label(card, f"Timestamp: {record.get('timestamp') or 'Not recorded'}\nSource file: {record.get('sourceFile') or '-'}\nRecord reference: {record.get('recordRef') or '-'}\nKind: {record.get('kind') or '-'}", color=MUTED, size=12)
+                for detail in evidence_details(record):
+                    self.label(card, detail, size=12)
             page_label.configure(text=f"Page {current[0] + 1} of {total_pages} | {len(ids)} source records")
             prev.configure(state="normal" if current[0] > 0 else "disabled")
             nxt.configure(state="normal" if current[0] + 1 < total_pages else "disabled")
@@ -951,6 +959,7 @@ class NexDataApp(ctk.CTk):
             link = str(action.get("link") or "").strip()
             if link:
                 self.action_link(card, link)
+        render_extras(self, page)
 
     def action_link(self, card, link):
         if link.lower().startswith("chrome://settings"):

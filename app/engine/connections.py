@@ -42,9 +42,11 @@ def build_connections(records, places=()):
         if not person or not (action in WEIGHTS or relation in ('follower', 'following')):
             continue
         key = identity(r.platform, person)
-        entry = people.setdefault(key, {'id': key, 'name': str(person), 'platform': r.platform,
-                                      'counts': Counter(), 'evidence': [], 'follows': set(),
-                                      'story_directions': Counter(), 'places': [], 'shared_places': []})
+        if key not in people:
+            people[key] = {'id': key, 'name': str(person), 'platform': r.platform,
+                           'counts': Counter(), 'evidence': [], 'follows': set(),
+                           'story_directions': Counter(), 'places': [], 'shared_places': []}
+        entry = people[key]
         entry['evidence'].append(r.id)
         if action in WEIGHTS:
             entry['counts'][action] += 1
@@ -95,9 +97,14 @@ def build_connections(records, places=()):
         directions = entry.pop('story_directions')
         entry['score'] = sum(WEIGHTS[k] * n for k, n in entry['counts'].items())
         entry['counts'] = dict(entry['counts'])
-        entry['relationship'] = ('mutual (follow both ways + chat)' if len(follows) == 2 and entry['counts'].get('dm') else
-                                 'follow both ways (chat not observed)' if len(follows) == 2 else
-                                 'one-way follow observed' if follows else 'follow relationship unknown')
+        if len(follows) == 2 and entry['counts'].get('dm'):
+            entry['relationship'] = 'mutual (follow both ways + chat)'
+        elif len(follows) == 2:
+            entry['relationship'] = 'follow both ways (chat not observed)'
+        elif follows:
+            entry['relationship'] = 'one-way follow observed'
+        else:
+            entry['relationship'] = 'follow relationship unknown'
         entry['labels'] = []
         if directions['out']:
             entry['labels'].append(f"you watch their stories ({directions['out']} exported views)")

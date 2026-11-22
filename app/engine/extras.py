@@ -18,7 +18,7 @@ def deletion_directory():
 
 
 def build_extras(records, profile):
-    dated, accounts = defaultdict(list), defaultdict(list)
+    dated, accounts = {}, defaultdict(list)
     directory = {}
     for reference in deletion_directory():
         for alias in (reference['service'], *reference['match_domains']):
@@ -28,16 +28,19 @@ def build_extras(records, profile):
         if r.timestamp:
             try:
                 date = datetime.fromisoformat(r.timestamp.replace('Z', '+00:00')).date().isoformat()
-                dated[r.platform].append((date, r.id))
+                previous = dated.get(r.platform)
+                if previous is None or date < previous[0]:
+                    dated[r.platform] = (date, [r.id])
+                elif date == previous[0]:
+                    previous[1].append(r.id)
             except (TypeError, ValueError, OverflowError):
                 pass
         if r.category == 'account' and r.meta.get('domain'):
             accounts[canonical_service_key(r.meta['domain'])].append(r.id)
     ages = []
-    for platform, dates in sorted(dated.items()):
-        oldest = min(d for d, _ in dates)
+    for platform, (oldest, evidence) in sorted(dated.items()):
         ages.append(item(f'{platform}: tracked since at least {oldest} (oldest exported record)',
-                         [key for date, key in dates if date == oldest], 0.9,
+                         evidence, 0.9,
                          platform=platform, oldest=oldest,
                          note='Archive lower bound only; not the actual start of tracking. Export timezones may differ.'))
     deletion = []

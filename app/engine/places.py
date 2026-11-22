@@ -1,7 +1,6 @@
 """Small hand-authored gazetteer; no geocoding service, tiles, downloads or IP lookup."""
 from __future__ import annotations
 
-from datetime import datetime
 from functools import lru_cache
 import json
 import math
@@ -26,16 +25,38 @@ def _patterns():
     return result
 
 
+@lru_cache(maxsize=1)
+def _candidate_index():
+    """First-token prefixes also cover joined hashtags and partly joined multiword names."""
+    index = {}
+    for position, (place, _) in enumerate(_patterns()):
+        for alias in [place['name'], *place.get('aliases', [])]:
+            words = alias.casefold().split()
+            for count in range(1, len(words) + 1):
+                tokens = re.findall(r'[^\W_]+', ''.join(words[:count]))
+                if tokens:
+                    index.setdefault(tokens[0], set()).add(position)
+    return index
+
+
 def find_mentions(text):
     found = []
     text = str(text or '')
-    for place, pattern in _patterns():
+    # Python's case-insensitive Latin patterns also accept dotted/dotless Turkish I.
+    tokens = set(re.findall(r'[^\W_]+', text.translate(str.maketrans({'İ': 'I', 'ı': 'i'})).casefold()))
+    index = _candidate_index()
+    candidates = set()
+    for token in tokens:
+        candidates.update(index.get(token, ()))
+    patterns = _patterns()
+    for position in sorted(candidates):
         check_cancel()
-        matches = list(pattern.finditer(text))
+        place, pattern = patterns[position]
+        matched = pattern.search(text) is not None
         if place.get('ambiguous'):
-            matches = [m for m in matches if text[max(0, m.start() - 1):m.start()] == '#'
-                       or re.search(r'\b(?:in|at|visit|visiting|from|to)\s+$', text[max(0, m.start() - 15):m.start()], re.I)]
-        if matches:
+            # Ordinary phrases such as 'interested in reading' are not location evidence.
+            matched = any(text[max(0, m.start() - 1):m.start()] == '#' for m in pattern.finditer(text))
+        if matched:
             found.append(dict(place))
     return found
 
@@ -68,7 +89,8 @@ def build_places(records):
     for r in records:
         check_cancel()
         m = r.meta
-        text = ' '.join(str(x or '') for x in (m.get('caption'), m.get('place'), ' '.join(m.get('hashtags') or [])))
+        hashtags = ' '.join('#' + str(tag).lstrip('#') for tag in m.get('hashtags') or [])
+        text = ' '.join(str(x or '') for x in (m.get('caption'), m.get('place'), hashtags))
         if text not in mention_cache:
             mention_cache[text] = find_mentions(text) if text.strip() else []
         matches = {p['id']: (p, False) for p in mention_cache[text]}

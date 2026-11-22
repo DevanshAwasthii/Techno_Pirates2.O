@@ -4,10 +4,12 @@ from __future__ import annotations
 import hashlib
 import math
 import re
+import zipfile
 from datetime import datetime, timezone
 
 from app.cancellation import check_cancel
 from app.engine.records import ParseError, Record
+from app.engine.services import canonical_service_key
 from app.parsers.instagram_html import boxes, parse_date
 
 # Match section + basename so an unrelated posts.html cannot masquerade as Instagram activity.
@@ -34,6 +36,10 @@ def section(name):
     path = name.replace('\\', '/').lower()
     # Some exports put the two topic pages directly under ads_and_topics.
     path = path.replace('/your_ads_see_more/', '/your_ads/').replace('/your_ads_see_less/', '/your_ads/')
+    path = re.sub(r'(?:^|/)ads_and_topics/(see_more|see_less)_topics\.html$',
+                  lambda match: '/your_ads/' + match[1] + '_topics.html', path)
+    path = re.sub(r'(?:^|/)(?:ads_and_topics/)?your_ads_(see_more|see_less)_topics\.html$',
+                  lambda match: '/your_ads/' + match[1] + '_topics.html', path)
     return next((value for suffix, value in SECTIONS.items() if path == suffix or path.endswith('/' + suffix)), None)
 
 
@@ -56,7 +62,7 @@ def _date(value):
             return None
 
 
-def parse(zf, src='instagram.zip', owner=None):
+def parse(zf, src='instagram.zip', owner=None, warnings=None):
     """Return (records, coverage, owner); an activity-only archive is supported."""
     records = []
     coverage = {k: 'not_assessed' for k in ('activity', 'interest', 'location', 'contact')}
@@ -65,13 +71,21 @@ def parse(zf, src='instagram.zip', owner=None):
         spec = section(name)
         if not spec:
             continue
-        if zf.getinfo(name).file_size > MAX_MEMBER_BYTES:
-            raise ParseError('too_large', 'Instagram activity page exceeds the local size limit', src)
         category, action = spec
-        with zf.open(name) as stream:
-            entries = boxes(stream.read().decode('utf-8', errors='replace'))
+        try:
+            if zf.getinfo(name).file_size > MAX_MEMBER_BYTES:
+                raise ParseError('too_large', 'Instagram activity page exceeds the local size limit', src)
+            with zf.open(name) as stream:
+                entries = boxes(stream.read().decode('utf-8', errors='replace'))
+        except (ParseError, zipfile.BadZipFile, OSError, RuntimeError) as exc:
+            if warnings is None:
+                raise
+            issue = exc if isinstance(exc, ParseError) else ParseError('corrupt_zip', 'Could not read an Instagram activity page', src)
+            warnings.append(issue.to_dict())
+            continue
         if category in coverage:
             coverage[category] = 'found' if entries or coverage[category] == 'found' else 'not_found'
+        digest = hashlib.sha256(name.encode('utf-8')).hexdigest()[:12]
         for index, entry in enumerate(entries):
             check_cancel()
             fields = {k.casefold().strip().rstrip(':'): v for k, v in entry['fields'].items()}
@@ -86,7 +100,8 @@ def parse(zf, src='instagram.zip', owner=None):
             caption = first('caption', 'text', 'description') or ''
             # In media exports the caption is often the heading or an unlabelled body div.
             if own and not caption:
-                caption = entry['title'] or ' '.join(t for t in entry['texts'] if t not in {v for vs in fields.values() for v in vs} and t.casefold() not in fields)
+                field_values = {v for vs in fields.values() for v in vs}
+                caption = entry['title'] or ' '.join(t for t in entry['texts'] if t not in field_values and t.casefold() not in fields)
             feedback = first('feedback', 'response') or ('Not interested' if action == 'not_interested' else None)
             negative = action in ('not_interested', 'see_less') or bool(feedback and re.search(r'not interested|see less|dislike', feedback, re.I))
             meta = {'action': action, 'person': owner if own else person, 'owner': owner if own else person,
@@ -97,7 +112,14 @@ def parse(zf, src='instagram.zip', owner=None):
                 meta['topic'] = topic
             if action in ('submitted_info', 'audience_insights'):
                 meta['fields'] = entry['fields']
-                meta['domain'] = first('advertiser', 'business', 'company')
+                company = first('advertiser', 'business', 'company')
+                meta['advertiser'] = company
+                if company:
+                    try:
+                        if canonical_service_key(company):
+                            meta['domain'] = company
+                    except ValueError:
+                        pass  # Keep the exported label, but do not pass a malformed URL to service analysis.
             if action == 'story':
                 meta['device'] = first('device', 'camera', 'device name')
             try:
@@ -108,7 +130,6 @@ def parse(zf, src='instagram.zip', owner=None):
             except (TypeError, ValueError):
                 pass
             timestamp = _date(first('date taken', 'time', 'timestamp', 'date')) or entry['date']
-            digest = hashlib.sha256(name.encode('utf-8')).hexdigest()[:12]
             records.append(Record(f'ia-{digest}-{index:06d}', 'instagram', category,
                                   f'Instagram {action.replace("_", " ")}', timestamp,
                                   sourceFile=name, recordRef=f'item {index + 1}', meta=meta))

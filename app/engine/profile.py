@@ -91,7 +91,7 @@ def daily_routine(records):
         # Quietest eight-hour interval is an inactivity guess, never proof of actual sleep.
         start = min(range(24), key=lambda h: sum(hours[(h + offset) % 24] for offset in range(8)))
         sleep = item(f'Guess: possible inactive/sleep window {start:02}:00–{(start + 8) % 24:02}:00', evidence, 0.3)
-    return {'label': 'Routine inferred from timestamped activity (export coverage may be sparse)',
+    return {'label': 'Routine guess from timestamped-record patterns (summaries are not individual events; coverage may be sparse)',
             'confidence': 0.5 if len(dates) >= 5 else 0.2, 'source': 'NexData-inferred', 'evidence': evidence,
             'peak_hours': [h for h, _ in hours.most_common(3)], 'hour_counts': [hours[h] for h in range(24)],
             'weekday_hours': [weekdays[h] for h in range(24)], 'weekend_hours': [weekends[h] for h in range(24)],
@@ -128,8 +128,9 @@ def build_profile(records, connections=(), places=()):
             source = m.get('source') or m['action']
             label = {'advertiser': 'Advertiser holds information', 'off_meta': 'Off-Meta activity sender',
                      'submitted_info': 'Submitted advertiser information'}.get(source, source)
-            if m.get('domain'):
-                label += ': ' + str(m['domain'])
+            company = m.get('domain') or m.get('advertiser')
+            if company:
+                label += ': ' + str(company)
             shopping.append(item(label, [r.id], 0.9, information_types=list((m.get('fields') or {}).keys())))
     interests, sensitive = [], []
     for (label, source), ids in topics.items():

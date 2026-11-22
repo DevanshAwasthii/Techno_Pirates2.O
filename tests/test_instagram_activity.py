@@ -62,3 +62,9 @@ def test_invalid_coordinates_and_empty_archive(tmp_path):
         pass
     with zipfile.ZipFile(archive) as z:
         assert instagram_activity.parse(z)[0] == []
+
+
+def test_topic_path_variants():
+    assert instagram_activity.section('ads_and_topics/see_more_topics.html') == ('interest', 'see_more')
+    assert instagram_activity.section('ads_and_topics/your_ads_see_more_topics.html') == ('interest', 'see_more')
+    assert instagram_activity.section('your_ads_see_less_topics.html') == ('interest', 'see_less')

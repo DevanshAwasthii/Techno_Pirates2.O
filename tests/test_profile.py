@@ -39,3 +39,12 @@ def test_routine_uses_activity_only_and_does_not_claim_sleep():
     assert 'guess' in p['routine']['sleep_window']['label'].lower()
     assert 'creation' not in p['routine']['evidence']
     assert build_profile([])['interests'] == []
+
+
+def test_routine_summary_and_raw_records_are_labelled_as_record_counts():
+    rows = [Record('summary', 'google', 'activity', '', '2026-11-02T18:00:00', meta={'count': 1000}),
+            Record('message', 'whatsapp', 'message', '', '2026-11-02T18:05:00')]
+    routine = build_profile(rows)['routine']
+    assert routine['hour_counts'][18] == 2
+    assert 'summaries are not individual events' in routine['label']
+    assert routine['sleep_window'] is None
