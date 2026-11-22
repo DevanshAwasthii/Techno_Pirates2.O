@@ -1,0 +1,1551 @@
+[
+  {
+    "service": "Instagram",
+    "match_domains": [
+      "instagram.com"
+    ],
+    "official_domains": [
+      "instagram.com",
+      "www.instagram.com"
+    ],
+    "url": "https://www.instagram.com/accounts/remove/request/permanent/",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Facebook",
+    "match_domains": [
+      "facebook.com"
+    ],
+    "official_domains": [
+      "facebook.com",
+      "www.facebook.com"
+    ],
+    "url": "https://www.facebook.com/help/224562897555674",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Google",
+    "match_domains": [
+      "google.com"
+    ],
+    "official_domains": [
+      "google.com",
+      "myaccount.google.com"
+    ],
+    "url": "https://myaccount.google.com/delete-services-or-account",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Apple",
+    "match_domains": [
+      "apple.com"
+    ],
+    "official_domains": [
+      "apple.com",
+      "privacy.apple.com"
+    ],
+    "url": "https://privacy.apple.com/",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Microsoft",
+    "match_domains": [
+      "microsoft.com",
+      "live.com"
+    ],
+    "official_domains": [
+      "microsoft.com",
+      "live.com",
+      "account.live.com"
+    ],
+    "url": "https://account.live.com/closeaccount.aspx",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Spotify",
+    "match_domains": [
+      "spotify.com"
+    ],
+    "official_domains": [
+      "spotify.com",
+      "support.spotify.com"
+    ],
+    "url": "https://support.spotify.com/article/close-account-and-delete-your-data/",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "WhatsApp",
+    "match_domains": [
+      "whatsapp.com"
+    ],
+    "official_domains": [
+      "whatsapp.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Telegram",
+    "match_domains": [
+      "telegram.org"
+    ],
+    "official_domains": [
+      "telegram.org",
+      "my.telegram.org"
+    ],
+    "url": "https://my.telegram.org/auth?to=delete",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Signal",
+    "match_domains": [
+      "signal.org"
+    ],
+    "official_domains": [
+      "signal.org",
+      "support.signal.org"
+    ],
+    "url": "https://support.signal.org/hc/en-us/articles/360007061192-Delete-Account",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Snapchat",
+    "match_domains": [
+      "snapchat.com"
+    ],
+    "official_domains": [
+      "snapchat.com",
+      "accounts.snapchat.com"
+    ],
+    "url": "https://accounts.snapchat.com/accounts/delete_account",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Reddit",
+    "match_domains": [
+      "reddit.com"
+    ],
+    "official_domains": [
+      "reddit.com",
+      "www.reddit.com"
+    ],
+    "url": "https://www.reddit.com/settings/account",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "X",
+    "match_domains": [
+      "x.com",
+      "twitter.com"
+    ],
+    "official_domains": [
+      "x.com",
+      "twitter.com",
+      "help.x.com"
+    ],
+    "url": "https://help.x.com/en/managing-your-account/how-to-deactivate-x-account",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "LinkedIn",
+    "match_domains": [
+      "linkedin.com"
+    ],
+    "official_domains": [
+      "linkedin.com",
+      "www.linkedin.com"
+    ],
+    "url": "https://www.linkedin.com/help/linkedin/answer/a1379064",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Pinterest",
+    "match_domains": [
+      "pinterest.com"
+    ],
+    "official_domains": [
+      "pinterest.com",
+      "help.pinterest.com"
+    ],
+    "url": "https://help.pinterest.com/en/article/deactivate-or-close-your-account",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Discord",
+    "match_domains": [
+      "discord.com"
+    ],
+    "official_domains": [
+      "discord.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "TikTok",
+    "match_domains": [
+      "tiktok.com"
+    ],
+    "official_domains": [
+      "tiktok.com",
+      "support.tiktok.com"
+    ],
+    "url": "https://support.tiktok.com/en/account-and-privacy/deleting-an-account/deleting-an-account",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "YouTube",
+    "match_domains": [
+      "youtube.com"
+    ],
+    "official_domains": [
+      "youtube.com",
+      "support.google.com"
+    ],
+    "url": "https://support.google.com/youtube/answer/55759",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Gmail",
+    "match_domains": [
+      "gmail.com"
+    ],
+    "official_domains": [
+      "gmail.com",
+      "support.google.com"
+    ],
+    "url": "https://support.google.com/accounts/answer/61177",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Amazon",
+    "match_domains": [
+      "amazon.in",
+      "amazon.com"
+    ],
+    "official_domains": [
+      "amazon.in",
+      "amazon.com",
+      "www.amazon.in"
+    ],
+    "url": "https://www.amazon.in/privacy/data-deletion",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Flipkart",
+    "match_domains": [
+      "flipkart.com"
+    ],
+    "official_domains": [
+      "flipkart.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Myntra",
+    "match_domains": [
+      "myntra.com"
+    ],
+    "official_domains": [
+      "myntra.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Meesho",
+    "match_domains": [
+      "meesho.com"
+    ],
+    "official_domains": [
+      "meesho.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "AJIO",
+    "match_domains": [
+      "ajio.com"
+    ],
+    "official_domains": [
+      "ajio.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Nykaa",
+    "match_domains": [
+      "nykaa.com"
+    ],
+    "official_domains": [
+      "nykaa.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "JioMart",
+    "match_domains": [
+      "jiomart.com"
+    ],
+    "official_domains": [
+      "jiomart.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Tata CLiQ",
+    "match_domains": [
+      "tatacliq.com"
+    ],
+    "official_domains": [
+      "tatacliq.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Snapdeal",
+    "match_domains": [
+      "snapdeal.com"
+    ],
+    "official_domains": [
+      "snapdeal.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "FirstCry",
+    "match_domains": [
+      "firstcry.com"
+    ],
+    "official_domains": [
+      "firstcry.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Lenskart",
+    "match_domains": [
+      "lenskart.com"
+    ],
+    "official_domains": [
+      "lenskart.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Pepperfry",
+    "match_domains": [
+      "pepperfry.com"
+    ],
+    "official_domains": [
+      "pepperfry.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Urban Ladder",
+    "match_domains": [
+      "urbanladder.com"
+    ],
+    "official_domains": [
+      "urbanladder.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "BigBasket",
+    "match_domains": [
+      "bigbasket.com"
+    ],
+    "official_domains": [
+      "bigbasket.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Blinkit",
+    "match_domains": [
+      "blinkit.com"
+    ],
+    "official_domains": [
+      "blinkit.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Zepto",
+    "match_domains": [
+      "zepto.com"
+    ],
+    "official_domains": [
+      "zepto.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Swiggy",
+    "match_domains": [
+      "swiggy.com"
+    ],
+    "official_domains": [
+      "swiggy.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Zomato",
+    "match_domains": [
+      "zomato.com"
+    ],
+    "official_domains": [
+      "zomato.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Dominos India",
+    "match_domains": [
+      "dominos.co.in"
+    ],
+    "official_domains": [
+      "dominos.co.in"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Pizza Hut India",
+    "match_domains": [
+      "pizzahut.co.in"
+    ],
+    "official_domains": [
+      "pizzahut.co.in"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Uber",
+    "match_domains": [
+      "uber.com"
+    ],
+    "official_domains": [
+      "uber.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Ola",
+    "match_domains": [
+      "olacabs.com"
+    ],
+    "official_domains": [
+      "olacabs.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Rapido",
+    "match_domains": [
+      "rapido.bike"
+    ],
+    "official_domains": [
+      "rapido.bike"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "IRCTC",
+    "match_domains": [
+      "irctc.co.in"
+    ],
+    "official_domains": [
+      "irctc.co.in"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "MakeMyTrip",
+    "match_domains": [
+      "makemytrip.com"
+    ],
+    "official_domains": [
+      "makemytrip.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Goibibo",
+    "match_domains": [
+      "goibibo.com"
+    ],
+    "official_domains": [
+      "goibibo.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Cleartrip",
+    "match_domains": [
+      "cleartrip.com"
+    ],
+    "official_domains": [
+      "cleartrip.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Yatra",
+    "match_domains": [
+      "yatra.com"
+    ],
+    "official_domains": [
+      "yatra.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "RedBus",
+    "match_domains": [
+      "redbus.in"
+    ],
+    "official_domains": [
+      "redbus.in"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Airbnb",
+    "match_domains": [
+      "airbnb.com"
+    ],
+    "official_domains": [
+      "airbnb.com",
+      "www.airbnb.com"
+    ],
+    "url": "https://www.airbnb.com/help/article/240",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Booking.com",
+    "match_domains": [
+      "booking.com"
+    ],
+    "official_domains": [
+      "booking.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Agoda",
+    "match_domains": [
+      "agoda.com"
+    ],
+    "official_domains": [
+      "agoda.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Expedia",
+    "match_domains": [
+      "expedia.com"
+    ],
+    "official_domains": [
+      "expedia.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Paytm",
+    "match_domains": [
+      "paytm.com"
+    ],
+    "official_domains": [
+      "paytm.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "PhonePe",
+    "match_domains": [
+      "phonepe.com"
+    ],
+    "official_domains": [
+      "phonepe.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Google Pay",
+    "match_domains": [
+      "pay.google.com"
+    ],
+    "official_domains": [
+      "pay.google.com",
+      "support.google.com"
+    ],
+    "url": "https://support.google.com/pay/answer/7643930",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Amazon Pay",
+    "match_domains": [
+      "pay.amazon.in"
+    ],
+    "official_domains": [
+      "pay.amazon.in"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "CRED",
+    "match_domains": [
+      "cred.club"
+    ],
+    "official_domains": [
+      "cred.club"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "MobiKwik",
+    "match_domains": [
+      "mobikwik.com"
+    ],
+    "official_domains": [
+      "mobikwik.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Freecharge",
+    "match_domains": [
+      "freecharge.in"
+    ],
+    "official_domains": [
+      "freecharge.in"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Razorpay",
+    "match_domains": [
+      "razorpay.com"
+    ],
+    "official_domains": [
+      "razorpay.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Groww",
+    "match_domains": [
+      "groww.in"
+    ],
+    "official_domains": [
+      "groww.in"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Zerodha",
+    "match_domains": [
+      "zerodha.com"
+    ],
+    "official_domains": [
+      "zerodha.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Upstox",
+    "match_domains": [
+      "upstox.com"
+    ],
+    "official_domains": [
+      "upstox.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Angel One",
+    "match_domains": [
+      "angelone.in"
+    ],
+    "official_domains": [
+      "angelone.in"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "INDmoney",
+    "match_domains": [
+      "indmoney.com"
+    ],
+    "official_domains": [
+      "indmoney.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Policybazaar",
+    "match_domains": [
+      "policybazaar.com"
+    ],
+    "official_domains": [
+      "policybazaar.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Truecaller",
+    "match_domains": [
+      "truecaller.com"
+    ],
+    "official_domains": [
+      "truecaller.com",
+      "www.truecaller.com"
+    ],
+    "url": "https://www.truecaller.com/unlisting",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Naukri",
+    "match_domains": [
+      "naukri.com"
+    ],
+    "official_domains": [
+      "naukri.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Indeed",
+    "match_domains": [
+      "indeed.com"
+    ],
+    "official_domains": [
+      "indeed.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Internshala",
+    "match_domains": [
+      "internshala.com"
+    ],
+    "official_domains": [
+      "internshala.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Apna",
+    "match_domains": [
+      "apna.co"
+    ],
+    "official_domains": [
+      "apna.co"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Shine",
+    "match_domains": [
+      "shine.com"
+    ],
+    "official_domains": [
+      "shine.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Unacademy",
+    "match_domains": [
+      "unacademy.com"
+    ],
+    "official_domains": [
+      "unacademy.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "BYJUS",
+    "match_domains": [
+      "byjus.com"
+    ],
+    "official_domains": [
+      "byjus.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Vedantu",
+    "match_domains": [
+      "vedantu.com"
+    ],
+    "official_domains": [
+      "vedantu.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Physics Wallah",
+    "match_domains": [
+      "pw.live"
+    ],
+    "official_domains": [
+      "pw.live"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Coursera",
+    "match_domains": [
+      "coursera.org"
+    ],
+    "official_domains": [
+      "coursera.org"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Udemy",
+    "match_domains": [
+      "udemy.com"
+    ],
+    "official_domains": [
+      "udemy.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Duolingo",
+    "match_domains": [
+      "duolingo.com"
+    ],
+    "official_domains": [
+      "duolingo.com",
+      "drive-thru.duolingo.com"
+    ],
+    "url": "https://drive-thru.duolingo.com/",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Khan Academy",
+    "match_domains": [
+      "khanacademy.org"
+    ],
+    "official_domains": [
+      "khanacademy.org"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "LeetCode",
+    "match_domains": [
+      "leetcode.com"
+    ],
+    "official_domains": [
+      "leetcode.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "GitHub",
+    "match_domains": [
+      "github.com"
+    ],
+    "official_domains": [
+      "github.com",
+      "docs.github.com"
+    ],
+    "url": "https://docs.github.com/en/account-and-profile/how-tos/account-management/deleting-your-personal-account",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "GitLab",
+    "match_domains": [
+      "gitlab.com"
+    ],
+    "official_domains": [
+      "gitlab.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Stack Overflow",
+    "match_domains": [
+      "stackoverflow.com"
+    ],
+    "official_domains": [
+      "stackoverflow.com"
+    ],
+    "url": "https://stackoverflow.com/help/deleting-account",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Dropbox",
+    "match_domains": [
+      "dropbox.com"
+    ],
+    "official_domains": [
+      "dropbox.com",
+      "help.dropbox.com"
+    ],
+    "url": "https://help.dropbox.com/account-settings/delete-account",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Box",
+    "match_domains": [
+      "box.com"
+    ],
+    "official_domains": [
+      "box.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Notion",
+    "match_domains": [
+      "notion.so"
+    ],
+    "official_domains": [
+      "notion.so",
+      "www.notion.so"
+    ],
+    "url": "https://www.notion.so/help/delete-your-account",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Evernote",
+    "match_domains": [
+      "evernote.com"
+    ],
+    "official_domains": [
+      "evernote.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Canva",
+    "match_domains": [
+      "canva.com"
+    ],
+    "official_domains": [
+      "canva.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Adobe",
+    "match_domains": [
+      "adobe.com"
+    ],
+    "official_domains": [
+      "adobe.com",
+      "helpx.adobe.com"
+    ],
+    "url": "https://helpx.adobe.com/manage-account/using/delete-adobe-account.html",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Zoom",
+    "match_domains": [
+      "zoom.us"
+    ],
+    "official_domains": [
+      "zoom.us"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Slack",
+    "match_domains": [
+      "slack.com"
+    ],
+    "official_domains": [
+      "slack.com"
+    ],
+    "url": "https://slack.com/help/articles/203953146-Deactivate-your-Slack-account",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Trello",
+    "match_domains": [
+      "trello.com"
+    ],
+    "official_domains": [
+      "trello.com",
+      "support.atlassian.com"
+    ],
+    "url": "https://support.atlassian.com/trello/docs/deleting-your-trello-account/",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Atlassian",
+    "match_domains": [
+      "atlassian.com"
+    ],
+    "official_domains": [
+      "atlassian.com",
+      "support.atlassian.com"
+    ],
+    "url": "https://support.atlassian.com/atlassian-account/docs/delete-your-atlassian-account/",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Netflix",
+    "match_domains": [
+      "netflix.com"
+    ],
+    "official_domains": [
+      "netflix.com",
+      "help.netflix.com"
+    ],
+    "url": "https://help.netflix.com/en/node/100625",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Prime Video",
+    "match_domains": [
+      "primevideo.com"
+    ],
+    "official_domains": [
+      "primevideo.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "JioHotstar",
+    "match_domains": [
+      "hotstar.com"
+    ],
+    "official_domains": [
+      "hotstar.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "SonyLIV",
+    "match_domains": [
+      "sonyliv.com"
+    ],
+    "official_domains": [
+      "sonyliv.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "ZEE5",
+    "match_domains": [
+      "zee5.com"
+    ],
+    "official_domains": [
+      "zee5.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "JioSaavn",
+    "match_domains": [
+      "jiosaavn.com"
+    ],
+    "official_domains": [
+      "jiosaavn.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Gaana",
+    "match_domains": [
+      "gaana.com"
+    ],
+    "official_domains": [
+      "gaana.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "SoundCloud",
+    "match_domains": [
+      "soundcloud.com"
+    ],
+    "official_domains": [
+      "soundcloud.com",
+      "help.soundcloud.com"
+    ],
+    "url": "https://help.soundcloud.com/hc/en-us/articles/115003452567-Deleting-your-account",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Deezer",
+    "match_domains": [
+      "deezer.com"
+    ],
+    "official_domains": [
+      "deezer.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Quora",
+    "match_domains": [
+      "quora.com"
+    ],
+    "official_domains": [
+      "quora.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Medium",
+    "match_domains": [
+      "medium.com"
+    ],
+    "official_domains": [
+      "medium.com",
+      "help.medium.com"
+    ],
+    "url": "https://help.medium.com/hc/en-us/articles/115004747348-Delete-your-account",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Tumblr",
+    "match_domains": [
+      "tumblr.com"
+    ],
+    "official_domains": [
+      "tumblr.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Flickr",
+    "match_domains": [
+      "flickr.com"
+    ],
+    "official_domains": [
+      "flickr.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Vimeo",
+    "match_domains": [
+      "vimeo.com"
+    ],
+    "official_domains": [
+      "vimeo.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Twitch",
+    "match_domains": [
+      "twitch.tv"
+    ],
+    "official_domains": [
+      "twitch.tv",
+      "www.twitch.tv"
+    ],
+    "url": "https://www.twitch.tv/user/delete-account",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Steam",
+    "match_domains": [
+      "steampowered.com"
+    ],
+    "official_domains": [
+      "steampowered.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Epic Games",
+    "match_domains": [
+      "epicgames.com"
+    ],
+    "official_domains": [
+      "epicgames.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Roblox",
+    "match_domains": [
+      "roblox.com"
+    ],
+    "official_domains": [
+      "roblox.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "PlayStation",
+    "match_domains": [
+      "playstation.com"
+    ],
+    "official_domains": [
+      "playstation.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Xbox",
+    "match_domains": [
+      "xbox.com"
+    ],
+    "official_domains": [
+      "xbox.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Fitbit",
+    "match_domains": [
+      "fitbit.com"
+    ],
+    "official_domains": [
+      "fitbit.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Strava",
+    "match_domains": [
+      "strava.com"
+    ],
+    "official_domains": [
+      "strava.com",
+      "support.strava.com"
+    ],
+    "url": "https://support.strava.com/hc/en-us/articles/216918827-Deleting-your-Strava-Account",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "MyFitnessPal",
+    "match_domains": [
+      "myfitnesspal.com"
+    ],
+    "official_domains": [
+      "myfitnesspal.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "HealthifyMe",
+    "match_domains": [
+      "healthifyme.com"
+    ],
+    "official_domains": [
+      "healthifyme.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Practo",
+    "match_domains": [
+      "practo.com"
+    ],
+    "official_domains": [
+      "practo.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Tata 1mg",
+    "match_domains": [
+      "1mg.com"
+    ],
+    "official_domains": [
+      "1mg.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "PharmEasy",
+    "match_domains": [
+      "pharmeasy.in"
+    ],
+    "official_domains": [
+      "pharmeasy.in"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Apollo 247",
+    "match_domains": [
+      "apollo247.com"
+    ],
+    "official_domains": [
+      "apollo247.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Urban Company",
+    "match_domains": [
+      "urbancompany.com"
+    ],
+    "official_domains": [
+      "urbancompany.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "NoBroker",
+    "match_domains": [
+      "nobroker.in"
+    ],
+    "official_domains": [
+      "nobroker.in"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Housing.com",
+    "match_domains": [
+      "housing.com"
+    ],
+    "official_domains": [
+      "housing.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "99acres",
+    "match_domains": [
+      "99acres.com"
+    ],
+    "official_domains": [
+      "99acres.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Magicbricks",
+    "match_domains": [
+      "magicbricks.com"
+    ],
+    "official_domains": [
+      "magicbricks.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "OLX",
+    "match_domains": [
+      "olx.in"
+    ],
+    "official_domains": [
+      "olx.in"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Quikr",
+    "match_domains": [
+      "quikr.com"
+    ],
+    "official_domains": [
+      "quikr.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Bumble",
+    "match_domains": [
+      "bumble.com"
+    ],
+    "official_domains": [
+      "bumble.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Tinder",
+    "match_domains": [
+      "tinder.com"
+    ],
+    "official_domains": [
+      "tinder.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Hinge",
+    "match_domains": [
+      "hinge.co"
+    ],
+    "official_domains": [
+      "hinge.co"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "Shaadi",
+    "match_domains": [
+      "shaadi.com"
+    ],
+    "official_domains": [
+      "shaadi.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "BharatMatrimony",
+    "match_domains": [
+      "bharatmatrimony.com"
+    ],
+    "official_domains": [
+      "bharatmatrimony.com"
+    ],
+    "url": null,
+    "status": "unknown"
+  },
+  {
+    "service": "PayPal",
+    "match_domains": [
+      "paypal.com"
+    ],
+    "official_domains": [
+      "paypal.com",
+      "www.paypal.com"
+    ],
+    "url": "https://www.paypal.com/us/cshelp/article/how-do-i-close-my-paypal-account-help247",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "eBay",
+    "match_domains": [
+      "ebay.com"
+    ],
+    "official_domains": [
+      "ebay.com",
+      "www.ebay.com"
+    ],
+    "url": "https://www.ebay.com/help/account/changing-account-settings/closing-account?id=4199",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "Etsy",
+    "match_domains": [
+      "etsy.com"
+    ],
+    "official_domains": [
+      "etsy.com",
+      "help.etsy.com"
+    ],
+    "url": "https://help.etsy.com/hc/en-us/articles/360021647374-How-to-Close-Your-Etsy-Account",
+    "status": "official route (offline reference)"
+  },
+  {
+    "service": "OpenAI",
+    "match_domains": [
+      "openai.com"
+    ],
+    "official_domains": [
+      "openai.com",
+      "privacy.openai.com"
+    ],
+    "url": "https://privacy.openai.com/",
+    "status": "official route (offline reference)"
+  }
+]
