@@ -130,7 +130,8 @@ def parse(zf: zipfile.ZipFile, src: str = "instagram.zip", owner_name: str | Non
     for f in _find(json_files, r"liked_posts\.json$"):
         check_cancel()
         d = _load(zf, f)
-        for i, e in enumerate(d.get("likes_media_likes", [])):
+        items = d if isinstance(d, list) else d.get("likes_media_likes", []) if isinstance(d, dict) else []
+        for i, e in enumerate(items):
             check_cancel()
             who = fix_text(e.get("title"))
             found = True
@@ -174,7 +175,8 @@ def parse(zf: zipfile.ZipFile, src: str = "instagram.zip", owner_name: str | Non
     for f in _find(json_files, r"your_activity_off_meta_technologies\.json$"):
         check_cancel()
         d = _load(zf, f)
-        for i, e in enumerate(d.get("apps_and_websites_off_meta_activity", [])):
+        items = d if isinstance(d, list) else d.get("apps_and_websites_off_meta_activity", []) if isinstance(d, dict) else []
+        for i, e in enumerate(items):
             check_cancel()
             name = fix_text(e.get("name"))
             events = e.get("events", [])
