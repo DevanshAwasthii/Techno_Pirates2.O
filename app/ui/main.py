@@ -27,6 +27,7 @@ from app.cancellation import Cancelled, cancellation, check_cancel
 from app.connect import PLATFORMS, DownloadWatcher, downloads_folder, file_key, recent_exports
 from app.engine.coverage import STATUS_LABELS, coverage_rows, audit_is_partial, tracker_display, storage_display, chat_display
 from app.ui.profile_views import render_profile, render_connections, render_extras, report_sections, evidence_details
+from app.reporting import export_result, json_report_bytes
 
 from app.paths import ROOT
 
@@ -166,8 +167,9 @@ def report_fonts(pdf):
     return families[0] if families else None
 
 
-def report_bytes(result):
+def report_bytes(result, *, include_full_values=False):
     """Embed Unicode fonts from Windows; preserve text as escapes if none are usable."""
+    result = export_result(result, include_full_values=include_full_values)
     pdf = FPDF()
     family = report_fonts(pdf)
     pdf.set_auto_page_break(auto=True, margin=15)
@@ -180,6 +182,7 @@ def report_bytes(result):
 
     line("NexData - Personal Data Footprint Auditor", 18, True)
     line("Offline report - nothing leaves this device")
+    line('Identifiers: full values included for this export' if include_full_values else 'Identifiers masked; raw record text and local references omitted')
     if not family:
         line("Unicode fonts unavailable: non-ASCII text is preserved as Unicode escape sequences.")
     line("Source: this PC and any user-selected imports" if result.get("sourceMode") == "pc" else "Source: user-selected imports")
@@ -946,6 +949,7 @@ class NexDataApp(ctk.CTk):
         self.label(page, "Your next steps, in priority order", bold=True, size=20)
         self.export_button = ctk.CTkButton(page, text="Export PDF", width=145, command=self.export_pdf, fg_color="#217989")
         self.export_button.pack(anchor="w", padx=16, pady=8)
+        ctk.CTkButton(page, text="Export JSON", width=145, command=self.export_json, fg_color="#217989").pack(anchor="w", padx=16, pady=4)
         self.export_label = self.label(page, "Save a local report with findings and actions.", color=MUTED, size=12)
         findings = ordered_findings(self.result)
         if not findings:
@@ -987,6 +991,9 @@ class NexDataApp(ctk.CTk):
             self.show_errors(f"Could not open link: {exc}")
 
     def export_pdf(self):
+        full_values = messagebox.askyesno('Report privacy',
+            'Include full values in this PDF export?\n\nNo (default): mask identifiers, names and local references.\nYes: include full values for this export only.',
+            parent=self, default='no')
         self.pdf_job_id += 1
         job_id, view = self.pdf_job_id, self.view_generation
         widgets = (self.export_button, self.export_label)
@@ -996,13 +1003,27 @@ class NexDataApp(ctk.CTk):
 
         def worker():
             try:
-                REPORT_PATH.write_bytes(report_bytes(snapshot))
+                REPORT_PATH.write_bytes(report_bytes(snapshot, include_full_values=full_values))
             except Exception as exc:
                 self.dispatch(self.export_complete, f"PDF export failed: {exc}", job_id, view, widgets)
             else:
                 self.dispatch(self.export_complete, f"Saved: {REPORT_PATH}", job_id, view, widgets)
 
         threading.Thread(target=worker, name="nexdata-pdf", daemon=True).start()
+
+    def export_json(self):
+        path = filedialog.asksaveasfilename(parent=self, title='Save JSON report', defaultextension='.json',
+                                          filetypes=[('JSON report', '*.json')])
+        if not path:
+            return
+        full_values = messagebox.askyesno('Report privacy',
+            'Include full values in this JSON export?\n\nNo (default): mask identifiers, names and local references.\nYes: include full values for this export only.',
+            parent=self, default='no')
+        try:
+            Path(path).write_bytes(json_report_bytes(self.result, include_full_values=full_values))
+            self.export_label.configure(text=f'Saved: {path}')
+        except (OSError, ValueError) as exc:
+            self.show_errors(f'JSON export failed: {exc}')
 
     def export_complete(self, message, job_id, view, widgets):
         if self.closing or job_id != self.pdf_job_id or view != self.view_generation:
